@@ -1,3 +1,5 @@
 # Algorithmization and programming I
 
-Repository for a university course on Python programming in the first semester of the first year.
+Repository for a university class on Python programming in the first semester of the first year.
+
+
