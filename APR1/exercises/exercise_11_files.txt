@@ -1,0 +1,29 @@
+ Volume in drive C has no label.
+ Volume Serial Number is 787E-D7F2
+
+ Directory of c:\Users\ondre\source\repos\git\UJEP\APR1\exercises
+
+14.12.2023  10:30    <DIR>          .
+01.12.2023  12:09    <DIR>          ..
+07.10.2023  16:09             2ÿ980 exercise_1.ipynb
+07.12.2023  19:28             6ÿ015 exercise_10.ipynb
+07.12.2023  11:51                16 exercise_10.txt
+14.12.2023  10:30             2ÿ237 exercise_11.ipynb
+14.12.2023  10:30                 0 exercise_11_files.txt
+14.12.2023  10:30                 7 exercise_11_notes.txt
+12.10.2023  18:07             3ÿ500 exercise_2.ipynb
+19.10.2023  16:00            21ÿ437 exercise_3.ipynb
+26.10.2023  19:05             3ÿ049 exercise_4.ipynb
+02.11.2023  19:26            10ÿ326 exercise_5.ipynb
+09.11.2023  11:49            54ÿ449 exercise_6.ipynb
+18.11.2023  21:41             5ÿ200 exercise_7.ipynb
+01.12.2023  10:06            11ÿ398 exercise_8.ipynb
+07.12.2023  19:29             7ÿ533 exercise_9.ipynb
+30.11.2023  22:14                47 exercise_9_marks.txt
+30.11.2023  22:14                47 exercise_9_marks_copy.txt
+30.11.2023  22:14                64 exercise_9_numbers_sum.txt
+30.11.2023  22:14               141 exercise_9_poem.txt
+14.12.2023  10:29             1ÿ308 files.txt
+14.12.2023  10:30                 7 notes.txt
+              20 File(s)        129ÿ761 bytes
+               2 Dir(s)  866ÿ306ÿ596ÿ864 bytes free
