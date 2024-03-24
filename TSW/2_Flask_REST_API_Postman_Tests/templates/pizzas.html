@@ -1,0 +1,13 @@
+{% extends "template.html" %}
+
+{% block main %}
+<h1>Menu</h1>
+<ol>
+  {% for pizza in menu %}
+  <li>
+    Name: {{ pizza["name"] }} </br>
+    Price: {{ pizza["price"] }}
+  </li>
+  {% endfor %}
+</ol>
+{% endblock %}
