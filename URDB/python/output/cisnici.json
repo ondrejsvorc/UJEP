@@ -1,0 +1,62 @@
+[
+    {
+        "id_zamestnanec": 4,
+        "nazev_pozice": "Vrchní číšník",
+        "jmeno": "Michal",
+        "prijmeni": "Dvořák"
+    },
+    {
+        "id_zamestnanec": 5,
+        "nazev_pozice": "Vrchní číšník",
+        "jmeno": "Tomáš",
+        "prijmeni": "Černý"
+    },
+    {
+        "id_zamestnanec": 13,
+        "nazev_pozice": "Číšník",
+        "jmeno": "Marek",
+        "prijmeni": "Růžička"
+    },
+    {
+        "id_zamestnanec": 14,
+        "nazev_pozice": "Číšník",
+        "jmeno": "Zdeněk",
+        "prijmeni": "Bartoš"
+    },
+    {
+        "id_zamestnanec": 15,
+        "nazev_pozice": "Číšník",
+        "jmeno": "Karel",
+        "prijmeni": "Hájek"
+    },
+    {
+        "id_zamestnanec": 16,
+        "nazev_pozice": "Číšník",
+        "jmeno": "Filip",
+        "prijmeni": "Pospíšil"
+    },
+    {
+        "id_zamestnanec": 17,
+        "nazev_pozice": "Číšník",
+        "jmeno": "Václav",
+        "prijmeni": "Marek"
+    },
+    {
+        "id_zamestnanec": 18,
+        "nazev_pozice": "Číšník",
+        "jmeno": "Adam",
+        "prijmeni": "Urban"
+    },
+    {
+        "id_zamestnanec": 19,
+        "nazev_pozice": "Číšník",
+        "jmeno": "Miroslav",
+        "prijmeni": "Duda"
+    },
+    {
+        "id_zamestnanec": 20,
+        "nazev_pozice": "Číšník",
+        "jmeno": "Richard",
+        "prijmeni": "Moravec"
+    }
+]
