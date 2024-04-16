@@ -49,7 +49,7 @@ GROUP BY
     Zakaznici.Jmeno,
     Zakaznici.Prijmeni
 ORDER BY
-	CelkovaUtrata DESC;
+    CelkovaUtrata DESC;
 
 -- Nejproduktivnější zaměstnanci.
 SELECT
@@ -90,19 +90,19 @@ GROUP BY
     CAST(Objednavky.Datum AS DATE)
 ORDER BY
     PocetVyrizenychObjednavek DESC,
-	DatumObjednavky DESC;
+    DatumObjednavky DESC;
 
 -- Zákazníci s více než 2 rezervacemi.
 SELECT 
     Zakaznici.Jmeno,
-	Zakaznici.Prijmeni,
+    Zakaznici.Prijmeni,
     COUNT(*) AS PocetRezervaci
 FROM 
     [Pivonka].[Rezervace] AS Rezervace
 INNER JOIN
-	[Pivonka].[Zakaznici] AS Zakaznici ON Rezervace.Id_Zakaznik = Zakaznici.Id_Zakaznik
+    [Pivonka].[Zakaznici] AS Zakaznici ON Rezervace.Id_Zakaznik = Zakaznici.Id_Zakaznik
 GROUP BY 
     Zakaznici.Jmeno,
-	Zakaznici.Prijmeni
+    Zakaznici.Prijmeni
 HAVING 
     COUNT(*) > 2;

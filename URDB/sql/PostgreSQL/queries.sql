@@ -99,9 +99,9 @@ SELECT
 FROM 
     Pivonka.Rezervace AS Rezervace
 INNER JOIN
-	Pivonka.Zakaznici AS Zakaznici ON Rezervace.Id_Zakaznik = Zakaznici.Id_Zakaznik
+    Pivonka.Zakaznici AS Zakaznici ON Rezervace.Id_Zakaznik = Zakaznici.Id_Zakaznik
 GROUP BY 
     Zakaznici.Jmeno,
-	Zakaznici.Prijmeni
+    Zakaznici.Prijmeni
 HAVING 
     COUNT(*) > 2;

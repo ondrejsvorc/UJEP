@@ -266,73 +266,73 @@ CHECK (DatumNastupu >= '2022-01-01');
 -- Pozice (8 záznamů)
 INSERT INTO [Pivonka].[Pozice] ([Id_Pozice], [Id_PoziceNadrizeny], [Nazev], [Plat])
 VALUES
-	(1, NULL, 'Majitel', 60000), -- Majitel nemá nadřízeného.
-	(2, 1, 'Šéfkuchař', 50000), -- Šéfkuchař má majitele jako nadřízeného.
-	(3, 1, 'Vrchní číšník', 45000), -- Vrchní číšník má majitele jako nadřízeného.
-	(4, 2, 'Kuchař', 35000), -- Kuchař má šéfkuchaře jako nadřízeného.
-	(5, 3, 'Číšník', 22000); -- Číšník má vrchního číšníka jako nadřízeného.
+    (1, NULL, 'Majitel', 60000), -- Majitel nemá nadřízeného.
+    (2, 1, 'Šéfkuchař', 50000), -- Šéfkuchař má majitele jako nadřízeného.
+    (3, 1, 'Vrchní číšník', 45000), -- Vrchní číšník má majitele jako nadřízeného.
+    (4, 2, 'Kuchař', 35000), -- Kuchař má šéfkuchaře jako nadřízeného.
+    (5, 3, 'Číšník', 22000); -- Číšník má vrchního číšníka jako nadřízeného.
 
 -- Předčíslí (5 záznamů)
 INSERT INTO [Pivonka].[Predcisli] ([Predcisli], [Poradi])
 VALUES
     ('+420', 1), -- Česká republika
-	('+421', 2), -- Slovensko
-	('+49', 4), -- Německo
+    ('+421', 2), -- Slovensko
+    ('+49', 4), -- Německo
     ('+48', 3), -- Polsko
     ('+43', 5); -- Rakousko
 
 -- Menu (20 záznamů)
 INSERT INTO [Pivonka].[Menu] ([DatumPlatnosti])
 VALUES
-	('2024-05-01'), -- Pondělí
-	('2024-05-02'), -- Úterý
-	('2024-05-03'), -- Středa
-	('2024-05-04'), -- Čtvrtek
-	('2024-05-05'), -- Pátek
-	('2024-05-08'), -- Pondělí
-	('2024-05-09'), -- Úterý
-	('2024-05-10'), -- Středa
-	('2024-05-11'), -- Čtvrtek
-	('2024-05-12'), -- Pátek
-	('2024-05-15'), -- Pondělí
-	('2024-05-16'), -- Úterý
-	('2024-05-17'), -- Středa
-	('2024-05-18'), -- Čtvrtek
-	('2024-05-19'), -- Pátek
-	('2024-05-22'), -- Pondělí
-	('2024-05-23'), -- Úterý
-	('2024-05-24'), -- Středa
-	('2024-05-25'), -- Čtvrtek
-	('2024-05-26'); -- Pátek
+    ('2024-05-01'), -- Pondělí
+    ('2024-05-02'), -- Úterý
+    ('2024-05-03'), -- Středa
+    ('2024-05-04'), -- Čtvrtek
+    ('2024-05-05'), -- Pátek
+    ('2024-05-08'), -- Pondělí
+    ('2024-05-09'), -- Úterý
+    ('2024-05-10'), -- Středa
+    ('2024-05-11'), -- Čtvrtek
+    ('2024-05-12'), -- Pátek
+    ('2024-05-15'), -- Pondělí
+    ('2024-05-16'), -- Úterý
+    ('2024-05-17'), -- Středa
+    ('2024-05-18'), -- Čtvrtek
+    ('2024-05-19'), -- Pátek
+    ('2024-05-22'), -- Pondělí
+    ('2024-05-23'), -- Úterý
+    ('2024-05-24'), -- Středa
+    ('2024-05-25'), -- Čtvrtek
+    ('2024-05-26'); -- Pátek
 
 -- PolozkyMenu (25 záznamů)
 INSERT INTO [Pivonka].[PolozkyMenu] ([Nazev], [Cena])
 VALUES
-	('Smažený sýr', 150.00),
-	('Telecí řízek', 220.00),
-	('Grilované kuřecí prsa', 190.00),
-	('Tatarský biftek', 280.00),
-	('Losos na grilu', 270.00),
-	('Hovězí guláš', 180.00),
-	('Kuřecí polévka s nudlemi', 120.00),
-	('Česneková', 100.00),
-	('Tatarský', 210.00),
-	('Pizza Margherita', 200.00),
-	('Lasagne', 230.00),
-	('Ravioli s ricottou a špenátem', 240.00),
-	('Tiramisu', 160.00),
-	('Cheesecake', 180.00),
-	('Jablečný závin', 130.00),
-	('Těstoviny Carbonara', 190.00),
-	('Paella', 250.00),
-	('Sushi mix', 300.00),
-	('Kuřecí salát', 150.00),
-	('Tzatziki', 100.00),
-	('Sýrová pomazánka', 140.00),
-	('Kořeněná zeleninová polévka', 130.00),
-	('Hovězí steak', 280.00),
-	('Krevety na grilu', 320.00),
-	('Grilovaný halibut', 290.00);
+    ('Smažený sýr', 150.00),
+    ('Telecí řízek', 220.00),
+    ('Grilované kuřecí prsa', 190.00),
+    ('Tatarský biftek', 280.00),
+    ('Losos na grilu', 270.00),
+    ('Hovězí guláš', 180.00),
+    ('Kuřecí polévka s nudlemi', 120.00),
+    ('Česneková', 100.00),
+    ('Tatarský', 210.00),
+    ('Pizza Margherita', 200.00),
+    ('Lasagne', 230.00),
+    ('Ravioli s ricottou a špenátem', 240.00),
+    ('Tiramisu', 160.00),
+    ('Cheesecake', 180.00),
+    ('Jablečný závin', 130.00),
+    ('Těstoviny Carbonara', 190.00),
+    ('Paella', 250.00),
+    ('Sushi mix', 300.00),
+    ('Kuřecí salát', 150.00),
+    ('Tzatziki', 100.00),
+    ('Sýrová pomazánka', 140.00),
+    ('Kořeněná zeleninová polévka', 130.00),
+    ('Hovězí steak', 280.00),
+    ('Krevety na grilu', 320.00),
+    ('Grilovaný halibut', 290.00);
 
 -- MenuPolozkyMenu (130 z znam )
 INSERT INTO [Pivonka].[MenuPolozkyMenu] ([Id_Menu], [Id_PolozkaMenu])
@@ -475,50 +475,50 @@ VALUES
 -- Zamestnanci (20 záznamů)
 INSERT INTO [Pivonka].[Zamestnanci] ([Id_Pozice], [Jmeno], [Prijmeni], [Email], [Id_Predcisli], [TelefonniCislo], [DatumNastupu])
 VALUES
-	(1, 'Jan', 'Novák', 'jan.novak@seznam.cz', 1, 123456789, DATEADD(DAY, -365, GETDATE())),
-	(2, 'Pavel', 'Svoboda', 'pavel.svoboda@gmail.com', 1, 987654321, DATEADD(DAY, -300, GETDATE())),
-	(2, 'Martin', 'Novotný', 'martin.novotny@email.cz', 1, 567891234, DATEADD(DAY, -250, GETDATE())),
-	(3, 'Michal', 'Dvořák', 'michal.dvorak@centrum.cz', 1, 345678912, DATEADD(DAY, -200, GETDATE())),
-	(3, 'Tomáš', 'Černý', 'tomas.cerny@seznam.cz', 1, 789123456, DATEADD(DAY, -150, GETDATE())),
-	(4, 'Petr', 'Procházka', 'petr.prochazka@gmail.com', 1, 456789123, DATEADD(DAY, -100, GETDATE())),
-	(4, 'Jakub', 'Kučera', 'jakub.kucera@email.cz', 1, 654321789, DATEADD(DAY, -50, GETDATE())),
-	(4, 'Jiří', 'Veselý', 'jiri.vesely@centrum.cz', 1, 234567891, GETDATE()),
-	(4, 'Lukáš', 'Horák', 'lukas.horak@seznam.cz', 1, 321789234, DATEADD(DAY, 50, GETDATE())),
-	(4, 'David', 'Němec', 'david.nemec@gmail.com', 1, 987654321, DATEADD(DAY, 100, GETDATE())),
-	(4, 'Jaroslav', 'Pokorný', 'jaroslav.pokorny@email.cz', 1, 567891234, DATEADD(DAY, 150, GETDATE())),
-	(4, 'Josef', 'Král', 'josef.kral@centrum.cz', 1, 345678912, DATEADD(DAY, 200, GETDATE())),
-	(5, 'Marek', 'Růžička', 'marek.ruzicka@seznam.cz', 1, 789123456, DATEADD(DAY, 250, GETDATE())),
-	(5, 'Zdeněk', 'Bartoš', 'zdenek.bartos@gmail.com', 1, 456789123, DATEADD(DAY, 300, GETDATE())),
-	(5, 'Karel', 'Hájek', 'karel.hajek@centrum.cz', 1, 654321789, DATEADD(DAY, 365, GETDATE())),
-	(5, 'Filip', 'Pospíšil', 'filip.pospisil@email.cz', 1, 234567891, DATEADD(DAY, -400, GETDATE())),
-	(5, 'Václav', 'Marek', 'vaclav.marek@gmail.com', 1, 321789234, DATEADD(DAY, -450, GETDATE())),
-	(5, 'Adam', 'Urban', 'adam.urban@seznam.cz', 1, 123456789, DATEADD(DAY, -500, GETDATE())),
-	(5, 'Miroslav', 'Duda', 'miroslav.duda@centrum.cz', 1, 987654321, DATEADD(DAY, -550, GETDATE())),
-	(5, 'Richard', 'Moravec', 'richard.moravec@gmail.com', 1, 567891234, DATEADD(DAY, -600, GETDATE()));
+    (1, 'Jan', 'Novák', 'jan.novak@seznam.cz', 1, 123456789, DATEADD(DAY, -365, GETDATE())),
+    (2, 'Pavel', 'Svoboda', 'pavel.svoboda@gmail.com', 1, 987654321, DATEADD(DAY, -300, GETDATE())),
+    (2, 'Martin', 'Novotný', 'martin.novotny@email.cz', 1, 567891234, DATEADD(DAY, -250, GETDATE())),
+    (3, 'Michal', 'Dvořák', 'michal.dvorak@centrum.cz', 1, 345678912, DATEADD(DAY, -200, GETDATE())),
+    (3, 'Tomáš', 'Černý', 'tomas.cerny@seznam.cz', 1, 789123456, DATEADD(DAY, -150, GETDATE())),
+    (4, 'Petr', 'Procházka', 'petr.prochazka@gmail.com', 1, 456789123, DATEADD(DAY, -100, GETDATE())),
+    (4, 'Jakub', 'Kučera', 'jakub.kucera@email.cz', 1, 654321789, DATEADD(DAY, -50, GETDATE())),
+    (4, 'Jiří', 'Veselý', 'jiri.vesely@centrum.cz', 1, 234567891, GETDATE()),
+    (4, 'Lukáš', 'Horák', 'lukas.horak@seznam.cz', 1, 321789234, DATEADD(DAY, 50, GETDATE())),
+    (4, 'David', 'Němec', 'david.nemec@gmail.com', 1, 987654321, DATEADD(DAY, 100, GETDATE())),
+    (4, 'Jaroslav', 'Pokorný', 'jaroslav.pokorny@email.cz', 1, 567891234, DATEADD(DAY, 150, GETDATE())),
+    (4, 'Josef', 'Král', 'josef.kral@centrum.cz', 1, 345678912, DATEADD(DAY, 200, GETDATE())),
+    (5, 'Marek', 'Růžička', 'marek.ruzicka@seznam.cz', 1, 789123456, DATEADD(DAY, 250, GETDATE())),
+    (5, 'Zdeněk', 'Bartoš', 'zdenek.bartos@gmail.com', 1, 456789123, DATEADD(DAY, 300, GETDATE())),
+    (5, 'Karel', 'Hájek', 'karel.hajek@centrum.cz', 1, 654321789, DATEADD(DAY, 365, GETDATE())),
+    (5, 'Filip', 'Pospíšil', 'filip.pospisil@email.cz', 1, 234567891, DATEADD(DAY, -400, GETDATE())),
+    (5, 'Václav', 'Marek', 'vaclav.marek@gmail.com', 1, 321789234, DATEADD(DAY, -450, GETDATE())),
+    (5, 'Adam', 'Urban', 'adam.urban@seznam.cz', 1, 123456789, DATEADD(DAY, -500, GETDATE())),
+    (5, 'Miroslav', 'Duda', 'miroslav.duda@centrum.cz', 1, 987654321, DATEADD(DAY, -550, GETDATE())),
+    (5, 'Richard', 'Moravec', 'richard.moravec@gmail.com', 1, 567891234, DATEADD(DAY, -600, GETDATE()));
 
 -- Zakaznici (20 záznamů)
 INSERT INTO [Pivonka].[Zakaznici] ([Jmeno], [Prijmeni], [Id_Predcisli], [TelefonniCislo], [Email])
 VALUES
-	('Martin', 'Novák', 1, 123456789, 'martin.novak@seznam.cz'),
-	('Petra', 'Svobodová', 1, 987654321, 'petra.svobodova@gmail.com'),
-	('Jana', 'Novotná', 1, 567891234, 'jana.novotna@email.cz'),
-	('Petr', 'Dvořák', 1, 345678912, 'petr.dvorak@centrum.cz'),
-	('Tomáš', 'Procházka', 1, 456789123, 'tomas.prochazka@seznam.cz'),
-	('Lucie', 'Kučerová', 1, 654321789, 'lucie.kucerova@gmail.com'),
-	('Jakub', 'Veselý', 1, 234567891, 'jakub.vesely@email.cz'),
-	('Eva', 'Horáková', 1, 321789234, 'eva.horakova@centrum.cz'),
-	('David', 'Němec', 1, 987654321, 'david.nemec@outlook.cz'),
-	('Lenka', 'Pokorná', 1, 567891234, 'lenka.pokorna@seznam.cz'),
-	('Jiří', 'Král', 1, 345678912, 'jiri.kral@gmail.com'),
-	('Jan', 'Bartoš', 1, 456789123, 'jan.bartos@gmail.com'),
-	('Kateřina', 'Hájková', 1, 654321789, 'katerina.hajkova@seznam.cz'),
-	('Adam', 'Pospíšil', 1, 234567891, 'adam.pospisil@outlook.cz'),
-	('Petra', 'Marešová', 1, 321789234, 'petra.maresova@gmail.com'),
-	('Lucas', 'Duda', 1, 987654321, 'lucas.duda@outlook.cz'),
-	('Johana', 'Moravcová', 1, 567891234, 'johana.moravcova@gmail.com'),
-	('Mohammed', 'Ali', 2, 123456789, 'mohammed.ali@gmail.com'), -- Cizinec (Slovensko)
-	('Maria', 'Garcia', 4, 12345678, 'maria.garcia@outlook.com'), -- Cizinec (Polsko)
-	('Jens', 'Schmidt', 3, 23456789, 'jens.schmidt@gmail.com'); -- Cizinec (Německo)
+    ('Martin', 'Novák', 1, 123456789, 'martin.novak@seznam.cz'),
+    ('Petra', 'Svobodová', 1, 987654321, 'petra.svobodova@gmail.com'),
+    ('Jana', 'Novotná', 1, 567891234, 'jana.novotna@email.cz'),
+    ('Petr', 'Dvořák', 1, 345678912, 'petr.dvorak@centrum.cz'),
+    ('Tomáš', 'Procházka', 1, 456789123, 'tomas.prochazka@seznam.cz'),
+    ('Lucie', 'Kučerová', 1, 654321789, 'lucie.kucerova@gmail.com'),
+    ('Jakub', 'Veselý', 1, 234567891, 'jakub.vesely@email.cz'),
+    ('Eva', 'Horáková', 1, 321789234, 'eva.horakova@centrum.cz'),
+    ('David', 'Němec', 1, 987654321, 'david.nemec@outlook.cz'),
+    ('Lenka', 'Pokorná', 1, 567891234, 'lenka.pokorna@seznam.cz'),
+    ('Jiří', 'Král', 1, 345678912, 'jiri.kral@gmail.com'),
+    ('Jan', 'Bartoš', 1, 456789123, 'jan.bartos@gmail.com'),
+    ('Kateřina', 'Hájková', 1, 654321789, 'katerina.hajkova@seznam.cz'),
+    ('Adam', 'Pospíšil', 1, 234567891, 'adam.pospisil@outlook.cz'),
+    ('Petra', 'Marešová', 1, 321789234, 'petra.maresova@gmail.com'),
+    ('Lucas', 'Duda', 1, 987654321, 'lucas.duda@outlook.cz'),
+    ('Johana', 'Moravcová', 1, 567891234, 'johana.moravcova@gmail.com'),
+    ('Mohammed', 'Ali', 2, 123456789, 'mohammed.ali@gmail.com'), -- Cizinec (Slovensko)
+    ('Maria', 'Garcia', 4, 12345678, 'maria.garcia@outlook.com'), -- Cizinec (Polsko)
+    ('Jens', 'Schmidt', 3, 23456789, 'jens.schmidt@gmail.com'); -- Cizinec (Německo)
 
 -- Rezervace (40 záznamů)
 INSERT INTO [Pivonka].[Rezervace] ([Id_Zakaznik], [Id_Stul], [Datum], [CasOd], [CasDo])
@@ -597,71 +597,71 @@ VALUES
     (28, 19, 3, '2024-04-04', '16:05:00', '16:20:00'),
     (29, 13, 3, '2024-04-04', '16:50:00', '17:05:00'),
     (30, 13, 3, '2024-04-04', '17:25:00', '17:40:00'),
-	(40, 13, 3, '2024-04-10', '13:35:00', '13:50:00');
+    (40, 13, 3, '2024-04-10', '13:35:00', '13:50:00');
 
 INSERT INTO [Pivonka].[PolozkyObjednavek] ([Id_Objednavka], [Id_PolozkaMenu], [Mnozstvi])
 VALUES
-	-- Objednávka 1
-	(1, 1, 2), -- Smažený sýr
-	(1, 6, 1), -- Hovězí guláš
-	(1, 7, 2), -- Kuřecí polévka s nudlemi
-	-- Objednávka 2
-	(2, 9, 1), -- Tatarský
-	(2, 10, 3), -- Pizza Margherita
-	-- Objednávka 3
-	(3, 15, 2), -- Jablkový závin
-	(3, 16, 1), -- Těstoviny Carbonara
-	-- Objednávka 4
-	(4, 18, 1), -- Kuřecí salát
-	(4, 19, 1), -- Tzatziki
-	-- Objednávka 5
-	(5, 22, 2), -- Kořeněná zeleninová polévka
-	(5, 23, 2), -- Hovězí steak
-	-- Objednávka 6
-	(6, 25, 1), -- Grilovaný halibut
-	(6, 24, 2), -- Krevety na grilu
-	-- Objednávka 7
-	(7, 1, 1), -- Smažený sýr
-	(7, 2, 2), -- Telecí řízek
-	-- Objednávka 8
-	(8, 3, 2), -- Grilované kuřecí prsa
-	(8, 4, 1), -- Tatarský biftek
-	-- Objednávka 9
-	(9, 5, 1), -- Losos na grilu
-	(9, 6, 1), -- Hovězí guláš
-	-- Objednávka 10
-	(10, 7, 2), -- Kuřecí polévka s nudlemi
-	(10, 8, 2), -- Česneková
-	-- Objednávka 11
-	(11, 9, 1), -- Tatarský
-	(11, 10, 2), -- Pizza Margherita
-	-- Objednávka 12
-	(12, 11, 2), -- Lasagne
-	(12, 12, 1), -- Ravioli s ricottou a špenátem
-	-- Objednávka 13
-	(13, 13, 1), -- Tiramisu
-	(13, 14, 1), -- Cheesecake
-	-- Objednávka 14
-	(14, 15, 1), -- Jablkový závin
-	(14, 16, 1), -- Těstoviny Carbonara
-	-- Objednávka 15
-	(15, 17, 2), -- Paella
-	(15, 18, 1), -- Sushi mix
-	-- Objednávka 16
-	(16, 19, 1), -- Kuřecí salát
-	(16, 20, 1), -- Tzatziki
-	-- Objednávka 17
-	(17, 21, 1), -- Sýrová pomazánka
-	(17, 22, 1), -- Kořeněná zeleninová polévka
-	-- Objednávka 18
-	(18, 23, 2), -- Hovězí steak
-	(18, 24, 2), -- Krevety na grilu
-	-- Objednávka 19
-	(19, 25, 1), -- Grilovaný halibut
-	(19, 1, 1), -- Smažený sýr
-	-- Objednávka 20
-	(20, 2, 2), -- Telecí řízek
-	(20, 3, 1); -- Grilované kuřecí prsa
+    -- Objednávka 1
+    (1, 1, 2), -- Smažený sýr
+    (1, 6, 1), -- Hovězí guláš
+    (1, 7, 2), -- Kuřecí polévka s nudlemi
+    -- Objednávka 2
+    (2, 9, 1), -- Tatarský
+    (2, 10, 3), -- Pizza Margherita
+    -- Objednávka 3
+    (3, 15, 2), -- Jablkový závin
+    (3, 16, 1), -- Těstoviny Carbonara
+    -- Objednávka 4
+    (4, 18, 1), -- Kuřecí salát
+    (4, 19, 1), -- Tzatziki
+    -- Objednávka 5
+    (5, 22, 2), -- Kořeněná zeleninová polévka
+    (5, 23, 2), -- Hovězí steak
+    -- Objednávka 6
+    (6, 25, 1), -- Grilovaný halibut
+    (6, 24, 2), -- Krevety na grilu
+    -- Objednávka 7
+    (7, 1, 1), -- Smažený sýr
+    (7, 2, 2), -- Telecí řízek
+    -- Objednávka 8
+    (8, 3, 2), -- Grilované kuřecí prsa
+    (8, 4, 1), -- Tatarský biftek
+    -- Objednávka 9
+    (9, 5, 1), -- Losos na grilu
+    (9, 6, 1), -- Hovězí guláš
+    -- Objednávka 10
+    (10, 7, 2), -- Kuřecí polévka s nudlemi
+    (10, 8, 2), -- Česneková
+    -- Objednávka 11
+    (11, 9, 1), -- Tatarský
+    (11, 10, 2), -- Pizza Margherita
+    -- Objednávka 12
+    (12, 11, 2), -- Lasagne
+    (12, 12, 1), -- Ravioli s ricottou a špenátem
+    -- Objednávka 13
+    (13, 13, 1), -- Tiramisu
+    (13, 14, 1), -- Cheesecake
+    -- Objednávka 14
+    (14, 15, 1), -- Jablkový závin
+    (14, 16, 1), -- Těstoviny Carbonara
+    -- Objednávka 15
+    (15, 17, 2), -- Paella
+    (15, 18, 1), -- Sushi mix
+    -- Objednávka 16
+    (16, 19, 1), -- Kuřecí salát
+    (16, 20, 1), -- Tzatziki
+    -- Objednávka 17
+    (17, 21, 1), -- Sýrová pomazánka
+    (17, 22, 1), -- Kořeněná zeleninová polévka
+    -- Objednávka 18
+    (18, 23, 2), -- Hovězí steak
+    (18, 24, 2), -- Krevety na grilu
+    -- Objednávka 19
+    (19, 25, 1), -- Grilovaný halibut
+    (19, 1, 1), -- Smažený sýr
+    -- Objednávka 20
+    (20, 2, 2), -- Telecí řízek
+    (20, 3, 1); -- Grilované kuřecí prsa
 
 GO
 
@@ -677,12 +677,12 @@ BEGIN
     -- Začátek transakce
     BEGIN TRANSACTION;
     BEGIN TRY
-		-- Nastavení Id_PoziceNadrizeny na NULL pro podřízené 
+        -- Nastavení Id_PoziceNadrizeny na NULL pro podřízené 
         UPDATE [Restaurace].[Pivonka].[Pozice]
         SET Id_PoziceNadrizeny = NULL
         WHERE Id_PoziceNadrizeny IN (SELECT Id_Pozice FROM deleted);
 
-		-- Odstranění nadřízeného
+        -- Odstranění nadřízeného
         DELETE FROM [Restaurace].[Pivonka].[Pozice]
         WHERE Id_Pozice IN (SELECT Id_Pozice FROM deleted);
 
@@ -737,7 +737,7 @@ SELECT
     Stoly.Id_Stul AS Cislo_stolu,
     CONCAT(Zakaznici.Jmeno, ' ', Zakaznici.Prijmeni) AS Zakaznik, 
     Rezervace.Datum,
-	-- https://www.techonthenet.com/sql_server/functions/convert.php
+    -- https://www.techonthenet.com/sql_server/functions/convert.php
     CONVERT(VARCHAR(5), Rezervace.CasOd, 113) + ' - ' + CONVERT(VARCHAR(5), Rezervace.CasDo, 113) AS CasRezervace
 FROM 
     [Pivonka].[Rezervace] AS Rezervace
