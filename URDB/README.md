@@ -39,4 +39,4 @@ Tato fiktivní databáze byla navržena pro získání zápočtu k předmětu **
 | JeCisnikNeboVrchniCisnik          | Tato funkce zjišťuje, zda je zaměstnanec číšníkem nebo vrchním číšníkem.                              |
 
 ## Schéma
-![](sql/schema.png)
+![](sql/scheme.png)

@@ -1,5 +1,7 @@
 -- https://www.t-mobile.cz/mezinarodni-predvolby
 -- https://en.wikipedia.org/wiki/List_of_mobile_telephone_prefixes_by_country
+-- 337 záznamů = 11 tabulek (min požadovaný 220 záznamů)
+-- FK_NazevTabulky_ReferencovanaTabulka_PrimarniKlicReferencovaneTabulkyBezId
 
 CREATE DATABASE [Restaurace]
 GO
@@ -739,7 +741,7 @@ SELECT
     CONVERT(VARCHAR(5), Rezervace.CasOd, 113) + ' - ' + CONVERT(VARCHAR(5), Rezervace.CasDo, 113) AS CasRezervace
 FROM 
     [Pivonka].[Rezervace] AS Rezervace
-JOIN 
+INNER JOIN 
     [Pivonka].[Stoly] AS Stoly ON Rezervace.Id_Stul = Stoly.Id_Stul
-JOIN 
+INNER JOIN 
     [Pivonka].[Zakaznici] AS Zakaznici ON Rezervace.Id_Zakaznik = Zakaznici.Id_Zakaznik;
