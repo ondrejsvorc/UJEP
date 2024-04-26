@@ -131,9 +131,16 @@ class DataFrame:
             )
         return "\n".join(lines)
 
-    def append_column(self, column: Column) -> None: ...
+    def append_column(self, col_name: str, column: Column) -> None:
+        if col_name in self._columns:
+            raise ValueError("Duplicate column name")
+        self._columns[col_name] = column.copy()
 
-    def append_row(self, row: Iterable) -> None: ...
+    def append_row(self, row: Iterable) -> None:
+        # zkontrolovat, jestli row má stejnou délku jako column
+        # jestli jo, přidat, jinak nepřidávat
+        # další řešení: přidávat postupně a když ta finální délka nebude jako počet sloupců, tak zpětně smazat
+        ...
 
     def filter(
         self, col_name: str, predicate: Callable[[Union[int, str]], bool]
@@ -159,6 +166,11 @@ class DataFrame:
         columns from `other` data table.
         """
         ...
+
+    def setvalue(self, col_name: str, row_index: int, value: Any) -> None:
+        # Přidat aserci a vyhazovat výjimky (neplatný sloupec, index, ...)
+        col = self._columns[col_name]
+        col[row_index] = col._cast(value)
 
     @staticmethod
     def read_csv(path: Union[str, Path]) -> "DataFrame":
@@ -209,6 +221,7 @@ if __name__ == "__main__":
             c=Column(range(2), Type.Float),
         )
     )
+    df.setvalue("a", 1, 42)
     print(df)
 
     df = DataFrame.read_json("data.json")
