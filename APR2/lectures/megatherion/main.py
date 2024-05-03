@@ -71,7 +71,7 @@ class Column(
     def __delitem__(self, index: Union[int, slice]) -> None:
         del self._data[index]
 
-    def permute(self, indices: List[int]):
+    def permute(self, indices: List[int]) -> "Column":
         assert len(indices) == len(self)
         ...
 
@@ -174,11 +174,11 @@ class DataFrame:
 
     @staticmethod
     def read_csv(path: Union[str, Path]) -> "DataFrame":
-        return CSVReader(path).read()
+        return CsvReader(path).read()
 
     @staticmethod
     def read_json(path: Union[str, Path]) -> "DataFrame":
-        return JSONReader(path).read()
+        return JsonReader(path).read()
 
 
 class Reader(ABC):
@@ -190,7 +190,7 @@ class Reader(ABC):
         raise NotImplemented("Abstract method")
 
 
-class JSONReader(Reader):
+class JsonReader(Reader):
     def read(self) -> DataFrame:
         with open(self.path, "rt") as f:
             json = load(f)
@@ -209,7 +209,7 @@ class JSONReader(Reader):
         return DataFrame(columns)
 
 
-class CSVReader(Reader):
+class CsvReader(Reader):
     def read(self) -> DataFrame: ...
 
 
