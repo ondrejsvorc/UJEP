@@ -1,5 +1,7 @@
 from abc import abstractmethod, ABC
+import csv
 from json import load
+import json
 from numbers import Real
 from pathlib import Path
 from typing import Dict, Iterable, Iterator, Tuple, Union, Any, List, Callable
@@ -12,85 +14,75 @@ class Type(Enum):
     String = 1
 
 
-def to_float(obj) -> float:
+def to_float(obj: Any) -> float:
     """
-    casts object to float with support of None objects (None is cast to None)
+    Casts object to float with support of None objects (None is cast to None).
+    Raises ValueError if the object cannot be converted to a float.
     """
-    return float(obj) if obj is not None else None
-
-
-def to_str(obj) -> str:
-    """
-    casts object to float with support of None objects (None is cast to None)
-    """
-    return str(obj) if obj is not None else None
-
-
-def common(iterable):  # from ChatGPT
-    """
-    returns True if all items of iterable are the same.
-    :param iterable:
-    :return:
-    """
+    if obj is None:
+        return None
     try:
-        # Nejprve zkusíme získat první prvek iterátoru
+        return float(obj)
+    except (TypeError, ValueError):
+        raise ValueError(f"Cannot convert {obj} to float.")
+
+
+def to_str(obj: Any) -> str:
+    """
+    Casts object to string with support of None objects (None is cast to None).
+    Raises TypeError if the object cannot be serialized to a string.
+    """
+    if obj is None:
+        return None
+    try:
+        return str(obj)
+    except TypeError:
+        raise TypeError(f"Cannot serialize {obj} to string.")
+
+
+def common(iterable):
+    try:
         iterator = iter(iterable)
         first_value = next(iterator)
     except StopIteration:
-        # Vyvolá výjimku, pokud je iterátor prázdný
         raise ValueError("Iterable is empty")
-
-    # Kontrola, zda jsou všechny další prvky stejné jako první prvek
     for value in iterator:
         if value != first_value:
             raise ValueError("Not all values are the same")
-
-    # Vrací hodnotu, pokud všechny prvky jsou stejné
     return first_value
 
 
-class Column(
-    MutableSequence
-):  # implement MutableSequence (some method are mixed from abc)
+# def common(iterable: Iterable) -> bool:
+#     """
+#     Returns True if all items are the same, False otherwise or if iterable is empty.
+#     """
+#     assert isinstance(
+#         iterable, Iterable
+#     ), "iterable must be an instance of collections.abc.Iterable"
+
+#     if not iterable:
+#         return False
+#     iterator = iter(iterable)
+#     first_value = next(iterator)
+#     return all(value == first_value for value in iterator)
+
+
+class Column(MutableSequence):
     """
     Representation of column of dataframe. Column has datatype: float columns contains
     only floats and None values, string columns contains strings and None values.
     """
 
     def __init__(self, data: Iterable, dtype: Type):
+        assert isinstance(dtype, Type), "dtype must be a Type"
+        assert dtype in [
+            Type.Float,
+            Type.String,
+        ], "dtype must be either Type.Float or Type.String"
+
         self.dtype = dtype
         self._cast = to_float if self.dtype == Type.Float else to_str
-        # cast function (it casts to floats for Float datatype or
-        # to strings for String datattype)
         self._data = [self._cast(value) for value in data]
-
-    def __len__(self) -> int:
-        """
-        Implementation of abstract base class `MutableSequence`.
-        :return: number of rows
-        """
-        return len(self._data)
-
-    def __getitem__(
-        self, item: Union[int, slice]
-    ) -> Union[float, str, list[str], list[float]]:
-        """
-        Indexed getter (get value from index or sliced sublist for slice).
-        Implementation of abstract base class `MutableSequence`.
-        :param item: index or slice
-        :return: item or list of items
-        """
-        return self._data[item]
-
-    def __setitem__(self, key: Union[int, slice], value: Any) -> None:
-        """
-        Indexed setter (set value to index, or list to sliced column)
-        Implementation of abstract base class `MutableSequence`.
-        :param key: index or slice
-        :param value: simple value or list of values
-
-        """
-        self._data[key] = self._cast(value)
 
     def append(self, item: Any) -> None:
         """
@@ -104,18 +96,12 @@ class Column(
         """
         Item is inserted to colum at index `index` (value is cast to float or string if is not number).
         Implementation of abstract base class `MutableSequence`.
-        :param index:  index of new item
-        :param value:  inserted value
+        :param index: index of new item
+        :param value: inserted value
         :return:
         """
+        assert 0 <= index < len(self._data), "Index out of range"
         self._data.insert(index, self._cast(value))
-
-    def __delitem__(self, index: Union[int, slice]) -> None:
-        """
-        Remove item from index `index` or sublist defined by `slice`.
-        :param index: index or slice
-        """
-        del self._data[index]
 
     def permute(self, indices: List[int]) -> "Column":
         """
@@ -125,15 +111,24 @@ class Column(
         :param indices: list of indexes (ints between 0 and len(self) - 1)
         :return: new column
         """
-        assert len(indices) == len(self)
-        ...
+        length = len(self)
+
+        assert (
+            len(indices) == length
+        ), "Number of indices must match the length of the column"
+
+        if not all(0 <= i < length for i in indices):
+            raise ValueError("One or more indices are out of range")
+
+        permuted_data = [self._data[i] for i in indices]
+        return Column(permuted_data, self.dtype)
 
     def copy(self) -> "Column":
         """
         Return shallow copy of column.
         :return: new column with the same items
         """
-        # FIXME: value is cast to the same type (minor optimisation problem)
+        # FIXME: value is casted to the same type (minor optimisation problem)
         return Column(self._data, self.dtype)
 
     def get_formatted_item(self, index: int, *, width: int):
@@ -155,6 +150,60 @@ class Column(
             self._data[index],
             f"{width}s" if self.dtype == Type.String else f"-{width}.2g",
         )
+
+    def __getitem__(
+        self, item: Union[int, slice]
+    ) -> Union[float, str, list[str], list[float]]:
+        """
+        Indexed getter (get value from index or sliced sublist for slice).
+        Implementation of abstract base class `MutableSequence`.
+        :param item: index or slice
+        :return: item or list of items
+        """
+        assert isinstance(item, (int, slice)), "item must be an integer or a slice"
+        return self._data[item]
+
+    def __setitem__(self, key: Union[int, slice], value: Any) -> None:
+        """
+        Indexed setter (set value to index, or list to sliced column)
+        Implementation of abstract base class `MutableSequence`.
+        :param key: index or slice
+        :param value: simple value or list of values
+
+        """
+        assert isinstance(key, (int, slice)), "key must be an integer or a slice"
+
+        if isinstance(key, int):
+            assert 0 <= key < len(self._data), "Key out of range"
+
+        if isinstance(key, slice):
+            assert 0 <= key.start < len(self._data), "Slice start out of range"
+            assert key.stop <= len(self._data), "Slice stop out of range"
+
+        self._data[key] = self._cast(value)
+
+    def __delitem__(self, index: Union[int, slice]) -> None:
+        """
+        Remove item from index `index` or sublist defined by `slice`.
+        :param index: index or slice
+        """
+        assert isinstance(index, (int, slice)), "index must be an integer or a slice"
+
+        if isinstance(index, int):
+            assert 0 <= index < len(self._data), "Index out of range"
+
+        if isinstance(index, slice):
+            assert 0 <= index.start < len(self._data), "Slice start out of range"
+            assert index.stop <= len(self._data), "Slice stop out of range"
+
+        del self._data[index]
+
+    def __len__(self) -> int:
+        """
+        Implementation of abstract base class `MutableSequence`.
+        :return: number of rows
+        """
+        return len(self._data)
 
 
 class DataFrame:
@@ -178,7 +227,8 @@ class DataFrame:
         :param index: index of row
         :return: tuple of items in row
         """
-        ...
+        assert 0 <= index < len(self), "Index out of range for the DataFrame."
+        return tuple(column[index] for column in self._columns.values())
 
     def __iter__(self) -> Iterator[Tuple[Union[str, float]]]:
         """
@@ -230,7 +280,12 @@ class DataFrame:
         Appends new row to dataframe.
         :param row: tuple of values for all columns
         """
-        ...
+        assert len(row) == len(
+            self._columns
+        ), "Row must have the same number of elements as columns."
+
+        for value, column in zip(row, self._columns.values()):
+            column.append(value)
 
     def filter(
         self, col_name: str, predicate: Callable[[Union[float, str]], bool]
@@ -243,7 +298,14 @@ class DataFrame:
         :param predicate: testing function
         :return: new dataframe
         """
-        ...
+        filtered_columns = {}
+        for column_name, column in self._columns.items():
+            if column_name == col_name:
+                filtered_values = [value for value in column if predicate(value)]
+            else:
+                filtered_values = column[:]
+            filtered_columns[column_name] = Column(filtered_values, column.dtype)
+        return DataFrame(filtered_columns)
 
     def sort(self, col_name: str, ascending=True) -> "DataFrame":
         """
@@ -259,7 +321,15 @@ class DataFrame:
         similar to pandas but only with min, max and avg statistics for floats and count"
         :return: string with formatted decription
         """
-        ...
+        description = ""
+        for column_name, column in self._columns.items():
+            if isinstance(column.dtype, float):
+                min_val = min(column)
+                max_val = max(column)
+                avg_val = sum(column) / len(column)
+                count = len(column)
+                description += f"{column_name}: Min={min_val}, Max={max_val}, Avg={avg_val:.2f}, Count={count}\n"
+        return description
 
     def inner_join(
         self, other: "DataFrame", self_key_column: str, other_key_column: str
@@ -276,9 +346,9 @@ class DataFrame:
     def setvalue(self, col_name: str, row_index: int, value: Any) -> None:
         """
         Set new value in dataframe.
-        :param col_name:  name of culumns
+        :param col_name: name of columns
         :param row_index: index of row
-        :param value:  new value (value is cast to type of column)
+        :param value: new value (value is cast to type of column)
         :return:
         """
         col = self._columns[col_name]
@@ -310,17 +380,18 @@ class Reader(ABC):
 
 class JsonReader(Reader):
     """
-    Factory class for creation of dataframe by CSV file. CSV file must contain
-    header line with names of columns.
-    The type of columns should be inferred from types of their values (columns which
-    contains only value has to be floats columns otherwise string columns),
+    Factory class for creation of dataframe by JSON file. JSON file must contain
+    one object with attributes which array values represents columns.
+    The type of columns are inferred from types of their values (columns which
+    contains only value is floats columns otherwise string columns),
     """
 
     def read(self) -> DataFrame:
         with open(self.path, "rt") as f:
             json = load(f)
+
         columns = {}
-        for cname in json.keys():  # cyklus přes sloupce (= atributy JSON objektu)
+        for cname in json.keys():
             dtype = (
                 Type.Float
                 if all(
@@ -329,35 +400,58 @@ class JsonReader(Reader):
                 else Type.String
             )
             columns[cname] = Column(json[cname], dtype)
+
         return DataFrame(columns)
 
 
 class CsvReader(Reader):
     """
-    Factory class for creation of dataframe by JSON file. JSON file must contain
-    one object with attributes which array values represents columns.
-    The type of columns are inferred from types of their values (columns which
-    contains only value is floats columns otherwise string columns),
+    Factory class for creation of dataframe by CSV file. CSV file must contain
+    header line with names of columns.
+    The type of columns should be inferred from types of their values (columns which
+    contains only value has to be floats columns otherwise string columns),
     """
 
-    def read(self) -> "DataFrame": ...
+    def read(self) -> "DataFrame":
+        with open(self.path, mode="rt", encoding="utf-8") as file:
+            reader = csv.DictReader(file)
+            columns: Dict[str, Column] = {}
+
+            for header in reader.fieldnames:
+                columns[header] = Column([], Type.String)
+
+            for row in reader:
+                for header, value in row.items():
+                    columns[header].append(value if value != "null" else None)
+
+        for header, column in columns.items():
+            column.dtype = (
+                Type.Float
+                if all(
+                    value is None or isinstance(value, Real) for value in column._data
+                )
+                else Type.String
+            )
+
+        return DataFrame(columns)
 
 
 if __name__ == "__main__":
-    df = DataFrame(
-        dict(
-            a=Column([None, 3.1415], Type.Float),
-            b=Column(["a", 2], Type.String),
-            c=Column(range(2), Type.Float),
-        )
-    )
-    df.setvalue("a", 1, 42)
-    print(df)
+    # df = DataFrame(
+    #     dict(
+    #         a=Column([None, 3.1415], Type.Float),
+    #         b=Column(["a", 2], Type.String),
+    #         c=Column(range(2), Type.Float),
+    #     )
+    # )
+    # df.setvalue("a", 1, 42)
+    # print(df)
 
     df = DataFrame.read_json("data.json")
     print(df)
 
-for line in df:
-    print(line)
+    # df = DataFrame.read_csv("data.csv")
+    # print(df)
 
-###
+    for line in df:
+        print(line)
