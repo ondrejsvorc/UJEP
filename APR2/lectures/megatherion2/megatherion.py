@@ -289,14 +289,14 @@ class DataFrame:
         """
         Read dataframe by CSV reader
         """
-        return CSVReader(path).read()
+        return CsvReader(path).read()
 
     @staticmethod
     def read_json(path: Union[str, Path]) -> "DataFrame":
         """
         Read dataframe by JSON reader
         """
-        return JSONReader(path).read()
+        return JsonReader(path).read()
 
 
 class Reader(ABC):
@@ -308,7 +308,7 @@ class Reader(ABC):
         raise NotImplemented("Abstract method")
 
 
-class JSONReader(Reader):
+class JsonReader(Reader):
     """
     Factory class for creation of dataframe by CSV file. CSV file must contain
     header line with names of columns.
@@ -332,7 +332,7 @@ class JSONReader(Reader):
         return DataFrame(columns)
 
 
-class CSVReader(Reader):
+class CsvReader(Reader):
     """
     Factory class for creation of dataframe by JSON file. JSON file must contain
     one object with attributes which array values represents columns.
