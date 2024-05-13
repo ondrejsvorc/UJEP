@@ -1,0 +1,2 @@
+jan:novak:21500
+petr:klic:1000
