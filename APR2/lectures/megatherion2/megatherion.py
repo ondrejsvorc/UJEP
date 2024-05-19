@@ -296,12 +296,11 @@ class DataFrame:
 
         return DataFrame(filtered_columns)
 
-    def sort(self, col_name: str, ascending=True) -> "DataFrame":
+    def sort(self, col_name: str, ascending=True) -> None:
         """
-        Sort dataframe by column with `col_name` ascending or descending.
+        Sort dataframe by column with `col_name` ascending or descending in place.
         :param col_name: name of key column
         :param ascending: direction of sorting
-        :return: new dataframe
         """
         assert col_name in self.columns, f"Column '{col_name}' not found in DataFrame"
 
@@ -312,12 +311,10 @@ class DataFrame:
             reverse=not ascending,
         )
 
-        sorted_columns = {
-            col_name: Column(sorted_column, self._columns[col_name].dtype)
-            for col_name, sorted_column in zip(self.columns, zip(*sorted_rows))
-        }
-
-        return DataFrame(sorted_columns)
+        for col_name, sorted_column in zip(self.columns, zip(*sorted_rows)):
+            self._columns[col_name] = Column(
+                list(sorted_column), self._columns[col_name].dtype
+            )
 
     def describe(self) -> str:
         """
@@ -573,8 +570,8 @@ if __name__ == "__main__":
     print()
 
     print("Testing sorting:")
-    sorted_df = df.sort("numbers", ascending=True)
-    print(sorted_df)
+    df.sort("numbers", ascending=True)
+    print(df)
     print()
 
     print("Testing describing:")
