@@ -1,0 +1,17 @@
+{
+  "numbers2": [
+    1,
+    1,
+    2
+  ],
+  "texts2": [
+    "cau",
+    "svete",
+    null
+  ],
+  "mixed2": [
+    2,
+    "a",
+    null
+  ]
+}
