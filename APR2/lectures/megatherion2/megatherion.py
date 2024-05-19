@@ -336,8 +336,55 @@ class DataFrame:
                 description += f"{column_name}: {stats}\n"
         return description
 
+    def to_html(self, filename: str = None) -> str:
+        """
+        Convert the DataFrame to an HTML table.
+
+        :param filename: Optional filename to save the HTML content.
+        :return: HTML string representing the DataFrame.
+        """
+        css_classes = """
+        <style>
+        .dataframe {
+            border-collapse: collapse;
+        }
+        .dataframe th, .dataframe td {
+            border: 1px solid black;
+            padding: 5px;
+        }
+        .numeric {
+            text-align: right;
+        }
+        </style>
+        """
+        html = "<table class='dataframe'>\n"
+
+        html += "<tr>"
+        for col_name in self.columns:
+            html += f"<th>{col_name}</th>"
+        html += "</tr>\n"
+
+        for i in range(len(self)):
+            html += "<tr>"
+            for col_name, column in self._columns.items():
+                cell_class = "numeric" if column.dtype == Type.Float else ""
+                if cell_class:
+                    html += f"<td class='{cell_class}'>{column[i]}</td>"
+                else:
+                    html += f"<td>{column[i] if column[i] is not None else 'NaN'}</td>"
+            html += "</tr>\n"
+
+        html += "</table>"
+        html = f"{css_classes}\n{html}"
+
+        if filename:
+            with open(filename, "w") as f:
+                f.write(html)
+
+        return html
+
     def inner_join(
-        self, other: "DataFrame", self_key_column: str, other_key_column: str
+        self, other: "DataFrame", self_key_col: str, other_key_col: str
     ) -> "DataFrame":
         """
         Inner join between self and other dataframe with join predicate
@@ -347,29 +394,13 @@ class DataFrame:
         columns from `other` data table.
         """
         assert (
-            self_key_column in self.columns
-        ), f"Column '{self_key_column}' not found in self"
+            self_key_col in self.columns
+        ), f"Column '{self_key_col}' not found in self"
         assert (
-            other_key_column in other.columns
-        ), f"Column '{other_key_column}' not found in other"
+            other_key_col in other.columns
+        ), f"Column '{other_key_col}' not found in other"
 
-        key_data = self._columns[self_key_column]
-        key_data_other = other._columns[other_key_column]
-        keys_common = set(key_data).intersection(set(key_data_other))
-
-        joined_columns = {}
-        for col_name, col_data in self._columns.items():
-            joined_columns[col_name] = col_data
-
-        for col_name, col_data in other._columns.items():
-            if col_name == other_key_column:
-                continue
-            other_col_name = f"_other_{col_name}"
-            joined_columns[other_col_name] = col_data
-
-        # TODO
-
-        # return DataFrame(joined_rows)
+        pass
 
     def setvalue(self, col_name: str, row_index: int, value: Any) -> None:
         """
@@ -501,7 +532,7 @@ class CsvReader(Reader):
                     ):
                         cols[cname].dtype = Type.Float
                 except ValueError:
-                    # If conversion fails, leave the column type as String
+                    # Keep dtype as Type.String
                     pass
 
         return DataFrame(cols)
@@ -551,8 +582,13 @@ if __name__ == "__main__":
     print(description)
     print()
 
+    print("Testing converting to HTML:")
+    html = df.to_html("test.html")
+    print(html)
+
     # print("Testing inner join:")
+    # df = DataFrame.read_json("data.json")
     # other_df = DataFrame.read_json("data2.json")
-    # joined_df = df.inner_join(other_df, "numbers", "numbers2")
+    # joined_df = df.inner_join(other_df, "numbers", "numbers")
     # print(joined_df)
     # print()
