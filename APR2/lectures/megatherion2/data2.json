@@ -1,15 +1,15 @@
 {
-  "numbers2": [
+  "numbers": [
     1,
     1,
     2
   ],
-  "texts2": [
+  "texts": [
     "cau",
     "svete",
     null
   ],
-  "mixed2": [
+  "mixed": [
     2,
     "a",
     null
