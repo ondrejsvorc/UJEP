@@ -8,6 +8,23 @@ from typing import Dict, Iterable, Iterator, Tuple, Union, Any, List, Callable
 from enum import Enum
 from collections.abc import MutableSequence
 
+# Doimplementováno:
+# - permute
+# - __getitem__
+# - append_row
+# - CSVReader.read
+# - filter
+# - describe
+# - sort
+
+# Přidáno nad rámec:
+# to_html
+
+# Vylepšeno:
+# to_float
+
+# + různé asserty, vyhazování exception
+
 
 class Type(Enum):
     Float = 0
@@ -98,7 +115,7 @@ class Column(MutableSequence):
     def permute(self, indices: List[int]) -> "Column":
         """
         Return new column which items are defined by list of indices (to original column).
-        (eg. `Column(["a", "b", "c"]).permute([0,0,2])`
+        (eg. `Column(["a", "b", "c"]).permute([0,0,999])`
         returns  `Column(["a", "a", "c"])
         :param indices: list of indexes (ints between 0 and len(self) - 1)
         :return: new column
@@ -270,6 +287,169 @@ class DataFrame:
             self._columns[col_name].append(value)
         self._size = common(len(column) for column in self._columns.values())
 
+    def transpose(self) -> "DataFrame":
+        column_len = len(next(iter(self._columns.values())))
+        columns_old = self._columns
+        columns_new: dict[str, Column] = {}
+
+        for i in range(column_len):
+            new_data = [columns_old[column_name][i] for column_name in columns_old]
+
+            try:
+                if all(value is None or float(value) for value in new_data):
+                    dtype = Type.Float
+            except ValueError:
+                dtype = Type.String
+
+            columns_new[f"column{i}"] = Column(new_data, dtype)
+
+        return DataFrame(columns_new)
+
+    def compare(self, other: "DataFrame") -> "DataFrame":
+        result_columns = {}
+
+        for name, column in self._columns.items():
+            if name not in other._columns:
+                continue
+
+            diff_values = []
+            for i in range(min(len(column), len(other._columns[name]))):
+                if column[i] != other._columns[name][i]:
+                    diff_values.append((column[i], other._columns[name][i]))
+
+            if diff_values:
+                result_columns[name] = Column(diff_values, Type.String)
+
+        columns = {name: col for name, col in result_columns.items()}
+        return DataFrame(columns)
+
+    def cumsum(self, axis: int = 0) -> "DataFrame":
+        columns_new: dict[str, Column] = {}
+
+        is_row_cumsum = axis == 0
+        if is_row_cumsum:
+            for name, column in self._columns.items():
+                cum_sum = 0
+                new_column_data = []
+                for value in column:
+                    if value is None:
+                        new_column_data.append(value)
+                    else:
+                        cum_sum += value
+                        new_column_data.append(cum_sum)
+                columns_new[name] = Column(new_column_data, column.dtype)
+            return DataFrame(columns_new)
+
+        is_column_cumsum = axis == 1
+        if is_column_cumsum:
+            num_rows = len(self)
+            new_rows = []
+            for row_index in range(num_rows):
+                new_row = []
+                cum_sum = 0
+                for column in self._columns.values():
+                    value = column[row_index]
+                    if value is None:
+                        new_row.append(value)
+                    else:
+                        cum_sum += value
+                        new_row.append(cum_sum)
+                new_rows.append(tuple(new_row))
+            columns_new = {
+                name: Column([], column.copy().dtype)
+                for name, column in self._columns.items()
+            }
+            df = DataFrame(columns_new)
+            for row in new_rows:
+                df.append_row(row)
+            return df
+
+    def cumprod(self, axis: int = 0) -> "DataFrame":
+        columns_new: dict[str, Column] = {}
+
+        is_row_cumprod = axis == 0
+        if is_row_cumprod:
+            for name, column in self._columns.items():
+                cum_prod = 1
+                new_column_data = []
+                for value in column:
+                    if value is None:
+                        new_column_data.append(value)
+                    else:
+                        cum_prod *= value
+                        new_column_data.append(cum_prod)
+                columns_new[name] = Column(new_column_data, column.dtype)
+            return DataFrame(columns_new)
+
+        is_column_cumprod = axis == 1
+        if is_column_cumprod:
+            num_rows = len(self)
+            new_rows = []
+            for row_index in range(num_rows):
+                new_row = []
+                cum_prod = 1
+                for column in self._columns.values():
+                    value = column[row_index]
+                    if value is None:
+                        new_row.append(value)
+                    else:
+                        cum_prod *= value
+                        new_row.append(cum_prod)
+                new_rows.append(tuple(new_row))
+            columns_new = {
+                name: Column([], column.copy().dtype)
+                for name, column in self._columns.items()
+            }
+            df = DataFrame(columns_new)
+            for row in new_rows:
+                df.append_row(row)
+            return df
+
+    def diff(self, axis: int = 0) -> "DataFrame":
+        num_rows = len(self)
+        row_len = len(self[0])
+
+        if axis == 0:
+            index = 1
+            new_rows = []
+            new_rows.append(tuple(None for _ in range(row_len)))
+
+            while index <= num_rows - 1:
+                new_row = tuple(x - y for x, y in zip(self[index], self[index - 1]))
+                new_rows.append(tuple(new_row))
+                index += 1
+
+            columns_new = {
+                name: Column([], column.copy().dtype)
+                for name, column in self._columns.items()
+            }
+            df = DataFrame(columns_new)
+            for row in new_rows:
+                df.append_row(row)
+            return df
+
+        if axis == 1:
+            new_columns = {}
+            first_column_name = next(iter(self._columns.keys()))
+            prev_column = None
+
+            for name, column in self._columns.items():
+                if prev_column is None:
+                    prev_column = column
+                    new_columns[first_column_name] = Column(
+                        [None] * len(column), column.dtype
+                    )
+                    continue
+
+                new_column_data = [x - y for x, y in zip(column, prev_column)]
+                new_columns[name] = Column(new_column_data, column.dtype)
+                prev_column = column
+
+            return DataFrame(new_columns)
+        
+    def add(self, ):
+
+
     def filter(
         self, col_name: str, predicate: Callable[[Union[float, str]], bool]
     ) -> "DataFrame":
@@ -296,6 +476,7 @@ class DataFrame:
 
         return DataFrame(filtered_columns)
 
+    # Tim Sort
     def sort(self, col_name: str, ascending=True) -> None:
         """
         Sort dataframe by column with `col_name` ascending or descending in place.
@@ -436,7 +617,7 @@ class DataFrame:
         :param index: index of row
         :return: tuple of items in row
         """
-        assert 0 <= index < len(self), "Index out of range for the DataFrame."
+        assert 0 <= abs(index) < len(self), "Index out of range for the DataFrame."
         return tuple(column[index] for column in self._columns.values())
 
     def __iter__(self) -> Iterator[Tuple[Union[str, float]]]:
@@ -524,9 +705,7 @@ class CsvReader(Reader):
 
             for cname, col in cols.items():
                 try:
-                    if all(
-                        value is None or isinstance(float(value), Real) for value in col
-                    ):
+                    if all(value is None or float(value) for value in col):
                         cols[cname].dtype = Type.Float
                 except ValueError:
                     # Keep dtype as Type.String
@@ -536,56 +715,135 @@ class CsvReader(Reader):
 
 
 if __name__ == "__main__":
-    print("Testing reading from CSV:")
-    df = DataFrame.read_csv("data.csv")
-    print(df)
-    print()
-
-    print("Testing reading from JSON:")
-    df = DataFrame.read_json("data.json")
-    print(df)
-    print()
-
-    print("Testing setting a value:")
-    df.setvalue("numbers", 0, 42)
-    print(df)
-    print()
-
-    print("Testing appending a column:")
-    new_column_data = [1.5, 2.5, 3]
-    new_column = Column(new_column_data, Type.Float)
-    df.append_column("new_column", new_column)
-    print(df)
-    print()
-
-    print("Testing appending a row:")
-    new_row = (1, "b", 3, 4)
-    df.append_row(new_row)
-    print(df)
-    print()
-
-    print("Testing filtering:")
-    filtered_df = df.filter("numbers", lambda x: x > 1)
-    print(filtered_df)
-    print()
-
-    print("Testing sorting:")
-    df.sort("numbers", ascending=True)
-    print(df)
-    print()
-
-    print("Testing describing:")
-    description = df.describe()
-    print(description)
-    print()
-
-    print("Testing converting to HTML:")
-    html = df.to_html("test.html")
-    print(html)
-
-    # print("Testing inner join:")
-    # df = DataFrame.read_json("data.json")
-    # other_df = DataFrame.read_json("data2.json")
-    # joined_df = df.inner_join(other_df, "numbers", "numbers")
-    # print(joined_df)
+    # print("Testing reading from CSV:")
+    # df = DataFrame.read_csv("data.csv")
+    # print(df)
     # print()
+
+    # print("Testing reading from JSON:")
+    # df = DataFrame.read_json("data.json")
+    # print(df)
+    # print()
+
+    # print("Testing setting a value:")
+    # df.setvalue("numbers", 0, 42)
+    # print(df)
+    # print()
+
+    # print("Testing appending a column:")
+    # new_column_data = [1.5, 2.5, 3]
+    # new_column = Column(new_column_data, Type.Float)
+    # df.append_column("new_column", new_column)
+    # print(df)
+    # print()
+
+    # print("Testing appending a row:")
+    # new_row = (1, "b", 3, 4)
+    # df.append_row(new_row)
+    # print(df)
+    # print()
+
+    # print("Testing filtering:")
+    # filtered_df = df.filter("numbers", lambda x: x > 1)
+    # print(filtered_df)
+    # print()
+
+    # print("Testing sorting:")
+    # df.sort("numbers", ascending=True)
+    # print(df)
+    # print()
+
+    # print("Testing describing:")
+    # description = df.describe()
+    # print(description)
+    # print()
+
+    # print("Testing converting to HTML:")
+    # html = df.to_html("test.html")
+    # print(html)
+    # print()
+
+    # df = DataFrame.read_json("data.json")
+    # print(df)
+    # transposed_df = df.transpose()
+    # print("Testing transpose:")
+    # print(transposed_df)
+    # print()
+
+    # df1 = DataFrame(
+    #     {
+    #         "col1": Column([1, 2], Type.Float),
+    #         "col2": Column([3, 4], Type.Float),
+    #         "col3": Column([5, 6], Type.Float),
+    #     }
+    # )
+    # print(df1)
+    # print()
+
+    # df2 = DataFrame(
+    #     {
+    #         "col1": Column([1, 2], Type.Float),
+    #         "col2": Column([3, 4], Type.Float),
+    #         "col3": Column([4, 7], Type.Float),
+    #     }
+    # )
+    # print(df2)
+    # print()
+
+    # print("Testing compare:")
+    # df_comparison = df1.compare(df2)
+    # print(df_comparison)
+    # print()
+
+    # print("Sample data frame with A and B columns:")
+    # df1 = DataFrame(
+    #     {
+    #         "A": Column([2.0, 3.0, 1.0], Type.Float),
+    #         "B": Column([1.0, None, 0.0], Type.Float),
+    #     }
+    # )
+    # print(df1)
+    # print()
+
+    # print("DataFrame.cumsum(axis=0)")
+    # df_cumsum = df1.cumsum(axis=0)
+    # print(df_cumsum)
+    # print()
+
+    # print("DataFrame.cumsum(axis=1)")
+    # df_cumsum = df1.cumsum(axis=1)
+    # print(df_cumsum)
+    # print()
+
+    # print("DataFrame.cumprod(axis=0)")
+    # df_cumsum = df1.cumprod(axis=0)
+    # print(df_cumsum)
+    # print()
+
+    # print("DataFrame.cumprod(axis=1)")
+    # df_cumsum = df1.cumprod(axis=1)
+    # print(df_cumsum)
+    # print()
+
+    # print("Sample data frame with a,b,c columns:")
+    # df1 = DataFrame(
+    #     {
+    #         "a": Column([1, 2, 3, 4, 5, 6], Type.Float),
+    #         "b": Column([1, 1, 2, 3, 5, 8], Type.Float),
+    #         "c": Column([1, 4, 9, 16, 25, 36], Type.Float),
+    #     }
+    # )
+    # print(df1)
+    # print()
+
+    # print("DataFrame.diff(axis=0)")
+    # diff_df = df1.diff(axis=0)
+    # print(diff_df)
+    # print()
+
+    # print("DataFrame.diff(axis=1)")
+    # diff_df = df1.diff(axis=1)
+    # print(diff_df)
+    # print()
+
+    pass
