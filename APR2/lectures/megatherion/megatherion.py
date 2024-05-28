@@ -446,9 +446,31 @@ class DataFrame:
                 prev_column = column
 
             return DataFrame(new_columns)
-        
-    def add(self, ):
 
+    def dot(self, other: "DataFrame") -> "DataFrame":
+        # Počet sloupců v jedné matici musí být roven počtu řádků v druhé matici.
+        if len(self._columns) != len(other):
+            raise ValueError(
+                "Number of columns in self must be the same as number of rows in other"
+            )
+
+        column_names = list(other._columns.keys())
+        columns = {name: [] for name in column_names}
+
+        for i in range(len(self)):  # Řádky (self)
+            new_row = []
+            for j in range(len(column_names)):  # Sloupce (other)
+                # Skalární součin daného řádku a sloupce
+                dot_product = sum(
+                    self[i][k] * other[k][j] for k in range(len(self._columns))
+                )
+                new_row.append(dot_product)
+            # Přidání hodnot nového řádku do odpovídajících sloupců
+            for col_name, value in zip(column_names, new_row):
+                columns[col_name].append(value)
+
+        columns = {name: Column(data, Type.Float) for name, data in columns.items()}
+        return DataFrame(columns)
 
     def filter(
         self, col_name: str, predicate: Callable[[Union[float, str]], bool]
@@ -846,4 +868,36 @@ if __name__ == "__main__":
     # print(diff_df)
     # print()
 
-    pass
+    df1 = DataFrame(
+        {
+            "a": Column([1, 4], Type.Float),
+            "b": Column([2, 5], Type.Float),
+            "c": Column([3, 6], Type.Float),
+        }
+    )
+
+    df2 = DataFrame(
+        {
+            "a": Column([1, 3, 5], Type.Float),
+            "b": Column([2, 4, 6], Type.Float),
+        }
+    )
+
+    dot_df = df1.dot(df2)
+    print(dot_df)
+
+    # df1 = DataFrame(
+    #     {
+    #         "a": Column([0, 1, -2, -1], Type.Float),
+    #         "b": Column([1, 1, 1, 1], Type.Float),
+    #     }
+    # )
+
+    # df2 = DataFrame(
+    #     {
+    #         "a": Column([0, 1], Type.Float),
+    #         "b": Column([1, 2], Type.Float),
+    #         "c": Column([-1, -1], Type.Float),
+    #         "d": Column([2, 0], Type.Float),
+    #     }
+    # )
