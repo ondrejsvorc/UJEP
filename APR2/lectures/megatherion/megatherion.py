@@ -17,6 +17,16 @@ from collections.abc import MutableSequence
 # - describe
 # - sort
 
+# Doimplementováno 2:
+# - transpose
+# - compare
+# - cumsum
+# - cumprod
+# - diff
+# - dot
+
+# - combine
+
 # Přidáno nad rámec:
 # to_html
 
@@ -504,6 +514,195 @@ class DataFrame:
         columns = {name: Column(data, Type.Float) for name, data in columns.items()}
         return DataFrame(columns)
 
+    def combine(self, other: "DataFrame", func: callable) -> "DataFrame":
+        # Ověření toho, že oba DataFrame mají stejný počet sloupců
+        if len(self._columns) != len(other._columns):
+            raise ValueError("Both data frames must have the same amount of columns")
+
+        combined_columns = {}
+
+        for name in self._columns:
+            # Ověření, že sloupec existuje i v druhém DataFrame
+            if name not in other._columns:
+                raise ValueError(
+                    f"Column {name} was not found in the other data frame."
+                )
+
+            # Kombinování dat ze dvou sloupců pomocí poskytnuté funkce
+            combined_data = [
+                func(self._columns[name][i], other._columns[name][i])
+                for i in range(len(self._columns[name]))
+            ]
+            combined_columns[name] = Column(combined_data, self._columns[name].dtype)
+
+        return DataFrame(combined_columns)
+
+    def groupby(
+        self, group_col: str, agg_func: callable = lambda x: sum(x) / len(x)
+    ) -> "DataFrame":
+        # Ověření, že sloupec pro seskupení existuje
+        if group_col not in self._columns:
+            raise ValueError(f"Sloupec {group_col} nebyl nalezen v DataFrame")
+
+        grouped_data = {}
+        # Iterování přes všechny řádky v DataFrame
+        for i in range(len(self._columns[group_col])):
+            group_key = self._columns[group_col][i]
+            if group_key not in grouped_data:
+                grouped_data[group_key] = {
+                    col: [] for col in self._columns if col != group_col
+                }
+            # Přidání hodnoty do příslušné skupiny
+            for col in self._columns:
+                if col != group_col:
+                    grouped_data[group_key][col].append(self._columns[col][i])
+
+        aggregated_data = {group_col: list(grouped_data.keys())}
+        # Iterování přes všechny skupiny a aplikace agregační funkce pouze na numerické sloupce
+        for group, data in grouped_data.items():
+            for col, values in data.items():
+                try:
+                    # Test, zda je sloupec numerický
+                    float(values[0])
+                    if col not in aggregated_data:
+                        aggregated_data[col] = []
+                    aggregated_data[col].append(agg_func(values))
+                except ValueError:
+                    continue
+
+        # Vytvoření nového DataFrame s agregovanými daty
+        columns_new = {
+            name: Column(data, Type.Float if name != group_col else Type.String)
+            for name, data in aggregated_data.items()
+        }
+        return DataFrame(columns_new)
+
+    def cummax(self, axis: int = 0) -> "DataFrame":
+        columns_new: dict[str, Column] = {}
+
+        if axis == 0:
+            # Cumulative max along columns
+            for name, column in self._columns.items():
+                cum_max = None
+                new_column_data = []
+                for value in column:
+                    if value is None:
+                        new_column_data.append(value)
+                    else:
+                        cum_max = value if cum_max is None else max(cum_max, value)
+                        new_column_data.append(cum_max)
+                columns_new[name] = Column(new_column_data, column.dtype)
+            return DataFrame(columns_new)
+
+        elif axis == 1:
+            # Cumulative max along rows
+            num_rows = len(next(iter(self._columns.values())))
+            new_rows = []
+            for row_index in range(num_rows):
+                row_values = [column[row_index] for column in self._columns.values()]
+                cum_max = None
+                new_row = []
+                for value in row_values:
+                    if value is None:
+                        new_row.append(value)
+                    else:
+                        cum_max = value if cum_max is None else max(cum_max, value)
+                        new_row.append(cum_max)
+                new_rows.append(new_row)
+
+            # Convert new_rows to new columns format
+            for col_index, name in enumerate(self._columns.keys()):
+                new_column_data = [row[col_index] for row in new_rows]
+                columns_new[name] = Column(new_column_data, self._columns[name].dtype)
+
+            return DataFrame(columns_new)
+
+        else:
+            raise ValueError("Axis must be 0 or 1")
+
+    def cummin(self, axis: int = 0) -> "DataFrame":
+        columns_new: dict[str, Column] = {}
+
+        if axis == 0:
+            # Kumulativní minimum po sloupcích
+            for name, column in self._columns.items():
+                cum_min = None
+                new_column_data = []
+                for value in column:
+                    if value is None:
+                        new_column_data.append(value)
+                    else:
+                        cum_min = value if cum_min is None else min(cum_min, value)
+                        new_column_data.append(cum_min)
+                columns_new[name] = Column(new_column_data, column.dtype)
+            return DataFrame(columns_new)
+
+        elif axis == 1:
+            # Kumulativní minimum po řádcích
+            num_rows = len(next(iter(self._columns.values())))
+            new_rows = []
+            for row_index in range(num_rows):
+                row_values = [column[row_index] for column in self._columns.values()]
+                cum_min = None
+                new_row = []
+                for value in row_values:
+                    if value is None:
+                        new_row.append(value)
+                    else:
+                        cum_min = value if cum_min is None else min(cum_min, value)
+                        new_row.append(cum_min)
+                new_rows.append(new_row)
+
+            # Převod new_rows na nový formát sloupců
+            for col_index, name in enumerate(self._columns.keys()):
+                new_column_data = [row[col_index] for row in new_rows]
+                columns_new[name] = Column(new_column_data, self._columns[name].dtype)
+
+            return DataFrame(columns_new)
+
+        else:
+            raise ValueError("Osa musí být 0 nebo 1")
+
+    def drop_duplicates(
+        self, subset: list[str] = None, keep: str = "first"
+    ) -> "DataFrame":
+        if subset is None:
+            subset = list(self._columns.keys())
+
+        # Validate keep parameter
+        if keep not in {"first", "last"}:
+            raise ValueError("keep must be either 'first' or 'last'")
+
+        seen = set()
+        indices_to_keep = []
+
+        for row_index in range(len(self)):
+            row_tuple = tuple(self._columns[col][row_index] for col in subset)
+            if row_tuple not in seen:
+                seen.add(row_tuple)
+                indices_to_keep.append(row_index)
+            elif keep == "last":
+                if row_tuple in seen:
+                    for i, idx in enumerate(indices_to_keep):
+                        if (
+                            tuple(self._columns[col][idx] for col in subset)
+                            == row_tuple
+                        ):
+                            indices_to_keep.pop(i)
+                            break
+                    indices_to_keep.append(row_index)
+
+        new_columns = {col: [] for col in list(self._columns.keys())}
+        for index in indices_to_keep:
+            for col in list(self._columns.keys()):
+                new_columns[col].append(self._columns[col][index])
+
+        result_columns = {
+            name: Column(data, self._columns[name].dtype)
+            for name, data in new_columns.items()
+        }
+        return DataFrame(result_columns)
+
     def filter(
         self, col_name: str, predicate: Callable[[Union[float, str]], bool]
     ) -> "DataFrame":
@@ -817,12 +1016,12 @@ if __name__ == "__main__":
     # print(html)
     # print()
 
-    df = DataFrame.read_json("data.json")
-    print(df)
-    transposed_df = df.transpose()
-    print("Testing transpose:")
-    print(transposed_df)
-    print()
+    # df = DataFrame.read_json("data.json")
+    # print(df)
+    # transposed_df = df.transpose()
+    # print("Testing transpose:")
+    # print(transposed_df)
+    # print()
 
     # df1 = DataFrame(
     #     {
@@ -900,23 +1099,23 @@ if __name__ == "__main__":
     # print(diff_df)
     # print()
 
-    df1 = DataFrame(
-        {
-            "a": Column([1, 4], Type.Float),
-            "b": Column([2, 5], Type.Float),
-            "c": Column([3, 6], Type.Float),
-        }
-    )
+    # df1 = DataFrame(
+    #     {
+    #         "a": Column([1, 4], Type.Float),
+    #         "b": Column([2, 5], Type.Float),
+    #         "c": Column([3, 6], Type.Float),
+    #     }
+    # )
 
-    df2 = DataFrame(
-        {
-            "a": Column([1, 3, 5], Type.Float),
-            "b": Column([2, 4, 6], Type.Float),
-        }
-    )
+    # df2 = DataFrame(
+    #     {
+    #         "a": Column([1, 3, 5], Type.Float),
+    #         "b": Column([2, 4, 6], Type.Float),
+    #     }
+    # )
 
-    dot_df = df1.dot(df2)
-    print(dot_df)
+    # dot_df = df1.dot(df2)
+    # print(dot_df)
 
     # df1 = DataFrame(
     #     {
@@ -933,3 +1132,86 @@ if __name__ == "__main__":
     #         "d": Column([2, 0], Type.Float),
     #     }
     # )
+
+    # df1 = DataFrame(
+    #     {
+    #         "A": Column([0, 0], Type.Float),
+    #         "B": Column([4, 4], Type.Float),
+    #     }
+    # )
+
+    # df2 = DataFrame(
+    #     {
+    #         "A": Column([1, 1], Type.Float),
+    #         "B": Column([3, 3], Type.Float),
+    #     }
+    # )
+
+    # take_smaller = lambda s1, s2: s1 if s1 + s2 < 7 else s2
+    # combined_df = df1.combine(df2, take_smaller)
+    # print(combined_df)
+    # print()
+
+    # df = DataFrame(
+    #     {
+    #         "Animal": Column(["Falcon", "Falcon", "Parrot", "Parrot"], Type.String),
+    #         "Max Speed": Column([380.0, 370.0, 24.0, 26.0], Type.Float),
+    #     }
+    # )
+
+    # grouped_df = df.groupby("Animal", agg_func=lambda x: sum(x) / len(x))
+    # print(grouped_df)
+
+    # df1 = DataFrame(
+    #     {
+    #         "A": Column([2.0, 3.0, 1.0], Type.Float),
+    #         "B": Column([1.0, None, 0.0], Type.Float),
+    #     }
+    # )
+
+    # cummax_df0 = df1.cummax(axis=0)
+    # print(cummax_df0)
+    # print()
+
+    # cummax_df1 = df1.cummax(axis=1)
+    # print(cummax_df1)
+    # print()
+
+    # df1 = DataFrame(
+    #     {
+    #         "A": Column([2.0, 3.0, 1.0], Type.Float),
+    #         "B": Column([1.0, None, 0.0], Type.Float),
+    #     }
+    # )
+
+    # cummin_df0 = df1.cummin(axis=0)
+    # print(cummin_df0)
+    # print()
+
+    # cummin_df1 = df1.cummin(axis=1)
+    # print(cummin_df1)
+    # print()
+
+    # df = DataFrame(
+    #     {
+    #         "brand": Column(
+    #             ["Yum Yum", "Yum Yum", "Indomie", "Indomie", "Indomie"], Type.String
+    #         ),
+    #         "style": Column(["cup", "cup", "cup", "pack", "pack"], Type.String),
+    #         "rating": Column([4, 4, 3.5, 15, 5], Type.Float),
+    #     }
+    # )
+
+    # df_dropped = df.drop_duplicates()
+    # print(df_dropped)
+    # print()
+
+    # df_dropped_subset = df.drop_duplicates(subset=["brand"])
+    # print(df_dropped_subset)
+    # print()
+
+    # df_dropped_last = df.drop_duplicates(subset=["brand", "style"], keep="last")
+    # print(df_dropped_last)
+    # print()
+
+    pass
