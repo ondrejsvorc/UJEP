@@ -288,11 +288,14 @@ class DataFrame:
         self._size = common(len(column) for column in self._columns.values())
 
     def transpose(self) -> "DataFrame":
-        column_len = len(next(iter(self._columns.values())))
+        column_len = len(self)
+        # column_len = len(next(iter(self._columns.values())))
         columns_old = self._columns
         columns_new: dict[str, Column] = {}
 
+        # Iterace přes indexy řádků
         for i in range(column_len):
+            # Vytvoření nového seznamu hodnot pro nový sloupec, který bude řádkem v původních datech
             new_data = [columns_old[column_name][i] for column_name in columns_old]
 
             try:
@@ -301,6 +304,7 @@ class DataFrame:
             except ValueError:
                 dtype = Type.String
 
+            # Vytvoření nového sloupce s transponovanými daty a přidání do slovníku sloupců
             columns_new[f"column{i}"] = Column(new_data, dtype)
 
         return DataFrame(columns_new)
@@ -309,14 +313,18 @@ class DataFrame:
         result_columns = {}
 
         for name, column in self._columns.items():
+            # Kontrola, zda sloupec existuje také v druhém data framu (other)
             if name not in other._columns:
                 continue
 
             diff_values = []
+            # Iterace přes všechny hodnoty ve sloupci, dokud jsou hodnoty v obou sloupcích
             for i in range(min(len(column), len(other._columns[name]))):
+                # Pokud jsou hodnoty různé, přidáme dvojici (hodnota_self, hodnota_other)
                 if column[i] != other._columns[name][i]:
                     diff_values.append((column[i], other._columns[name][i]))
 
+            # Pokud existují rozdíly, přidáme je do výsledného sloupce
             if diff_values:
                 result_columns[name] = Column(diff_values, Type.String)
 
@@ -369,9 +377,11 @@ class DataFrame:
 
         is_row_cumprod = axis == 0
         if is_row_cumprod:
+            # Iterace přes všechny sloupce
             for name, column in self._columns.items():
                 cum_prod = 1
                 new_column_data = []
+                # Iterace přes všechny hodnoty ve sloupci
                 for value in column:
                     if value is None:
                         new_column_data.append(value)
@@ -385,9 +395,11 @@ class DataFrame:
         if is_column_cumprod:
             num_rows = len(self)
             new_rows = []
+            # Iterace přes všechny řádky
             for row_index in range(num_rows):
                 new_row = []
                 cum_prod = 1
+                # Iterace přes všechny sloupce a získání hodnoty pro aktuální řádek
                 for column in self._columns.values():
                     value = column[row_index]
                     if value is None:
@@ -406,44 +418,59 @@ class DataFrame:
             return df
 
     def diff(self, axis: int = 0) -> "DataFrame":
+        # Zjištění počtu řádků a délky řádku (resp. počtu sloupců)
         num_rows = len(self)
         row_len = len(self[0])
 
+        # Rozdíly mezi řádky
         if axis == 0:
             index = 1
             new_rows = []
+
+            # První řádek bude obsahovat hodnoty None, protože nemáme s čím srovnávat
             new_rows.append(tuple(None for _ in range(row_len)))
 
+            # Iterace přes řádky od druhého do posledního
             while index <= num_rows - 1:
+                # Výpočet rozdílů mezi aktuálním a předchozím řádkem
                 new_row = tuple(x - y for x, y in zip(self[index], self[index - 1]))
                 new_rows.append(tuple(new_row))
                 index += 1
 
+            # Inicializace nových sloupců s prázdnými daty, ale stejným datovým typem
             columns_new = {
                 name: Column([], column.copy().dtype)
                 for name, column in self._columns.items()
             }
+
             df = DataFrame(columns_new)
+
+            # Přidání nových řádků do nového DataFrame
             for row in new_rows:
                 df.append_row(row)
+
             return df
 
+        # Rozdíly mezi sloupci
         if axis == 1:
             new_columns = {}
             first_column_name = next(iter(self._columns.keys()))
-            prev_column = None
+            previous_column = None
 
             for name, column in self._columns.items():
-                if prev_column is None:
-                    prev_column = column
+                # První sloupec bude obsahovat hodnoty None, protože nemáme s čím srovnávat
+                # Tato podmínka bude pravdivá pouze jednou (prostor pro optimalizaci)
+                if previous_column is None:
+                    previous_column = column
                     new_columns[first_column_name] = Column(
                         [None] * len(column), column.dtype
                     )
                     continue
 
-                new_column_data = [x - y for x, y in zip(column, prev_column)]
+                # Výpočet rozdílů mezi aktuálním a předchozím sloupcem
+                new_column_data = [x - y for x, y in zip(column, previous_column)]
                 new_columns[name] = Column(new_column_data, column.dtype)
-                prev_column = column
+                previous_column = column
 
             return DataFrame(new_columns)
 
@@ -457,14 +484,19 @@ class DataFrame:
         column_names = list(other._columns.keys())
         columns = {name: [] for name in column_names}
 
-        for i in range(len(self)):  # Řádky (self)
+        # Řádky (self)
+        for i in range(len(self)):
             new_row = []
-            for j in range(len(column_names)):  # Sloupce (other)
+
+            # Sloupce (other)
+            for j in range(len(column_names)):
+
                 # Skalární součin daného řádku a sloupce
                 dot_product = sum(
                     self[i][k] * other[k][j] for k in range(len(self._columns))
                 )
                 new_row.append(dot_product)
+
             # Přidání hodnot nového řádku do odpovídajících sloupců
             for col_name, value in zip(column_names, new_row):
                 columns[col_name].append(value)
@@ -486,8 +518,8 @@ class DataFrame:
         assert col_name in self.columns, f"Column '{col_name}' not found in DataFrame"
 
         filtered_columns = {}
-
         length = 0
+
         for column_name, column in self._columns.items():
             if column_name == col_name:
                 filtered_values = [value for value in column if predicate(value)]
@@ -785,12 +817,12 @@ if __name__ == "__main__":
     # print(html)
     # print()
 
-    # df = DataFrame.read_json("data.json")
-    # print(df)
-    # transposed_df = df.transpose()
-    # print("Testing transpose:")
-    # print(transposed_df)
-    # print()
+    df = DataFrame.read_json("data.json")
+    print(df)
+    transposed_df = df.transpose()
+    print("Testing transpose:")
+    print(transposed_df)
+    print()
 
     # df1 = DataFrame(
     #     {
