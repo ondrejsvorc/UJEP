@@ -703,6 +703,96 @@ class DataFrame:
         }
         return DataFrame(result_columns)
 
+    def product(self, axis: int = 0) -> "DataFrame":
+        columns_new: dict[str, Column] = {}
+
+        is_column_product = axis == 1
+        if is_column_product:
+            row_index = 0
+            for row in self:
+                product = None
+                for value in row:
+                    if value is not None:
+                        product = product if product is not None else 1
+                        product *= value
+                columns_new[f"col{row_index}"] = Column([product], Type.Float)
+                row_index += 1
+        else:
+            for name, column in self._columns.items():
+                if column.dtype is Type.String:
+                    continue
+                product = None
+                for value in column:
+                    if value is not None:
+                        product = product if product is not None else 1
+                        product *= value
+                columns_new[name] = Column([product], Type.Float)
+
+        return DataFrame(columns_new)
+
+    def replace(
+        self,
+        to_replace: Union[float, str, list[Union[float, str]]],
+        value: Union[float, str],
+    ) -> "DataFrame":
+        columns_new: dict[str, Column] = {}
+
+        should_replace = False
+        if isinstance(to_replace, list):
+            should_replace = lambda x, y: x in y
+        else:
+            should_replace = lambda x, y: x == y
+
+        for name, column in self._columns.items():
+            new_column_data = []
+            for column_value in column:
+                if should_replace(column_value, to_replace):
+                    new_column_data.append(value)
+                else:
+                    new_column_data.append(column_value)
+
+            dtype = Type.String
+            try:
+                is_still_numeric = False
+                if isinstance(to_replace, list):
+                    is_still_numeric = all(
+                        float(val) for val in to_replace
+                    ) and isinstance(value, float)
+                else:
+                    is_still_numeric = float(to_replace) and isinstance(value, float)
+
+                if is_still_numeric:
+                    dtype = column.dtype
+            except:
+                pass
+
+            columns_new[name] = Column(new_column_data, dtype)
+
+        return DataFrame(columns_new)
+
+    def melt(self, id_vars: List, value_vars: List) -> "DataFrame":
+        columns_new: dict[str, Column] = {}
+
+        for name, column in self._columns.items():
+            if name in id_vars and name in value_vars:
+                raise Exception("You cannot both want to keep and delete same column.")
+
+            if name in id_vars and name not in value_vars:
+                columns_new[name] = column
+
+            if name not in id_vars and name in value_vars:
+                variable_col = f"variable_{name}"
+                value_col = f"value_{name}"
+
+                columns_new[variable_col] = Column([], Type.String)
+                columns_new[value_col] = Column([], column.dtype)
+
+                for column_value in column:
+                    columns_new[variable_col].append(name)
+                    columns_new[value_col].append(column_value)
+
+        return DataFrame(columns_new)
+
     def filter(
         self, col_name: str, predicate: Callable[[Union[float, str]], bool]
     ) -> "DataFrame":
@@ -767,6 +857,7 @@ class DataFrame:
                 description += f"{column_name}: {stats}\n"
         return description
 
+    # TODO: Use templating
     def to_html(self, filename: str = None) -> str:
         """
         Convert the DataFrame to an HTML table.
@@ -1214,4 +1305,53 @@ if __name__ == "__main__":
     # print(df_dropped_last)
     # print()
 
-    pass
+    df = DataFrame(
+        {
+            "A": Column([1, 1, 2], Type.Float),
+            "B": Column([2, 3, 2], Type.Float),
+            "C": Column([0, 1, 3], Type.Float),
+        }
+    )
+    print("Testing DataFrame.product(axis=0)")
+    df_product = df.product()
+    print(df_product)
+    print()
+
+    print("Testing DataFrame.product(axis=1)")
+    df_product = df.product(axis=1)
+    print(df_product)
+    print()
+
+    df = DataFrame(
+        {
+            "A": Column([0, 1, 2, 3, 4], Type.Float),
+            "B": Column([5, 6, 7, 8, 9], Type.Float),
+            "C": Column(["a", "b", "c", "d", "e"], Type.String),
+        }
+    )
+    print("Testing DataFrame.replace(0, 5)")
+    df_replace = df.replace(0, 5)
+    print(df_replace)
+    print()
+
+    print("Testing DataFrame.replace([0, 1, 2, 3], 4.0)")
+    df_replace = df.replace([0, 1, 2, 3], 4.0)
+    print(df_replace)
+    print()
+
+    df = DataFrame(
+        {
+            "A": Column(["a", "b", "c"], Type.String),
+            "B": Column([1, 3, 5], Type.Float),
+            "C": Column([2, 4, 6], Type.Float),
+        }
+    )
+    print("Testing DataFrame.melt(id_vars=['A'], value_vars=['B'])")
+    df_melt = df.melt(id_vars=["A"], value_vars=["B"])
+    print(df_melt)
+    print()
+
+    print("Testing DataFrame.melt(id_vars=['A'], value_vars=['B, C'])")
+    df_melt = df.melt(id_vars=["A"], value_vars=["B", "C"])
+    print(df_melt)
+    print()
