@@ -1,0 +1,42 @@
+---
+title: "Kriminalita"
+author: "Ondřej Švorc"
+format: html
+editor: visual
+---
+
+```{r}
+if (!requireNamespace("here", quietly = TRUE)) {
+  install.packages("here")
+}
+library(here)
+setwd(here())
+```
+
+```{r}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(ggplot2)
+  library(lubridate)
+  library(readxl)
+  library(tidyr)
+})
+```
+
+```{r}
+types_df <- read.csv("types.csv")
+all_data_df <- read.csv("202405.csv")
+```
+
+```{r}
+type_counts <- all_data_df %>%
+  group_by(types) %>%
+  summarise(count = n()) %>%
+  arrange(desc(count)) %>%
+  top_n(5)
+
+top_5_labels <- types_df[match(type_counts$types, types_df$id), "label"]
+
+result <- data.frame(label = top_5_labels, pocet = type_counts$count)
+print(result)
+```
