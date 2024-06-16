@@ -20,6 +20,7 @@ suppressPackageStartupMessages({
   library(ggplot2)
   library(knitr)
   library(lubridate)
+  library(stringr)
 })
 ```
 
@@ -50,9 +51,42 @@ cetnosti_leku_s_dopingem <-
   mutate(procent = (cetnost / sum(cetnost)) * 100) %>%
   select(doping, procent)
 
-vysledek <- 
+vysledek_s_procenty <- 
   inner_join(dopingy, cetnosti_leku_s_dopingem, by = c("DOPING" = "doping")) %>%
   arrange(desc(procent))
 
-kable(vysledek)
+kable(vysledek_s_procenty)
+```
+
+Vykreslete sloupcový graf léků, které se nesmí používat při sportu (popis obsahuje klíčové slovo “sport”). Pomocí regulárních výrazů odstraňte z popisů vysvětlivky v závorkách.
+
+```{r}
+dopingy_sport <- 
+  vysledek_s_procenty %>%
+  filter(grepl("sport", NAZEV, ignore.case = TRUE)) %>%
+  select(NAZEV, procent) %>%
+  mutate(NAZEV = str_replace_all(NAZEV, "\\s*\\([^\\)]+\\)", ""))
+
+duplicitni_radek <- dopingy_sport %>%
+  filter(NAZEV == "S5-Diuretika a maskovací látky.") %>%
+  summarise(NAZEV = "S5-Diuretika a maskovací látky.", procent = sum(procent))
+
+ostatni_radky <- 
+  dopingy_sport %>%
+  filter(NAZEV != "S5-Diuretika a maskovací látky.")
+
+spojeni_radku <-
+  bind_rows(duplicitni_radek, ostatni_radky)
+
+# Vezme název od 4 do posledního znaku (tím odraníme prefix S5- např.)
+spojeni_radku$NAZEV <-
+  substr(spojeni_radku$NAZEV, 4, nchar(spojeni_radku$NAZEV) - 1)
+
+ggplot(spojeni_radku, aes(x = procent, y = NAZEV)) +
+  geom_col(color = "black", fill = "skyblue") +  # Barvy sloupců
+  labs(title = "Procentuální zastoupení dopingových úrovní obsahujících 'sport'",
+       x = "Procento (%)",
+       y = "Dopingové úrovně") +
+  theme_minimal() +
+  theme(axis.text.x = element_text(angle = 0))  # Nastavení úhlu textu na ose x
 ```
