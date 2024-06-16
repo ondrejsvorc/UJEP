@@ -82,11 +82,8 @@ spojeni_radku <-
 spojeni_radku$NAZEV <-
   substr(spojeni_radku$NAZEV, 4, nchar(spojeni_radku$NAZEV) - 1)
 
-ggplot(spojeni_radku, aes(x = procent, y = NAZEV)) +
-  geom_col(color = "black", fill = "skyblue") +  # Barvy sloupců
-  labs(title = "Procentuální zastoupení dopingových úrovní obsahujících 'sport'",
-       x = "Procento (%)",
-       y = "Dopingové úrovně") +
-  theme_minimal() +
-  theme(axis.text.x = element_text(angle = 0))  # Nastavení úhlu textu na ose x
+spojeni_radku %>% 
+  ggplot(aes(x = NAZEV, y = procent)) +
+  geom_col() +
+  coord_flip()
 ```
