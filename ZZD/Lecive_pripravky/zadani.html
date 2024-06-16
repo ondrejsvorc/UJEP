@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<!-- saved from url=(0051)https://physics.ujep.cz/~jskvor/ZZD2023/2023-06-02/ -->
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+
+<meta name="generator" content="quarto-1.2.335">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Zpracování dat z Databáze léčivých přípravků</title>
+<style class="anchorjs"></style><style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="./zadani_files/clipboard.min.js.stažený soubor"></script>
+<script src="./zadani_files/quarto.js.stažený soubor"></script>
+<script src="./zadani_files/popper.min.js.stažený soubor"></script>
+<script src="./zadani_files/tippy.umd.min.js.stažený soubor"></script>
+<script src="./zadani_files/anchor.min.js.stažený soubor"></script>
+<link href="./zadani_files/tippy.css" rel="stylesheet">
+<link href="./zadani_files/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="./zadani_files/bootstrap.min.js.stažený soubor"></script>
+<link href="./zadani_files/bootstrap-icons.css" rel="stylesheet">
+<link href="./zadani_files/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+
+</head>
+
+<body class="quarto-light">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article toc-left">
+<div id="quarto-sidebar-toc-left" class="sidebar toc-left">
+  <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Obsah</h2>
+   
+  <ul>
+  <li><a href="https://physics.ujep.cz/~jskvor/ZZD2023/2023-06-02/#instrukce" id="toc-instrukce" class="nav-link active" data-scroll-target="#instrukce">Instrukce</a></li>
+  <li><a href="https://physics.ujep.cz/~jskvor/ZZD2023/2023-06-02/#%C3%BAkol-1" id="toc-úkol-1" class="nav-link" data-scroll-target="#úkol-1">Úkol 1</a></li>
+  <li><a href="https://physics.ujep.cz/~jskvor/ZZD2023/2023-06-02/#%C3%BAkol-2" id="toc-úkol-2" class="nav-link" data-scroll-target="#úkol-2">Úkol 2</a></li>
+  <li><a href="https://physics.ujep.cz/~jskvor/ZZD2023/2023-06-02/#%C3%BAkol-3" id="toc-úkol-3" class="nav-link" data-scroll-target="#úkol-3">Úkol 3</a></li>
+  </ul>
+</nav>
+</div>
+<div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+</div>
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Zpracování dat z Databáze léčivých přípravků</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+</header>
+
+<section id="instrukce" class="level2">
+<h2 class="anchored" data-anchor-id="instrukce">Instrukce<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://physics.ujep.cz/~jskvor/ZZD2023/2023-06-02/#instrukce" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+<p>Z <a href="https://data.gov.cz/">Portálu otevřených dat ČR</a> stáhněte data konkrétně z <a href="https://opendata.sukl.cz/soubory/SODERECEPT/DLPAKTUALNI.zip">databáze léčivých přípravků</a>. K orientaci v uvedených datech slouží <a href="https://opendata.sukl.cz/soubory/DLP_datove_rozhrani20201201.csv">tato dokumentace</a>. Data jsou uložena v <code>csv</code> souborech s&nbsp;<code>fileEncoding = "CP1250"</code>.</p>
+<ul>
+<li><p>Dle zadání zreprodukujte tabulky a grafy.</p></li>
+<li><p>Pro udělení zápočtu je potřeba vypracovat alespoň 75 % úloh.</p></li>
+<li><p>Výsledkem bude <strong>Quarto report</strong> (nebo R Notebook) zobrazující nejen grafy a tabulky, ale také textový popis řešení.</p></li>
+<li><p><strong>Výsledný dokument ve formátu html zašlete spolu se zdrojovým kódem (qmd, nebo rmd) na e-mailové adresy</strong> <a href="mailto:jiri.skvara@ujep.cz">jiri.skvara@ujep.cz</a> a <a href="mailto:jiri.skvor@ujep.cz">jiri.skvor@ujep.cz</a>.</p></li>
+</ul>
+<p>Pro vypracování se doporučuje využití následujících knihoven:</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="https://physics.ujep.cz/~jskvor/ZZD2023/2023-06-02/#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb1-2"><a href="https://physics.ujep.cz/~jskvor/ZZD2023/2023-06-02/#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb1-3"><a href="https://physics.ujep.cz/~jskvor/ZZD2023/2023-06-02/#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(knitr)</span>
+<span id="cb1-4"><a href="https://physics.ujep.cz/~jskvor/ZZD2023/2023-06-02/#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lubridate)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="úkol-1" class="level2">
+<h2 class="anchored" data-anchor-id="úkol-1">Úkol 1<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://physics.ujep.cz/~jskvor/ZZD2023/2023-06-02/#%C3%BAkol-1" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+<p>Zjistěte, kolik procent léků v databázi spadá do určité dopingové úrovně. Tabulku s výslednými daty seřaďte dle procentuálního zastoupení sestupně. Výsledná tabulka bude obsahovat kód typu závislosti, její popis/název a vypočtené procento.</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<colgroup>
+<col style="width: 2%">
+<col style="width: 92%">
+<col style="width: 5%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: left;">kod</th>
+<th style="text-align: left;">NAZEV</th>
+<th style="text-align: right;">procento</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">OOO</td>
+<td style="text-align: left;">Přípravky obsahující složku, která může být za určitých podmínek posuzována jako doping, viz aktuální Seznam zakázaných látek a metod Světové antidopingové agentury.</td>
+<td style="text-align: right;">10.10</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">S5D</td>
+<td style="text-align: left;">Diuretika a maskovací látky (nelze pro léčbu sportovců použít vůbec).</td>
+<td style="text-align: right;">4.15</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">S7</td>
+<td style="text-align: left;">Narkotika (zakázané pouze při soutěži).</td>
+<td style="text-align: right;">2.56</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">P1</td>
+<td style="text-align: left;">Beta-blokátory (zakázané v určitých sportech).</td>
+<td style="text-align: right;">1.64</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">S4</td>
+<td style="text-align: left;">Hormonové a metabolické modulátory (nelze pro léčbu sportovců použít vůbec).</td>
+<td style="text-align: right;">1.31</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">S2</td>
+<td style="text-align: left;">Peptidové hormony, růstové faktory, příbuzné látky a mimetika (nelze pro léčbu sportovců použít vůbec).</td>
+<td style="text-align: right;">1.14</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">S5</td>
+<td style="text-align: left;">Diuretika a maskovací látky (nelze pro léčbu sportovců použít vůbec).</td>
+<td style="text-align: right;">0.96</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">S9</td>
+<td style="text-align: left;">Glukokortikoidy (zakázané pouze při soutěži).</td>
+<td style="text-align: right;">0.35</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">S6</td>
+<td style="text-align: left;">Stimulancia (zakázané pouze při soutěži).</td>
+<td style="text-align: right;">0.25</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">S3</td>
+<td style="text-align: left;">Beta-2 agonisté (nelze pro léčbu sportovců použít vůbec).</td>
+<td style="text-align: right;">0.19</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">M3</td>
+<td style="text-align: left;">Genový a buněčný doping</td>
+<td style="text-align: right;">0.08</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">S1</td>
+<td style="text-align: left;">Anabolické látky (nelze pro léčbu sportovců použít vůbec).</td>
+<td style="text-align: right;">0.08</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">S8</td>
+<td style="text-align: left;">Kanabinoidy (zakázané pouze při soutěži).</td>
+<td style="text-align: right;">0.03</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">M1</td>
+<td style="text-align: left;">Manipulace s krví a krevními komponentami</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Vykreslete sloupcový graf léků, které se nesmí používat při sportu (popis obsahuje klíčové slovo “sport”). Pomocí regulárních výrazů odstraňte z&nbsp;popisů vysvětlivky v závorkách.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="./zadani_files/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+<section id="úkol-2" class="level2">
+<h2 class="anchored" data-anchor-id="úkol-2">Úkol 2<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://physics.ujep.cz/~jskvor/ZZD2023/2023-06-02/#%C3%BAkol-2" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+<p>Zjistěte, z jakých léčivých látek se jednotlivé léky skládají. Vytvořte tabulku, která bude obsahovat identifikátor léku, název léku a pro každý lék soupis účinných látek. Hlavička výsledné tabulky by měla vypadat následovně:</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: right;">Kod</th>
+<th style="text-align: left;">Nazev</th>
+<th style="text-align: left;">Latky</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: right;">9</td>
+<td style="text-align: left;">ACYLCOFFIN</td>
+<td style="text-align: left;">KYSELINA ACETYLSALICYLOVÁ</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">9</td>
+<td style="text-align: left;">ACYLCOFFIN</td>
+<td style="text-align: left;">KOFEIN</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">113</td>
+<td style="text-align: left;">DILURAN</td>
+<td style="text-align: left;">ACETAZOLAMID</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">113</td>
+<td style="text-align: left;">DILURAN</td>
+<td style="text-align: left;">MONOHYDRÁT LAKTOSY</td>
+</tr>
+<tr class="odd">
+<td style="text-align: right;">113</td>
+<td style="text-align: left;">DILURAN</td>
+<td style="text-align: left;">ŽELATINA</td>
+</tr>
+<tr class="even">
+<td style="text-align: right;">113</td>
+<td style="text-align: left;">DILURAN</td>
+<td style="text-align: left;">SACHAROSA</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<p>Zjistěte deset nejčastěji používaných látek. Do tabulky je vypište seřazené od nejpoužívanější.</p>
+<div class="cell">
+<div class="cell-output-display">
+<table class="table table-sm table-striped">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Latky</th>
+<th style="text-align: right;">pocet</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">MAGNESIUM-STEARÁT</td>
+<td style="text-align: right;">36284</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MONOHYDRÁT LAKTOSY</td>
+<td style="text-align: right;">21094</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ŽLUTÝ OXID ŽELEZITÝ</td>
+<td style="text-align: right;">14501</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">ŽELATINA</td>
+<td style="text-align: right;">11114</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">VODA PRO INJEKCI</td>
+<td style="text-align: right;">9850</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">MANNITOL</td>
+<td style="text-align: right;">6541</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">ČERNÝ OXID ŽELEZITÝ</td>
+<td style="text-align: right;">6305</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">CHLORID SODNÝ</td>
+<td style="text-align: right;">5739</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">POVIDON K 30</td>
+<td style="text-align: right;">5552</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">PROPYLENGLYKOL</td>
+<td style="text-align: right;">5498</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+</section>
+<section id="úkol-3" class="level2">
+<h2 class="anchored" data-anchor-id="úkol-3">Úkol 3<a class="anchorjs-link " aria-label="Anchor" data-anchorjs-icon="" href="https://physics.ujep.cz/~jskvor/ZZD2023/2023-06-02/#%C3%BAkol-3" style="font: 1em / 1 anchorjs-icons; padding-left: 0.375em;"></a></h2>
+<p>Dle sloupce “Datum rozhodnutí pro SPC” určete kolik bylo v daném roce za Českou republiku (Země sídla držitele rozhodnutí o registraci,<code>ZEMDRZ</code>) vyprodukováno léčiv klasifikovaných jako psychotropní látky. Pro určení klasifikace využijte tabulku <code>dlp_zavislost</code> a ověřte, zda text popisu závislosti obsahuje slovo “psychotropní”.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="./zadani_files/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    let tooltip;
+    if (window.bootstrap) {
+      button.setAttribute("data-bs-toggle", "tooltip");
+      button.setAttribute("data-bs-placement", "left");
+      button.setAttribute("data-bs-title", "Copied!");
+      tooltip = new bootstrap.Tooltip(button, 
+        { trigger: "manual", 
+          customClass: "code-copy-button-tooltip",
+          offset: [0, -8]});
+      tooltip.show();    
+    }
+    setTimeout(function() {
+      if (tooltip) {
+        tooltip.hide();
+        button.removeAttribute("data-bs-title");
+        button.removeAttribute("data-bs-toggle");
+        button.removeAttribute("data-bs-placement");
+      }
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  const findCites = (el) => {
+    const parentEl = el.parentElement;
+    if (parentEl) {
+      const cites = parentEl.dataset.cites;
+      if (cites) {
+        return {
+          el,
+          cites: cites.split(' ')
+        };
+      } else {
+        return findCites(el.parentElement)
+      }
+    } else {
+      return undefined;
+    }
+  };
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const citeInfo = findCites(ref);
+    if (citeInfo) {
+      tippyHover(citeInfo.el, function() {
+        var popup = window.document.createElement('div');
+        citeInfo.cites.forEach(function(cite) {
+          var citeDiv = window.document.createElement('div');
+          citeDiv.classList.add('hanging-indent');
+          citeDiv.classList.add('csl-entry');
+          var biblioDiv = window.document.getElementById('ref-' + cite);
+          if (biblioDiv) {
+            citeDiv.innerHTML = biblioDiv.innerHTML;
+          }
+          popup.appendChild(citeDiv);
+        });
+        return popup.innerHTML;
+      });
+    }
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

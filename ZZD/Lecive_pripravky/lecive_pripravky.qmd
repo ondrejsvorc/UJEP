@@ -1,0 +1,58 @@
+---
+title: "lecive_pripravky"
+format: html
+editor: visual
+---
+
+# **Zpracování dat z Databáze léčivých přípravků**
+
+| Jméno a příjmení | Studentské číslo | Datum |
+|------------------|------------------|-------|
+| Ondřej Švorc     | x                | x     |
+
+```{r}
+rm(list=ls())
+```
+
+```{r}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(ggplot2)
+  library(knitr)
+  library(lubridate)
+})
+```
+
+```{r}
+if (!requireNamespace("here", quietly = TRUE)) {
+  install.packages("here")
+}
+library(here)
+setwd(here())
+```
+
+Zjistěte, kolik procent léků v databázi spadá do určité dopingové úrovně. Tabulku s výslednými daty seřaďte dle procentuálního zastoupení sestupně. Výsledná tabulka bude obsahovat kód typu závislosti, její popis/název a vypočtené procento.
+
+```{r}
+lecive_pripravky <- read.csv("dlp_lecivepripravky.csv", fileEncoding = "CP1250", sep = ";")
+dopingy <- read.csv("dlp_doping.csv", fileEncoding = "CP1250", sep = ";")
+```
+
+```{r}
+kod_sukl <- lecive_pripravky$KOD_SUKL
+doping <- lecive_pripravky$DOPING
+leky <- data.frame(kod_sukl, doping)
+
+cetnosti_leku_s_dopingem <- 
+  leky %>% 
+  group_by(doping) %>%
+  summarise(cetnost = n()) %>%
+  mutate(procent = (cetnost / sum(cetnost)) * 100) %>%
+  select(doping, procent)
+
+vysledek <- 
+  inner_join(dopingy, cetnosti_leku_s_dopingem, by = c("DOPING" = "doping")) %>%
+  arrange(desc(procent))
+
+kable(vysledek)
+```
