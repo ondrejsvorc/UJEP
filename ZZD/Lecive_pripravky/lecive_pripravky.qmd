@@ -87,3 +87,69 @@ spojeni_radku %>%
   geom_col() +
   coord_flip()
 ```
+
+Zjistěte, z jakých léčivých látek se jednotlivé léky skládají. Vytvořte tabulku, která bude obsahovat identifikátor léku, název léku a pro každý lék soupis účinných látek.
+
+```{r}
+data <- read.csv("dlp_lecivepripravky.csv", fileEncoding = "CP1250", sep = ";")
+data_slozeni <- read.csv("dlp_slozeni.csv", fileEncoding = "CP1250", sep = ";")
+data_latky <- read.csv("dlp_lecivelatky.csv", fileEncoding = "CP1250", sep = ";")
+```
+
+```{r}
+kod_leku <- data$KOD_SUKL
+Název <- data$NAZEV
+leky <- data.frame(kod_leku, Název)
+
+kable(head(leky, 5))
+```
+
+```{r}
+kod_latky <- data_latky$KOD_LATKY
+Látky <- data_latky$NAZEV
+latky <- data.frame(kod_latky, Látky)
+
+kable(head(latky, 5))
+```
+
+```{r}
+kod_leku_fk <- data_slozeni$KOD_SUKL
+kod_latky_fk <- data_slozeni$KOD_LATKY
+slozeni <- data.frame(kod_leku_fk, kod_latky_fk)
+
+kable(head(slozeni, 5))
+```
+
+```{r}
+vysledek <- inner_join(slozeni, leky, by = c("kod_leku_fk" = "kod_leku"))
+
+kable(head(vysledek, 5))
+```
+
+```{r}
+vysledek <- inner_join(vysledek, latky, by = c("kod_latky_fk" = "kod_latky" ))
+
+kable(head(vysledek, 5))
+```
+
+```{r}
+Kód <- vysledek$kod_leku_fk
+Název <- vysledek$Název
+Látky <- vysledek$Látky  
+vysledek <- data.frame(Kód, Název, Látky)
+
+kable(head(vysledek , 10))
+```
+
+Zjistěte deset nejčastěji používaných látek. Do tabulky je vypište seřazené od nejpoužívanější.
+
+```{r}
+
+nejpouzivanejsi_latky <-
+  vysledek %>%
+  group_by(Látky) %>%
+  summarise(Počet_výskytů = n()) %>%
+  arrange(desc(Počet_výskytů))
+
+kable(head(nejpouzivanejsi_latky, 10))
+```
