@@ -1,0 +1,281 @@
+---
+title: "generovanitabulky"
+format: html
+editor: visual
+---
+
+```{r}
+rm(list=ls())
+```
+
+```{r}
+if (!requireNamespace("here", quietly = TRUE)) {
+  install.packages("here")
+}
+library(here)
+setwd(here())
+```
+
+# **Úkol 1**
+
+Vygenerujte tabulku pracovního výkazu za rok 2022
+
+-   Do tabulky zahrňte výši úvazku. Úvazek bude začínat na náhodné hodnotě mezi 0 a 1 a každý měsíc se změní náhodně o 0.1 náhodným směrem. Na základě úvazku vypočtěte povinnost odpracovaných hodin (8 hodin denně při 100% úvazku).
+
+-   Dle povinnosti odpracovaných hodin zadejte do tabulky hodnoty pro příchod a odchod.
+
+    -   příchod začíná v 8:00. Pro věrohodnost přidejte náhodný faktor v násobcích pěti minut (lze přičítat i odčítat)
+
+    -   odchod vypočtete jako čas příchodu plus povinnost odpracovaných hodin (pro věrohodnost opět přičtěte náhodný faktor k času odchodu)
+
+-   V případě, že povinné hodiny k odpracování jsou více než 6 hodin, zadejte do tabulky čas začátku a konce přestávky.
+
+    -   přestávka by měla mít 30 minut
+
+    -   u začátku a konce přestávky lze opět přidat náhodný faktor
+
+    -   začátek i konec přestávky musí být vždy umístěna mezi časy příchodu a odchodu ze zaměstnání
+
+    -   pokud je vyplněna přestávka, čas odchodu ze zaměstnání by se měl posunout o délku přestávky
+
+| datum      | den     | uvazek | povinnost | prichod | prestavkaZacatek | prestavkaKonec | odchod |
+|------------|---------|--------|-----------|---------|------------------|----------------|--------|
+| 2022-01-01 | Sobota  | 0.8    | 6.4       | 08:00   | 12:00            | 12:30          | 14:34  |
+| 2022-01-02 | Neděle  | 0.8    | 6.4       | 07:45   | 11:50            | 12:20          | 14:24  |
+| 2022-01-03 | Pondělí | 0.8    | 6.4       | 08:00   | 11:50            | 12:25          | 13:59  |
+| 2022-01-04 | Úterý   | 0.8    | 6.4       | 07:45   | 12:05            | 12:40          | 13:59  |
+| 2022-01-05 | Středa  | 0.8    | 6.4       | 07:50   | 12:15            | 12:50          | 14:04  |
+| 2022-01-06 | Čtvrtek | 0.8    | 6.4       | 08:15   | 12:00            | 12:30          | 14:19  |
+
+```{r}
+generate_dates <- function(from, to) {
+  dates <- seq(from = as.Date(from), to = as.Date(to), by = "day")
+  return(dates)
+}
+```
+
+```{r}
+generate_uvazek_values <- function(dates) {
+  # Vygeneruj náhodný úvazek od 0 do 1.
+  # 1 = 100 % úvazek
+  # 0.5 = 50 % úvazek
+  # ...
+  start_uvazek <- runif(1, min = 0, max = 1)
+  
+  # Sloupec s úvazky bude číselný a stejně dlouhý, jako sloupec s datumy.
+  uvazek_values <- numeric(length(dates))
+  
+  # Nastav první záznam sloupce s úvazky na počátečně vygenerovaný úvazek.
+  uvazek_values[1] <- start_uvazek
+  
+  # Získej první měsíc ze sloupce s datumy.
+  current_month <- as.integer(format(dates[1], "%m"))  
+  
+  for (i in 2:length(dates)) {
+    # Pokud se měsíc změnil, uprav náhodně úvazek o ±0.1
+    if (as.integer(format(dates[i], "%m")) != current_month) {
+      change <- sample(c(-0.1, 0, 0.1), 1)
+      uvazek_values[i] <- min(max(uvazek_values[i - 1] + change, 0), 1)
+      # Změň nynější měsíc, od něho se odvijí podmínka výše.
+      current_month <- as.integer(format(dates[i], "%m"))  
+    } else {
+      # Měsíc se nezměnil, proto ponech úvazek takový, jaký již byl.
+      uvazek_values[i] <- uvazek_values[i - 1]
+    }
+  }
+  
+  return(uvazek_values)
+}
+```
+
+```{r}
+generate_povinnosti <- function(uvazky) {
+  # 100% úvazek = 8 hodin
+  max_hours_per_day <- 8  
+  
+  # Úvazky jsou desetinná čísla (např. 50% úvazek = 0.5).
+  # Získej počet povinných hodin dle úvazku.
+  povinnosti <- uvazky * max_hours_per_day
+  return(povinnosti)
+}
+```
+
+```{r}
+generate_prichody <- function(povinnosti) {
+  # Příchod začíná v 8:00.
+  start_time <- as.POSIXlt("08:00:00", format = "%H:%M:%S")
+  
+  # Sloupec s příchody bude string a stejně dlouhý, jako sloupec s povinnostmi.
+  prichody <- character(length(povinnosti))
+  
+  for (i in seq_along(povinnosti)) {
+    # Vygeneruj náhodnou odchylku v násobcích 5.
+    # Nejnižší hodnota bude -60 a nejvyšší 60 (v minutách).
+    random_offset <- sample(-12:12, 1) * 5  
+    
+    # Vygeneruj náhodný příchod do práce. 
+    # (8:00 + náhodná odchylka) * 60 (pro převod na sekundy).
+    arrival_time <- start_time + random_offset * 60  
+    
+    # Naformátuj čas jako string.
+    # Převede sekundy nejprve na hodiny, pak na minuty, a pak na zbylé sekundy.
+    prichody[i] <- format(arrival_time, format = "%H:%M:%S")
+  }
+  
+  return(prichody)
+}
+```
+
+```{r}
+generate_odchody <- function(prichody, povinnosti) {
+  # Sloupec s odchody bude string a stejně dlouhý, jako sloupec s příchody.
+  odchody <- character(length(prichody))
+  
+  for (i in seq_along(prichody)) {
+    # Získá příchod jako string.
+    prichod_time <- as.POSIXlt(prichody[i], format = "%H:%M:%S")
+    
+    # Celkový počet hodin, které má daná osoba odpracovat.
+    hours <- floor(povinnosti[i])
+    
+    # Vypočítá počet zbývajících minut k odpracování,
+    # které zbydou po odečtení celých hodin
+    minutes <- round((povinnosti[i] - hours) * 60)
+    
+    # Vygeneruj náhodnou odchylku v násobcích 5.
+    # Nejnižší hodnota bude -60 a nejvyšší 60 (v minutách).
+    random_offset <- sample(-12:12, 1) * 5  
+    
+    # Vygeneruj náhodný odchod z práce. 
+    odchod_time <- prichod_time + hours * 3600 + minutes * 60 + random_offset * 60
+    
+    # Naformátuj čas jako string.
+    # Převede sekundy nejprve na hodiny, pak na minuty, a pak na zbylé sekundy.
+    odchody[i] <- format(odchod_time, format = "%H:%M:%S")
+  }
+  
+  return(odchody)
+}
+```
+
+```{r}
+generate_prestavky <- function(povinnosti, prichody, odchody) {
+  # Sloupce s přestávkami budou string a stejně dlouhé, jako sloupec s příchody.
+  prestavkaZacatek <- character(length(prichody))
+  prestavkaKonec <- character(length(prichody))
+  
+  for (i in seq_along(povinnosti)) {
+    # Pokud jsou povinné hodiny k odpracování více než 6 hodin,
+    # uveď přestávky. Jinak mají být tyto záznamy N/A.
+    if (povinnosti[i] > 6) {
+      # Naformátuj časy jako string.
+      prichod_time <- as.POSIXlt(prichody[i], format = "%H:%M:%S")
+      odchod_time <- as.POSIXlt(odchody[i], format = "%H:%M:%S")
+      
+      # Nalezni přibližný střed mezi příchodem a odchodem.
+      work_duration_secs <- as.numeric(
+        difftime(odchod_time, prichod_time, units = "secs")
+      )
+      mid_work_time <- prichod_time + (work_duration_secs / 2)
+      
+      # Vygeneruj náhodnou odchylku v násobcích 5.
+      # Nejnižší hodnota bude -10 a nejvyšší 10 (v minutách).
+      random_start_offset <- sample(-2:2, 1) * 5 * 60
+      prestavka_start_time <- mid_work_time + random_start_offset
+      
+      # Přestávka trvá 30 minut.
+      prestavka_end_time <- prestavka_start_time + 30 * 60  
+
+      # Ujisti se, zda jsou přestávky v pracovních hodinách.
+      # Tzn. mezi časem příchodu a časem odchodu.
+      if (prestavka_start_time < prichod_time) {
+        prestavka_start_time <- prichod_time
+      }
+      if (prestavka_end_time > odchod_time) {
+        prestavka_end_time <- odchod_time
+      }
+
+      # Naformátuj časy jako string.
+      # Převede sekundy nejprve na hodiny, pak na minuty, a pak na zbylé sekundy.
+      prestavkaZacatek[i] <- format(prestavka_start_time, format = "%H:%M:%S")
+      prestavkaKonec[i] <- format(prestavka_end_time, format = "%H:%M:%S")
+    } else {
+      prestavkaZacatek[i] <- NA
+      prestavkaKonec[i] <- NA
+    }
+  }
+  
+  return(list(prestavkaZacatek = prestavkaZacatek, prestavkaKonec = prestavkaKonec))
+}
+```
+
+```{r}
+
+columns <- c(
+  "datum", 
+  "den", 
+  "uvazek", 
+  "povinnost", 
+  "prichod", 
+  "prestavka Zacatek", 
+  "prestavka Konec", 
+  "odchod",
+  "poznamka"
+)
+
+columns_count <- length(columns)
+rows_to_generate_count <- 6
+
+df <- data.frame(matrix(ncol = columns_count, nrow = rows_to_generate_count))
+colnames(df) <- columns
+
+dates <- generate_dates("2021-12-30", "2022-01-06")
+days <- weekdays(dates)
+uvazky <- generate_uvazek_values(dates)
+povinnosti <- generate_povinnosti(uvazky)
+prichody <- generate_prichody(povinnosti)
+odchody <- generate_odchody(prichody, povinnosti)
+prestavky <- generate_prestavky(povinnosti, prichody, odchody)
+
+df <- data.frame(
+  datum = dates,
+  den = days,
+  uvazek = uvazky,
+  povinnost = povinnosti,
+  prichod = prichody,
+  prestavkaZacatek = prestavky$prestavkaZacatek,
+  prestavkaKonec = prestavky$prestavkaKonec,
+  odchod = odchody
+)
+
+kable(df)
+```
+
+```{r}
+library(rvest)
+
+url <- "https://www.advent.cz/kalendar-svatku-na-rok-2021/"
+column_names <- c("datum", "nazev")
+webpage <- read_html(url)
+
+# F12 -> pravé tlačítko myši na <table> prvek -> Kopírovat -> Kopírovat cestu XPath
+table_xpath <- "/html/body/div[2]/div/div/div/article/div[1]/table"
+table_data <- webpage %>% html_table(fill = TRUE)
+
+write.csv(table_data[[1]], "svatky.csv", row.names = FALSE)
+```
+
+```{r}
+svatky <- read.csv("svatky.csv")
+svatky <- svatky[-1, ]
+write.csv(svatky, "svatky.csv", row.names = FALSE)
+```
+
+```{r}
+svatky <- read.csv("svatky.csv")
+kable(svatky)
+```
+
+```{r}
+
+```
