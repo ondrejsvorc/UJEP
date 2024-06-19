@@ -1,0 +1,136 @@
+---
+title: "netflix"
+format: html
+editor: visual
+---
+
+# **Netflix**
+
+| Jméno a příjmení | Studentské číslo | Datum |
+|------------------|------------------|-------|
+| Ondřej Švorc     | x                | x     |
+
+## Import knihoven
+
+```{r}
+rm(list=ls())
+```
+
+```{r}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(ggplot2)
+  library(knitr)
+  library(lubridate)
+  library(stringr)
+  library(tidyr)
+})
+```
+
+## **Úkol 1**
+
+Spočítejte, kolik procent obsahu platformy Netflix je tvořeno filmy a kolik je tvořeno seriály.
+
+```{r}
+netflix <- read.csv("netflix_titles.csv")
+netflix %>% head(10)
+```
+
+```{r}
+result_1 <- 
+  netflix %>%
+  select(show_id, type) %>%
+  group_by(type) %>%
+  summarise(count = n()) %>%
+  mutate(percentage = (count / sum(count)) * 100)
+
+kable(result_1)
+```
+
+```{r}
+result_1 %>%
+  ggplot(aes(x = type, y = percentage, fill = type)) +
+  geom_col(position = "dodge") +
+  scale_fill_manual(values = c("Movie" = "blue", "TV Show" = "red")) +
+  labs(title = "Percentage of Movies and TV Shows on Netflix",
+       x = "Type",
+       y = "Percentage") +
+  theme_minimal()
+
+print(result_1)
+```
+
+## Úkol 2
+
+Kolik procent seriálů a filmů je produkováno v rámci jednotlivých zemí? Do grafu vykreslete pouze deset nejvýznamnějších zemí (není nutné řešit chybějící záznamy).
+
+```{r}
+result_2 <-
+  netflix %>%
+  select(show_id, type, country) %>%
+  separate_rows(country, sep = ", ") %>%
+  group_by(country) %>%
+  summarise(count = n()) %>%
+  mutate(percentage = (count / sum(count)) * 100) %>%
+  arrange(desc(count)) %>%
+  head(10)
+
+print(result_2)
+```
+
+```{r}
+ggplot(result_2, aes(x = percentage, y = reorder(country, percentage), fill = country)) +
+  geom_col(width = 0.6) +
+  labs(title = "Percentage of Series and Films Produced by Country (Top 10)",
+       x = "Percentage",
+       y = "Country",
+       fill = "Country") +
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+
+## Úkol 2
+
+Vykreslete graf, který bude popisovat počty filmů a seriálů publikovaných dle kategorie `rating`.
+
+```{r}
+result_3 <- 
+  netflix %>%
+  select(show_id, type, rating) %>%
+  group_by(type, rating) %>%
+  summarise(count = n()) %>%
+  mutate(percentage = (count / sum(count)) * 100)
+
+result_3 %>% head(10) %>% kable()
+
+ggplot(result_3, aes(x = percentage, y = reorder(rating, count), fill = rating)) +
+  geom_col() +
+  facet_wrap(~ type, scales = "free_y") +
+  labs(title = "Number of Films and Series by Rating Category",
+       x = "Count",
+       y = "Rating",
+       fill = "Rating") +
+  theme_minimal() +
+  theme(legend.position = "none")
+```
+
+```{r}
+zeme <- netflix$country
+delky <- netflix$duration
+delky <- as.numeric(sub(" min","",delky), na.rm = TRUE)
+
+typy <- netflix$type
+df <- data.frame(zeme, delky)
+df <- df %>% filter(str_detect("Movie",typy))
+nej_zeme <- c("United States", "United Kingdom", "Spain","South Korea", "Mexico", "Japan","India","France","Canada")
+df <- df %>% filter(zeme %in% nej_zeme)
+
+df %>% ggplot(aes(x=zeme,y=delky)) +
+  geom_boxplot() + 
+  labs(x="Country",y="Duration (min)") +
+  coord_flip()
+```
+
+## **Úkol 3**
+
+Spočítejte celkový počet seriálů a filmů v různých letech dle data vydání, tj. kolik celkem bylo filmů/seriálů natočeno do daného roku.
