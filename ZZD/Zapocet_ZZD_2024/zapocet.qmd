@@ -1,0 +1,232 @@
+---
+title: "Zápočet 20. 6. 2024"
+author: "Ondřej Švorc"
+format: html
+editor: visual
+---
+
+# Data o pohybové aktivitě z chytrých náramků
+
+| Jméno a příjmení | Studentské číslo | Datum        |
+|------------------|------------------|--------------|
+| Ondřej Švorc     | st101971         | 20\. 6. 2024 |
+
+### **Vymazání lokálního proměnného prostředí**
+
+```{r}
+rm(list=ls())
+```
+
+### **Načtení knihoven**
+
+```{r}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(ggplot2)
+  library(knitr)
+  library(lubridate)
+  library(stringr)
+  library(DBI)
+  library(tidyr)
+  library(tidyverse)
+})
+```
+
+### Nastavení pracovní složky
+
+```{r}
+if (!requireNamespace("here", quietly = TRUE)) {
+  install.packages("here")
+}
+
+library(here)
+setwd(here())
+```
+
+### Připojení k Gadgetbridge databázi a naplnění df
+
+```{r}
+# Naváže spojení s lokální SQLite databází "Gadgetbridge"
+con <- dbConnect(RSQLite::SQLite(), dbname="Gadgetbridge")
+
+# Načte všechna data z tabulky MI_BAND_ACTIVITY_SAMPLE do datového rámce "df"
+df <- dbGetQuery(con,'select * from MI_BAND_ACTIVITY_SAMPLE')
+
+# Odpojí se od databáze (již není potřeba být k ní být připojen).
+dbDisconnect(con)
+```
+
+### Mutace df za účelem vytvoření UTC datumového sloupce z dat z TIMESTAMP sloupce
+
+```{r}
+df$datetime <- as_datetime(df$TIMESTAMP)
+
+df$datetime %>% head(5)
+```
+
+### „Z času odečtěte 2 hodiny.“
+
+```{r}
+df <- 
+  df %>%
+  mutate(datetime = datetime - hours(2))
+
+df$datetime %>% head(5)
+```
+
+```{r}
+# Pro ujištění se, že veškeré mutace dopadly v pořádku.
+df %>% head(3)
+```
+
+#### Vytvořte následující graf. Uživatel je určen proměnnou `DEVICE_ID`. V grafu je použita sekundární osa (`sec.axis`).
+
+```{r}
+# "2021-03-18 15:09:00 UTC => "2021-03-18"
+df$date <- as_date(df$datetime)
+
+df$date %>% head(5)
+```
+
+#### Výpočet počtu kroků uživatele v každém datu.
+
+```{r}
+# Předá přes rouru "df",
+# sjednotí dle sloupce "date" 
+# a provede sumu kroků pro každého uživatele k danému datu.
+daily_steps <- 
+  df %>%
+  group_by(date) %>%
+  summarise(steps = sum(STEPS), users = n_distinct(DEVICE_ID))
+
+daily_steps %>% 
+  arrange(desc(steps)) %>% 
+  head(5)
+```
+
+#### Vykreslení grafu ukazující časový vývoj počtu kroků na uživatele.
+
+```{r}
+user_scaling_factor <- max(daily_steps$steps) / max(daily_steps$users)
+
+ggplot(daily_steps, aes(x = date)) +
+  geom_line(aes(y = steps), color = "black") +
+  geom_point(aes(y = steps), color = "black") +
+  geom_line(aes(y = users * user_scaling_factor), color = "red") + 
+  scale_y_continuous(
+    name = "steps",
+    labels = scales::number_format(accuracy = 1),
+    sec.axis = sec_axis(~./user_scaling_factor, name = "users", labels = scales::number_format(accuracy = 1))
+  ) +
+  labs(title = "Časový vývoj počtu kroků na uživatele,\nresp. počtu uživatelů v jednotlivých dnech") +
+  theme_minimal()
+```
+
+#### Vytvořte následující tabulku. Tabulka zobrazuje ve vybraných dnech počty kroků jednotlivých uživatelů. K zobrazení je využita funkce `knitr::kable()`.
+
+```{r}
+# Zjištění nejnižšího a nejvyššího DEVICE_ID.
+min_id <- min(df$DEVICE_ID)
+max_id <- max(df$DEVICE_ID)
+
+print(min_id)
+print(max_id)
+```
+
+```{r}
+# DEVICE_ID tedy může být hodnota v rozsahu 1:26
+all_possible_ids <- min_id:max_id
+
+# Všechna ID.
+unique_device_ids <- unique(df$DEVICE_ID)
+
+# Dá se chápat jako rozdíl dvou množin.
+# Výsledkem jsou chybějící IDs.
+# (jen pro přehled/zajímavost, kdyby jich chybělo třeba více)
+missing_ids <- setdiff(all_possible_ids, unique_device_ids)
+missing_ids
+```
+
+```{r}
+# Vlastní funkce pro filtrování datumů, které jsou v daném rozsahu.
+# Kód filter() byl používán tímto způsobem na vícero místech.
+#
+# %>% = pipe/roura operátor
+# & = a zároveň
+filter_dates <- function(data, start_date = "2021-05-10", end_date = "2021-05-23") {
+  data %>% filter(date >= as.Date(start_date) & date <= as.Date(end_date))
+}
+```
+
+```{r}
+user_steps_by_date <- 
+  df %>%
+  group_by(date, DEVICE_ID) %>%
+  summarise(steps = sum(STEPS)) %>%
+  pivot_wider(names_from = DEVICE_ID, values_from = steps)
+
+# Sloupec "8" se vykresluje až jako poslední sloupec.
+# Přemístění sloupce "8" mezi "7" a "9".
+user_steps_by_date <- 
+  user_steps_by_date %>%
+  select(date, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, everything()) %>%
+  filter(date >= as.Date("2021-05-10") & date <= as.Date("2021-05-23")) %>%
+  filter_dates()
+
+kable(user_steps_by_date)
+```
+
+#### V poslední části již využijete také data v souboru `schedule.csv`, který obsahuje školní rozvrh uživatelů.
+
+```{r}
+schedule <- read.csv("schedule.csv")
+schedule %>% head(10)
+```
+
+```{r}
+df$HEART_RATE %>% head(10)
+```
+
+#### Vaším úkolem je zobrazit následující graf, který zpracovává
+
+-   data z proměnné `HEART_RATE` původní databáze,
+
+-   přičemž započítává pouze ta pozorování, ve kterých tato proměnná nabývá hodnot (0,255)(0,255),
+
+-   ve dnech dle první zobrazované tabulky, tj. od 10. května do 23. května,
+
+-   v době výuky dle výše uvedeného rozvrhu, konkrétně v závislosti na vyučovaných předmětech.
+
+```{r}
+
+# Pro správnou funkci weekdays. Chceme, aby se vygenerovali
+# názvů dnů v angličtině.
+Sys.setlocale("LC_TIME", "en_US.UTF-8")
+
+# Přidání dnů v týdnu v angličtině.
+filtered_df <- 
+  df %>%
+  filter(HEART_RATE > 0 & HEART_RATE < 255) %>%
+  filter_dates() %>%
+  mutate(day = weekdays(date))
+
+# Provedení spojení na základě sloupce "day".
+# Sjednocení dle předmětu.
+merged_data <- filtered_df %>%
+  inner_join(schedule, by = "day") %>%
+  group_by(subject)
+
+# Vykreslení grafu.
+ggplot(merged_data, aes(x = HEART_RATE, y = subject)) +
+  geom_boxplot() +
+  labs(x = "HEART_RATE", y = "subject") +
+  theme_minimal() +
+  theme(
+    panel.background = element_rect(fill = "grey95", color = NA)
+  )
+```
+
+```{r}
+# Vrácení lokalizace do původního stavu (bylo-li RStudio původně v češtině).
+Sys.setlocale("LC_TIME", "cs_CZ.UTF-8")
+```
