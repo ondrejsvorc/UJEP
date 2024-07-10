@@ -1,0 +1,55 @@
+---
+title: "Skoly"
+author: "Ondřej Švorc"
+format: html
+editor: visual
+---
+
+```{r}
+if (!requireNamespace("here", quietly = TRUE)) {
+  install.packages("here")
+}
+library(here)
+setwd(here())
+```
+
+```{r}
+suppressPackageStartupMessages({
+  library(dplyr)
+  library(ggplot2)
+  library(lubridate)
+  library(readxl)
+  library(tidyr)
+  library(RCzechia)
+})
+```
+
+```{r}
+skoly_df <- read.csv("skoly.csv", sep = ";")
+```
+
+```{r}
+# Standardize district names: merge all "Praha" districts into one
+skoly_df$Okres <- ifelse(grepl("Praha", skoly_df$Okres), "Praha", skoly_df$Okres)
+
+# Count number of schools per district
+district_counts <- skoly_df %>%
+  group_by(Okres) %>%
+  summarise(n = n()) %>%
+  arrange(desc(n))
+
+# Display top 5 districts
+top_5_districts <- head(district_counts, 5)
+print(top_5_districts)
+
+# Load map data
+mapa <- okresy("low")
+mapa <- left_join(mapa, district_counts, by = c("NAZ_LAU1" = "Okres"))
+
+# Plot the map
+ggplot(data = mapa) +
+  geom_sf(aes(fill = n), color = "black") +
+  scale_fill_viridis_c(option = "viridis", na.value = "white", guide = guide_legend(title = "Number of Schools")) +
+  labs(title = "Number of Schools and School Facilities in Each District") +
+  theme_minimal()
+```
