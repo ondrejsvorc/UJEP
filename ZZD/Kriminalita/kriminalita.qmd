@@ -20,6 +20,8 @@ suppressPackageStartupMessages({
   library(lubridate)
   library(readxl)
   library(tidyr)
+  library(knitr)
+  library(stringr)
 })
 ```
 
@@ -27,6 +29,8 @@ suppressPackageStartupMessages({
 types_df <- read.csv("types.csv")
 all_data_df <- read.csv("202405.csv")
 ```
+
+Ze získaných tabulek zjistěte 5 nejčastěji hlášených trestních činů (sloupec label), které byly hlášeny v květnu 2024 (složka 202405).
 
 ```{r}
 type_counts <- all_data_df %>%
@@ -40,3 +44,67 @@ top_5_labels <- types_df[match(type_counts$types, types_df$id), "label"]
 result <- data.frame(label = top_5_labels, pocet = type_counts$count)
 print(result)
 ```
+
+Pro každý z trestných činů získaných v předchozím úkolu vypočtěte průměrný počet jejich hlášení v jednotlivých hodinách. Výslednou tabulku vykreslete jako sloupcový graf.
+
+```{r}
+datum <- all_data_df$date
+id_cinu <- all_data_df$id
+id_nazvu_cinu_fk <- all_data_df$types
+
+df1 <- data.frame(id_cinu, id_nazvu_cinu_fk, datum)
+kable(head(df1, 5))
+
+id_nazvu_cinu <- types_df$id
+nazev_cinu <- types_df$name
+label_cinu <- types_df$label
+
+df2 <- data.frame(id_nazvu_cinu, nazev_cinu, label_cinu)
+kable(head(df2, 5))
+
+df1$datum <- ymd_hms(df1$datum)
+df1$hodina<- hour(df1$datum)
+df1$den <- day(df1$datum)
+
+df <- inner_join(df1, df2, by = c("id_nazvu_cinu_fk" = "id_nazvu_cinu"))
+df$id_cinu <- NULL
+df$id_nazvu_cinu_fk <- NULL
+
+kable(head(df, 5))
+
+df <- df %>%
+  filter(label_cinu %in% result$label) %>%
+  group_by(den, hodina, nazev_cinu) %>%
+  summarise(počet = n())
+  
+df <- df %>% 
+  group_by(hodina, nazev_cinu) %>%          
+  summarise(average = mean(počet))
+
+df %>%
+  ggplot(aes(x = hodina, y = average, fill = nazev_cinu)) +     
+  geom_col() + 
+  facet_wrap(~nazev_cinu, scales = "free_y")
+```
+
+## **Úkol 3**
+
+Využijte tabulky pro města Most, Praha a Poděbrady popisující trestnou činnost v těchto městech za rok 2023.
+
+Tyto tabulky spojte do jedné tak, aby nová tabulka obsahovala všechny řádky a sloupce všech tří tabulek, a záznamy pro jednotlivá města byly rozlišeny kategoriální hodnotou nového sloupce `mesto`.
+
+Pro vybrané následující typy trestních činů:
+
+-   `"KRÁDEŽE"`
+
+-   `"KRÁDEŽE VLOUPÁNÍM"`
+
+-   `"Rychlost"`
+
+-   `"PODVODY"`
+
+spočtěte jejich četnost vztaženou na počet obyvatel a porovnejte tak jednotlivá města mezi sebou. Informaci o počtech obyvatel načtěte z tabulky `pocty_obyvatel.xlsx`.
+
+Data ve výsledné tabulce zaokrouhlete na tři desetinná místa a vytvořte sloupcový graf, který bude popisovat relativní četnost vybraných trestních činů v jednotlivých městech.
+
+![](images/clipboard-3969972967.png)
