@@ -13,5 +13,3 @@ dotnet new console --framework net8.0
 ```
 dotnet run
 ```
-
-Zápočet: Ukázková aplikace s návrhovými vzory
