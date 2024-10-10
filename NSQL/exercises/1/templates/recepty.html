@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+
+{% block obsah %}
+<h2>Recepty</h2>
+<ul>
+  {% for recept in recepty %}
+  <li>
+    <article>
+      <h3>{{ recept["jmeno"] }}</h3>
+      <ol>
+        {% for surovina in recept["ingredience"] %}
+        <li>{{ surovina }}</li>
+        {% endfor %}
+      </ol>
+      <p>{{ recept["postup"] }}</p>
+    </article>
+  </li>
+  {% endfor %}
+</ul>
+{% endblock %}

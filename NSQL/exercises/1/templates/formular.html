@@ -1,0 +1,22 @@
+{% extends "layout.html" %}
+
+{% block obsah %}
+<h2>Nový recept</h2>
+<form action="" method="post">
+  <fieldset>
+    
+    <label for="jmeno">Jméno</label>
+    <input type="text" id="jmeno" name="jmeno" required>
+    <br>
+
+    <label for="ingredience">Ingredience</label>
+    <textarea cols="50" id="ingredience" name="ingredience" rows="5" required></textarea>
+    <br>
+
+    <label for="postup">Postup</label>
+    <textarea cols="50" id="postup" name="postup" rows="5" required></textarea>
+
+  </fieldset>
+  <button type="submit">Vytvořit recept</button>
+</form>
+{% endblock %}
