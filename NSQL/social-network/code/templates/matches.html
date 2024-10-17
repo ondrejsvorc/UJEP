@@ -3,18 +3,18 @@
 {% block content %}
 <h2>Shody</h2>
 {% if profiles %}
-    {% for profile in profiles %}
+    {% for friend in profiles %}
         <article class="card" style="width: 18rem;">
             <!-- <img src="..." class="card-img-top" alt="..."> -->
             <section class="card-body">
-            <h3 class="card-title">{{ profile.get("friend.name") }}</h5>
+            <h3 class="card-title">{{ friend.name }}</h5>
             <ul class="card-text">
-                <li>Věk: {{ profile.get("friend.age") }}</li>
+                <li>Věk: {{ friend.age }}</li>
                 <li>Záliby:
                     <ul>
-                    {% for hobby in profile.get("friend.hobbies") %}
-                        <li>{{ hobby }}</li>
-                    {% endfor %}
+                        {% for hobby in friend.hobbies %}
+                            <li>{{ hobby }}</li>
+                        {% endfor %}
                     </ul>
                 </li>
             </ul>

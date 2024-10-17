@@ -15,16 +15,10 @@
 <article class="card" style="width: 18rem;">
     <!-- <img src="..." class="card-img-top" alt="..."> -->
     <section class="card-body">
-      <h3 class="card-title">{{ profile.get("user.name") }}</h5>
+      <h3 class="card-title">{{ profile.name }}</h5>
       <ul class="card-text">
-        <li>Věk: {{ profile.get("user.age") }}</li>
-        <li>Záliby:
-            <ul>
-            {% for hobby in profile.get("user.hobbies") %}
-                <li>{{ hobby }}</li>
-            {% endfor %}
-            </ul>
-        </li>
+        <li>Věk: {{ profile.age }}</li>
+        <li>Záliby: {{ profile.hobbies | join(", ") }}</li>
       </ul>
     </section>
 </article>
