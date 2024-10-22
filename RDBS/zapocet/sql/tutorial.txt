@@ -1,0 +1,10 @@
+1. Vytvořit databázi
+CREATE DATABASE Restaurace;
+
+2. Připojit se k databázi
+restaurace/postgres@Postgre SQL 16
+
+3. Vytvořit schéma
+CREATE SCHEMA Pivonka;
+
+4. Vykonat další příkazy

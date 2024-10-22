@@ -1,0 +1,56 @@
+[
+    {
+        "id_zamestnanec": 2,
+        "nazev_pozice": "Šéfkuchař",
+        "jmeno": "Pavel",
+        "prijmeni": "Svoboda"
+    },
+    {
+        "id_zamestnanec": 3,
+        "nazev_pozice": "Šéfkuchař",
+        "jmeno": "Martin",
+        "prijmeni": "Novotný"
+    },
+    {
+        "id_zamestnanec": 6,
+        "nazev_pozice": "Kuchař",
+        "jmeno": "Petr",
+        "prijmeni": "Procházka"
+    },
+    {
+        "id_zamestnanec": 7,
+        "nazev_pozice": "Kuchař",
+        "jmeno": "Jakub",
+        "prijmeni": "Kučera"
+    },
+    {
+        "id_zamestnanec": 8,
+        "nazev_pozice": "Kuchař",
+        "jmeno": "Jiří",
+        "prijmeni": "Veselý"
+    },
+    {
+        "id_zamestnanec": 9,
+        "nazev_pozice": "Kuchař",
+        "jmeno": "Lukáš",
+        "prijmeni": "Horák"
+    },
+    {
+        "id_zamestnanec": 10,
+        "nazev_pozice": "Kuchař",
+        "jmeno": "David",
+        "prijmeni": "Němec"
+    },
+    {
+        "id_zamestnanec": 11,
+        "nazev_pozice": "Kuchař",
+        "jmeno": "Jaroslav",
+        "prijmeni": "Pokorný"
+    },
+    {
+        "id_zamestnanec": 12,
+        "nazev_pozice": "Kuchař",
+        "jmeno": "Josef",
+        "prijmeni": "Král"
+    }
+]
