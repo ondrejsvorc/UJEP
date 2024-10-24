@@ -1,0 +1,11 @@
+{% extends "template.html" %}
+
+{% block main %}
+<h1>Order pizza</h1>
+<form action="/order-pizza" method="post">
+  <label for="pizzaName">Name</label>
+  <input name="pizzaName" type="text" required>
+  <input name="pizzaAmount" type="number">
+  <input type="submit" value="Order"></input>
+</form>
+{% endblock %}
