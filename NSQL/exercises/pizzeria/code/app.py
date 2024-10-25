@@ -1,10 +1,33 @@
 import json
 from flask import Flask, redirect, render_template, request, make_response
 from redis import Redis
+from pymongo import MongoClient
 from helpers import add_pizza, delete_pizza, get_pizza, get_pizzas, update_pizza
 
 app = Flask(__name__)
 redis = Redis(host="redis", port=6379)
+mongo = MongoClient(
+    host="mongodb", port=27017, username="admin", password="admin", authSource="admin"
+)
+db = mongo["somedb"]
+storage = db["storage"]
+sensor_1 = {"id": "0001", "name": "Temp"}
+storage.insert_one(sensor_1)
+
+
+@app.route("/sensor/<sensor_id>", methods=["GET"])
+def get_sensor(sensor_id):
+    sensor_data = redis.get(f"sensor:{sensor_id}")
+    if sensor_data:
+        return (f"Z Redisu: {sensor_data.decode('utf-8')}", 200)
+
+    sensor = storage.find_one({"id": sensor_id})
+    if sensor:
+        sensor["_id"] = str(sensor["_id"])
+        redis.set(f"sensor:{sensor_id}", json.dumps(sensor))
+        return f"Z MongoDB: {sensor}", 200
+
+    return f"Data senzoru s id {sensor_id} nebyla nalezena", 404
 
 
 @app.route("/", methods=["GET"])
