@@ -1,29 +1,13 @@
-from neomodel import (
-    db,
-    config,
-    StructuredNode,
-    StringProperty,
-    IntegerProperty,
-    ArrayProperty,
-    RelationshipTo,
-)
+from typing import List
+from neomodel import db, config
 from flask import Flask, render_template, request, redirect
 from random import choice
-
+from models.person import Person
 
 app = Flask(__name__)
 config.DATABASE_URL = "bolt://neo4j:adminpass@neo4j:7687"
 
 logged_user = "Pepa"
-
-
-class Person(StructuredNode):
-    name = StringProperty(unique_index=True, required=True)
-    age = IntegerProperty(required=True)
-    hobbies = ArrayProperty()
-
-    likes = RelationshipTo("Person", "LIKES")
-    dislikes = RelationshipTo("Person", "DISLIKES")
 
 
 def mock_data():
@@ -43,15 +27,15 @@ def mock_data():
     richard.likes.connect(alena)
 
 
-def get_user_node(username):
+def get_user_node(username: str) -> Person:
     return Person.nodes.get(name=username)
 
 
-def get_logged_user_profile(username):
+def get_logged_user(username: str) -> Person:
     return get_user_node(username)
 
 
-def get_matches(username):
+def get_matches(username: str) -> List[Person]:
     query = """
     MATCH (friend:Person)-[:LIKES]->(user:Person)-[:LIKES]->(friend:Person)
     WHERE user.name = $username
@@ -61,7 +45,7 @@ def get_matches(username):
     return [Person.inflate(row[0]) for row in results]
 
 
-def available_matches(username):
+def get_available_matches(username: str) -> List[Person]:
     query = """
     MATCH (user:Person), (friend:Person)
     WHERE user.name = $username
@@ -72,10 +56,9 @@ def available_matches(username):
     RETURN friend.name, friend.age, friend.hobbies
     """
     results, _ = db.cypher_query(query, {"username": username})
-    return [dict(name=row[0], age=row[1], hobbies=row[2]) for row in results]
+    return [Person(name=row[0], age=row[1], hobbies=row[2]) for row in results]
 
 
-# Routes
 @app.route("/login")
 def login():
     return render_template("login.html")
@@ -83,10 +66,10 @@ def login():
 
 @app.route("/")
 @app.route("/home")
-def hello_world():
-    logged_user_info = get_logged_user_profile(logged_user)
+def home():
+    logged_user_info = get_logged_user(logged_user)
     num_of_matches = len(get_matches(logged_user))
-    num_of_available_matches = len(available_matches(logged_user))
+    num_of_available_matches = len(get_available_matches(logged_user))
     return render_template(
         "home.html",
         profile=logged_user_info,
@@ -104,22 +87,22 @@ def matches():
 @app.route("/search", methods=["GET", "POST"])
 def search():
     if request.method == "GET":
-        potential_matches = available_matches(logged_user)
-        random_profile = choice(potential_matches) if potential_matches else None
+        available_matches = get_available_matches(logged_user)
+        random_profile = choice(available_matches) if available_matches else None
         return render_template("search.html", profile=random_profile)
-    else:  # POST method
-        date_choice = request.form.get("date_choice")
-        friend_name = request.form.get("friend_name")
 
-        user_node = get_user_node(logged_user)
-        friend_node = get_user_node(friend_name)
+    date_choice = request.form.get("date_choice")
+    friend_name = request.form.get("friend_name")
 
-        if date_choice == "like":
-            user_node.likes.connect(friend_node)
-        elif date_choice == "dislike":
-            user_node.dislikes.connect(friend_node)
+    user_node = get_user_node(logged_user)
+    friend_node = get_user_node(friend_name)
 
-        return redirect("/search")
+    if date_choice == "like":
+        user_node.likes.connect(friend_node)
+    elif date_choice == "dislike":
+        user_node.dislikes.connect(friend_node)
+
+    return redirect("/search")
 
 
 if __name__ == "__main__":
