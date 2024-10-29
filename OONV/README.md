@@ -11,6 +11,16 @@ dotnet new console --framework net8.0
 ```
 
 ```
+class Program
+{
+    static void Main()
+    {
+      
+    }
+}
+```
+
+```
 dotnet run
 ```
 
