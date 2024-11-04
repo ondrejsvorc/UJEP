@@ -1,0 +1,64 @@
+---
+title: "cheatsheet"
+author: "Ondřej Švorc"
+format: html
+editor: visual
+---
+
+```{r}
+rm(list=ls())
+```
+
+## Absolutní četnost
+
+```{r}
+table(sloupec)
+```
+
+## Relativní četnost
+
+```{r}
+prop.table(table(sloupec)) # v desetinných číslech
+round(prop.table(table(sloupec))*100, 2) # v procentech, zaokrouhlené na 2 des. místa
+```
+
+## Absolutní i relativní četnost v jednom
+
+```{r}
+data.frame(cbind("Absolutni"=table(sloupec),"Procenta"=prop.table(table(sloupec))))
+```
+
+## Zobrazování dat
+
+-   tabulka - `kable()` - balíček `knitr`
+
+-   frekvenční polygon - `plot()`
+
+-   sloupcový graf - `barplot()`
+
+-   koláčový graf - `pie()`
+
+-   histogram - `hist()`
+
+-   krabicový graf - `boxplot()`
+
+```{r}
+```
+
+## Popisná statistika
+
+-   charakteristiky polohy
+
+    -   aritmetický průměr
+
+    -   medián
+
+    -   modus
+
+-   charakteristiky variability
+
+    -   rozptyl základního souboru
+
+    -   směrodatná odchylka
+
+    -   variační koeficient
