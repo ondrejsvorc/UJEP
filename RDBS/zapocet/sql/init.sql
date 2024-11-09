@@ -1,9 +1,3 @@
--- IDENTITY(1, 1) -> SERIAL
--- nvarchar -> VARCHAR
--- tinyint -> SMALLINT
--- GO -> není potřeba
--- BIT -> BOOLEAN (v MSSQL není BOOLEAN)
-
 -- CREATE DATABASE Restaurace;
 CREATE SCHEMA Pivonka;
 
