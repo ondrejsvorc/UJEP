@@ -132,6 +132,7 @@ FOREIGN KEY (Id_Pozice) REFERENCES Pivonka.Pozice (Id_Pozice);
 
 -- Každý zaměstnanec byl měl být unikátní e-mail.
 -- (odlišný od e-mailu jiných zaměstnanců).
+-- CREATE UNIQUE INDEX idx_zamestnanci_email ON Pivonka.Zamestnanci(Email);
 ALTER TABLE Pivonka.Zamestnanci
 ADD CONSTRAINT UQ_Zamestnanci_Email 
 UNIQUE (Email);
