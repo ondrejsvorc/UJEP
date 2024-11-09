@@ -1,4 +1,35 @@
+-- Jeden SELECT vypočte průměrný počet záznamů na jednu tabulku v DB
+-- Jeden SELECT bude obsahovat vnořený SELECT
+SELECT 
+(
+	(SELECT COUNT(*) FROM Pivonka.menu) +
+	(SELECT COUNT(*) FROM Pivonka.menupolozkymenu) +
+	(SELECT COUNT(*) FROM Pivonka.objednavky) +
+	(SELECT COUNT(*) FROM Pivonka.polozkymenu) +
+	(SELECT COUNT(*) FROM Pivonka.polozkyobjednavek) +
+	(SELECT COUNT(*) FROM Pivonka.pozice) +
+	(SELECT COUNT(*) FROM Pivonka.predcisli) +
+	(SELECT COUNT(*) FROM Pivonka.rezervace) +
+	(SELECT COUNT(*) FROM Pivonka.stoly) +
+	(SELECT COUNT(*) FROM Pivonka.zakaznici) +
+	(SELECT COUNT(*) FROM Pivonka.zamestnanci)
+)::decimal / 11 as "Průměrný počet záznamů na tabulku";
+
+SELECT avg(n_live_tup)::decimal as "Průměrný počet záznamů na tabulku"
+FROM 
+(
+    SELECT schemaname, relname, n_live_tup
+    FROM pg_stat_all_tables 
+    WHERE schemaname = 'pivonka'
+);
+
+SELECT relname, n_live_tup
+FROM pg_stat_all_tables 
+WHERE schemaname = 'pivonka'
+ORDER BY n_live_tup DESC;
+
 -- Nejoblíbenější (nejobjednávanější) jídla.
+-- Jeden SELECT bude obsahovat nějakou analytickou funkci (SUM, COUNT, AVG,…) spolu s agregační klauzulí GROUP BY
 SELECT 
     PolozkyMenu.Nazev AS NazevJidla,
     COUNT(*) AS PocetObjednavek
@@ -10,6 +41,63 @@ GROUP BY
     PolozkyMenu.Nazev
 ORDER BY 
     PocetObjednavek DESC;
+
+-- Jeden SELECT bude řešit rekurzi nebo hierarchii (SELF JOIN)
+-- Zobrazí pozice a jejich nadřízené pozice.
+WITH RECURSIVE PoziceCTE AS (
+    SELECT Id_Pozice, Nazev, NULL::VARCHAR AS Nazev_Nadrizene_Pozice
+    FROM Pivonka.Pozice
+    WHERE Id_PoziceNadrizeny IS NULL
+    UNION ALL
+    SELECT p.Id_Pozice, p.Nazev, cte.Nazev
+    FROM Pivonka.Pozice p
+    JOIN PoziceCTE cte ON p.Id_PoziceNadrizeny = cte.Id_Pozice
+)
+SELECT Id_Pozice, Nazev, Nazev_Nadrizene_Pozice
+FROM PoziceCTE
+ORDER BY Id_Pozice;
+
+-- Další rekurzivní SELECT.
+-- Zobrazí zaměstnance na pozicích a jejích nadřízené.
+WITH RECURSIVE position_hierarchy AS (
+    SELECT
+        z.Id_Zamestnanec,
+        z.Jmeno || ' ' || z.Prijmeni AS jmeno_zamestnance,
+        p.Id_Pozice,
+        p.Nazev AS nazev_pozice,
+        p.Id_PoziceNadrizeny,
+        CASE
+            WHEN p.Id_PoziceNadrizeny IS NULL THEN NULL
+            ELSE n.Jmeno || ' ' || n.Prijmeni
+        END AS jmeno_nadrizeneho
+    FROM Pivonka.Zamestnanci z
+    JOIN Pivonka.Pozice p ON z.Id_Pozice = p.Id_Pozice
+    LEFT JOIN Pivonka.Zamestnanci n ON p.Id_PoziceNadrizeny = n.Id_Pozice
+),
+recursive_hierarchy AS (
+    SELECT
+        id_zamestnanec,
+        jmeno_zamestnance,
+        id_pozice,
+        nazev_pozice,
+        id_pozicenadrizeny,
+        jmeno_nadrizeneho
+    FROM position_hierarchy
+    WHERE id_pozicenadrizeny IS NULL
+    UNION ALL
+    SELECT
+        ph.id_zamestnanec,
+        ph.jmeno_zamestnance,
+        ph.id_pozice,
+        ph.nazev_pozice,
+        ph.id_pozicenadrizeny,
+        ph.jmeno_nadrizeneho
+    FROM position_hierarchy ph
+    INNER JOIN recursive_hierarchy rh ON ph.id_pozicenadrizeny = rh.id_pozice
+)
+SELECT DISTINCT * 
+FROM recursive_hierarchy
+ORDER BY Id_Pozice;
 
 -- Nejoblíbenější (nejobjednávanější) jídla dle data objednávky.
 SELECT 
@@ -105,60 +193,3 @@ GROUP BY
     Zakaznici.Prijmeni
 HAVING 
     COUNT(*) > 2;
-
--- Rekurzivní SELECT.
--- Zobrazí pozice a jejich nadřízené pozice.
-WITH RECURSIVE PoziceCTE AS (
-    SELECT Id_Pozice, Nazev, NULL::VARCHAR AS Nazev_Nadrizene_Pozice
-    FROM Pivonka.Pozice
-    WHERE Id_PoziceNadrizeny IS NULL
-    UNION ALL
-    SELECT p.Id_Pozice, p.Nazev, cte.Nazev
-    FROM Pivonka.Pozice p
-    JOIN PoziceCTE cte ON p.Id_PoziceNadrizeny = cte.Id_Pozice
-)
-SELECT Id_Pozice, Nazev, Nazev_Nadrizene_Pozice
-FROM PoziceCTE
-ORDER BY Id_Pozice;
-
--- Další rekurzivní SELECT.
--- Zobrazí zaměstnance na pozicích a jejích nadřízené.
-WITH RECURSIVE position_hierarchy AS (
-    SELECT
-        z.Id_Zamestnanec,
-        z.Jmeno || ' ' || z.Prijmeni AS jmeno_zamestnance,
-        p.Id_Pozice,
-        p.Nazev AS nazev_pozice,
-        p.Id_PoziceNadrizeny,
-        CASE
-            WHEN p.Id_PoziceNadrizeny IS NULL THEN NULL
-            ELSE n.Jmeno || ' ' || n.Prijmeni
-        END AS jmeno_nadrizeneho
-    FROM Pivonka.Zamestnanci z
-    JOIN Pivonka.Pozice p ON z.Id_Pozice = p.Id_Pozice
-    LEFT JOIN Pivonka.Zamestnanci n ON p.Id_PoziceNadrizeny = n.Id_Pozice
-),
-recursive_hierarchy AS (
-    SELECT
-        id_zamestnanec,
-        jmeno_zamestnance,
-        id_pozice,
-        nazev_pozice,
-        id_pozicenadrizeny,
-        jmeno_nadrizeneho
-    FROM position_hierarchy
-    WHERE id_pozicenadrizeny IS NULL
-    UNION ALL
-    SELECT
-        ph.id_zamestnanec,
-        ph.jmeno_zamestnance,
-        ph.id_pozice,
-        ph.nazev_pozice,
-        ph.id_pozicenadrizeny,
-        ph.jmeno_nadrizeneho
-    FROM position_hierarchy ph
-    INNER JOIN recursive_hierarchy rh ON ph.id_pozicenadrizeny = rh.id_pozice
-)
-SELECT DISTINCT * 
-FROM recursive_hierarchy
-ORDER BY Id_Pozice;
