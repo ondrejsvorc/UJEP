@@ -1,0 +1,17 @@
+```{r}
+library(DescTools)
+library(MASS)
+library(asbio)
+```
+
+```{r}
+# Useknutý průměr
+# Mezikvartilové rozpětí (IQR)
+# Mediánová absolutní ochylka od mediánu (MAD)
+# Kvartilovy koeficient sikmosti (Bowley)
+# Aktilovy koeficient spicatosti (Moorse)
+```
+
+```{r}
+
+```
