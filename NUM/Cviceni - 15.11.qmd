@@ -1,0 +1,121 @@
+```{r}
+# exp(x) from 0 to 1; e-1
+```
+
+```{r}
+# Funkce pro odhad integrálu metodou Monte Carlo na základě střední hodnoty
+IntegStredniHodnota <- function(f, a, b, N) {
+  return(mean(f(runif(N, a, b)))*(b-a))
+}
+
+# Funkce pro odhad integrálu metodou Monte Carlo s využitím symetrizace
+IntegStredniHodnotaSym <- function(f, a, b, N) {
+  x <- runif(N, a, b)
+  return(0.5*mean(f(x)+f(a+b-x))*(b-a))
+}
+
+# Funkce pro odhad integrálu metodou Monte Carlo geometricky (počítáním bodů pod křivkou)
+IntegGeom <- function(f, a, b, h, N) {
+  x <- runif(N, a, b)
+  y <- runif(N, 0, h)
+  return((b-a)*h*sum(y < f(x))/N)  
+}
+```
+
+```{r}
+print(exp(1)-1)
+```
+
+```{r}
+N <- 1000
+result <- replicate(1000, IntegStredniHodnota(f=exp, a=0, b=1, N))
+cat(mean(result), "±", sd(result), "\n")
+N <- 4000
+result <- replicate(1000, IntegStredniHodnota(f=exp, a=0, b=1, N))
+cat(mean(result), "±", sd(result), "\n")
+
+cat("\n")
+
+N <- 1000
+result <- replicate(1000, IntegStredniHodnotaSym(f=exp, a=0, b=1, N))
+cat(mean(result), "±", sd(result), "\n")
+N <- 4000
+result <- replicate(1000, IntegStredniHodnotaSym(f=exp, a=0, b=1, N))
+cat(mean(result), "±", sd(result), "\n")
+
+cat("\n")
+
+N <- 1000
+result <- replicate(1000, IntegGeom(f=exp, a=0, b=1, h=3, N))
+cat(mean(result), "±", sd(result), "\n")
+N <- 4000
+result <- replicate(1000, IntegGeom(f=exp, a=0, b=1, h=3, N))
+cat(mean(result), "±", sd(result), "\n")
+```
+
+```{r}
+# https://en.wikipedia.org/wiki/Gaussian_quadrature
+# viz sekce Change of interval (substituce)
+
+GaussovaKvadraturaProDvaBody <- function(f, a, b) {
+  x1 <- 1/sqrt(3)
+  x <- c(x1, -x1)
+  sklon <- 0.5*(b-a)
+  return(sum(f(x*sklon+0.5*(a+b)))*sklon)
+}
+
+GaussovaKvadraturaProTriBody <- function(f, a, b) {
+  x1 <- sqrt(0.6)
+  x <- c(x1, -x1, 0)
+  sklon <- 0.5*(b-a)
+  y <- f(x*sklon+0.5*(a+b))
+  result <- 5/9*(y[1]+y[2])+8/9*y[3]
+  return(result*sklon)
+}
+```
+
+```{r}
+print(exp(1)-1)
+print(GaussovaKvadraturaProDvaBody(exp, 0, 1))
+print(GaussovaKvadraturaProTriBody(exp, 0, 1)) # přesnější
+```
+
+```{r}
+# Funkce schopna analyticky integrovat polynom
+# funkce: 2x^2-5x+1
+# integrál by byl: 2x^3/3 -5x^2/2 + x
+
+# polynom.R
+horner <- function(x, coef) {
+  n <- length(coef)  # Počet koeficientů
+  res <- coef[n]  # Začneme s posledním koeficientem (nejvyšší stupeň polynomu)
+  
+  # V každém kroku spočítáme polynom postupně podle Hornerova schématu
+  for (i in (n-1):1) {
+    res <- res * x + coef[i]  # res = res * x + další koeficient
+  }
+  
+  return(res)  # Vracíme hodnotu polynomu
+}
+
+AnalytickaInterpolacePolynomu <- function(coef, a, b) {
+  n <- length(coef)
+  coef <- coef/(1:n)
+  return(b*horner(b, coef) - a*horner(a, coef)) # funkční hodnota v prvním a v druhém bodě
+}
+```
+
+```{r}
+# integrate 2*x^3+7*x^2-5*x+3 from 5 to 6
+# https://www.wolframalpha.com/input?i=integrate+2*x%5E3%2B7*x%5E2-5*x%2B3+from+5+to+6
+print(GaussovaKvadraturaProDvaBody(function (x) 2*x^3+7*x^2-5*x+3, 5, 6))
+print(AnalytickaInterpolacePolynomu(c(3, -5, 7, 2), 5, 6))
+```
+
+```{r}
+N <- 15
+coef <- runif(N)
+print(GaussovaKvadraturaProDvaBody(function (x) horner(x, coef), 5, 6))
+print(GaussovaKvadraturaProTriBody(function (x) horner(x, coef), 5, 6))
+print(AnalytickaInterpolacePolynomu(coef, 5, 6))
+```
