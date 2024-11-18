@@ -1,25 +1,59 @@
 {% extends "template.html" %}
 
 {% block content %}
-<h2>Vítej na Matchomatu</h2>
-<p>Zapaluj, nech se zapalovat a nalezni si zde svou drahou polovičku se kterou budete hořet.</p>
+<div class="container py-5">
+    <h2 class="mb-4 text-center text-light">Statistiky</h2>
+    
+    <div class="row g-4 justify-content-center">
+      <div class="col-md-6 col-lg-4">
+          <div class="card bg-info text-white">
+              <div class="card-body">
+                  <div class="d-flex flex-column">
+                      <h5 class="card-title mb-0">
+                          <span>Počet lidí</span>
+                      </h5>
+                      <h6 class="card-title text-muted">
+                          <span>...se kterými se můžeš seznámit</span>
+                      </h6>
+                  </div>
+                  <p class="card-text fs-3 fw-bold">{{ num_of_available_matches }}</p>
+              </div>
+          </div>
+      </div>
+  
+      <div class="col-md-6 col-lg-4">
+          <div class="card bg-success text-white">
+              <div class="card-body">
+                  <div class="d-flex flex-column">
+                      <h5 class="card-title mb-0">
+                          <span>Počet lidí</span>
+                      </h5>
+                      <h6 class="card-title text-muted">
+                          <span>...se kterými jsi již v páru</span>
+                      </h6>
+                  </div>
+                  <p class="card-text fs-3 fw-bold">{{ num_of_matches }}</p>
+              </div>
+          </div>
+      </div>
+  </div>
 
-<h3>Statistiky</h3>
-<ul>
-  <li>Počet lidí, se kterými se ještě můžeš seznámit: {{ num_of_available_matches }}</li>
-  <li>Počet lidí, se kterými jsi již v páru: {{ num_of_matches }}</li>
-</ul>
+    <hr class="my-5">
+    <h2 class="mb-4 text-center text-light">Tvůj profil</h2>
 
-<h3>Tvůj profil</h3>
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-4">
+            <div class="card text-white bg-dark">
+                <div class="card-body">
+                    <h3 class="card-title">{{ profile.name }}</h3>
+                    <ul class="list-group list-group-flush">
+                        <li class="list-group-item bg-dark text-light">Věk: {{ profile.age }}</li>
+                        <li class="list-group-item bg-dark text-light">Záliby: {{ profile.hobbies | join(", ") }}</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
-<article class="card" style="width: 18rem;">
-    <!-- <img src="..." class="card-img-top" alt="..."> -->
-    <section class="card-body">
-      <h3 class="card-title">{{ profile.name }}</h5>
-      <ul class="card-text">
-        <li>Věk: {{ profile.age }}</li>
-        <li>Záliby: {{ profile.hobbies | join(", ") }}</li>
-      </ul>
-    </section>
-</article>
 {% endblock %}

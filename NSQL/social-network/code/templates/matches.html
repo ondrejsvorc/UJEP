@@ -1,27 +1,25 @@
 {% extends "template.html" %}
 
 {% block content %}
-<h2>Shody</h2>
+
 {% if profiles %}
+  <div class="row justify-content-center">
     {% for friend in profiles %}
-        <article class="card mb-3" style="width: 18rem;">
-            <section class="card-body">
-            <h3 class="card-title">{{ friend.name }}</h5>
-            <ul class="card-text">
-                <li>Věk: {{ friend.age }}</li>
-                <li>Záliby:
-                    <ul>
-                        {% for hobby in friend.hobbies %}
-                            <li>{{ hobby }}</li>
-                        {% endfor %}
-                    </ul>
-                </li>
+      <div class="col-md-6 col-lg-4 mb-4">
+        <article class="card text-white bg-dark h-100">
+          <section class="card-body">
+            <h3 class="card-title">{{ friend.name }}</h3>
+            <ul class="list-group list-group-flush">
+              <li class="list-group-item bg-dark text-light"><strong>Věk:</strong> {{ friend.age }}</li>
+              <li class="list-group-item bg-dark text-light"><strong>Záliby:</strong> {{ friend.hobbies | join(", ") }}</li>
             </ul>
-            </section>
+          </section>
         </article>
+      </div>
     {% endfor %}
+  </div>
 {% else %}
-    <p>Bohužel nemáte žádné shody.</p>
+  <p class="text-center mt-5 fst-italic">Bohužel nemáte žádné shody.</p>
 {% endif %}
 
 {% endblock %}

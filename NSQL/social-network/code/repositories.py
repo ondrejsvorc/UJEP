@@ -1,10 +1,13 @@
 import os
 from typing import List
+from bson import ObjectId
 from dotenv import load_dotenv
 from pymongo import MongoClient
 from neomodel import config, db
 from redis import Redis
-from models import Person
+from models import MongoUser, Person
+
+load_dotenv()
 
 
 class Neo4jRepository:
@@ -23,9 +26,6 @@ class Neo4jRepository:
 
     def get_user_node(self, username: str) -> Person:
         return Person.nodes.get(name=username)
-
-    def get_logged_user(self, username: str) -> Person:
-        return self.get_user_node(username)
 
     def get_matches(self, username: str) -> List[Person]:
         query = """
@@ -81,6 +81,19 @@ class MongoRepository:
                 authSource=os.getenv("MONGO_AUTH_SOURCE"),
             )
         return cls._instance
+
+    def get_user_by_id(self, user_id):
+        users_collection = self._db["social_media"]["users"]
+        return users_collection.find_one({"_id": ObjectId(user_id)})
+
+    def verify_user(self, username, password):
+        users_collection = self._db["social_media"]["users"]
+        user_data = users_collection.find_one(
+            {"username": username, "password": password}
+        )
+        if user_data:
+            return MongoUser(user_data)
+        return None
 
     def _mock_data(self):
         users_collection = self._db["social_media"]["users"]
