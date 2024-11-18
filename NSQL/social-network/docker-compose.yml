@@ -9,7 +9,11 @@ services:
       - ./code:/code
     depends_on:
       neo4j:
-        condition: service_healthy # Wait for neo4j to be ready
+        condition: service_healthy
+      mongodb:
+        condition: service_started
+      redis:
+        condition: service_started
       
   neo4j:
     image: 'neo4j:latest'
@@ -19,7 +23,20 @@ services:
     environment:
       NEO4J_AUTH: 'neo4j/adminpass'
     healthcheck:
-      test: cypher-shell --username neo4j --password adminpass 'MATCH (n) RETURN COUNT(n);' # Checks if neo4j server is up and running
+      test: cypher-shell --username neo4j --password adminpass 'MATCH (n) RETURN COUNT(n);'
       interval: 10s
       timeout: 10s
       retries: 5
+
+  mongodb:
+    image: mongo:latest
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: admin
+      MONGO_INITDB_ROOT_PASSWORD: admin
+    ports:
+      - 27017:27017
+
+  redis:
+    image: redislabs/redismod
+    ports:
+      - "6379:6379"
