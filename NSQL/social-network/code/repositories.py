@@ -1,31 +1,32 @@
 import os
-from typing import List
+from typing import Any, List, Optional
 from bson import ObjectId
-from dotenv import load_dotenv
 from pymongo import MongoClient
+from pymongo.collection import Collection
 from neomodel import config, db
 from redis import Redis
 from models import MongoUser, Person
 
-load_dotenv()
-
 
 class Neo4jRepository:
-    _instance = None
+    _instance: "Neo4jRepository" = None
 
     def __init__(self):
+        self._setup_database()
         self._mock_data()
 
     def __new__(cls):
-        print(os.getenv("NEO4J_DATABASE_URL"))
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            config.DATABASE_URL = os.getenv("NEO4J_DATABASE_URL")
-            cls._instance._db = db
         return cls._instance
 
-    def get_user_node(self, username: str) -> Person:
-        return Person.nodes.get(name=username)
+    def get_all_persons(self) -> List[Person]:
+        query = """
+        MATCH (p:Person)
+        RETURN p
+        """
+        results, _ = self._db.cypher_query(query)
+        return [Person.inflate(row[0]) for row in results]
 
     def get_matches(self, username: str) -> List[Person]:
         query = """
@@ -34,7 +35,8 @@ class Neo4jRepository:
         RETURN friend
         """
         results, _ = self._db.cypher_query(query, {"username": username})
-        return [Person.inflate(row[0]) for row in results]
+        matches = self._convert_query_results(results)
+        return matches
 
     def get_available_matches(self, username: str) -> List[Person]:
         query = """
@@ -44,10 +46,21 @@ class Neo4jRepository:
         AND NOT (friend)-[:DISLIKES]->(user)
         AND NOT (user)-[:DISLIKES]->(friend)
         AND NOT friend.name = $username
-        RETURN friend.name, friend.age, friend.hobbies
+        RETURN friend
         """
         results, _ = self._db.cypher_query(query, {"username": username})
-        return [Person(name=row[0], age=row[1], hobbies=row[2]) for row in results]
+        available_matches = self._convert_query_results(results)
+        return available_matches
+
+    def get_user_node(self, username: str) -> Person:
+        return Person.nodes.get(name=username)
+
+    def _convert_query_results(self, results: List[tuple]) -> List[Person]:
+        return [Person.inflate(row[0]) for row in results] if results else []
+
+    def _setup_database(self):
+        config.DATABASE_URL = os.getenv("NEO4J_DATABASE_URL")
+        self._db = db
 
     def _mock_data(self):
         self._db.cypher_query("MATCH (n) DETACH DELETE n")
@@ -68,80 +81,67 @@ class MongoRepository:
     _instance = None
 
     def __init__(self):
+        self._setup_database()
         self._mock_data()
 
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance._db = MongoClient(
-                host=os.getenv("MONGO_HOST"),
-                port=int(os.getenv("MONGO_PORT")),
-                username=os.getenv("MONGO_USERNAME"),
-                password=os.getenv("MONGO_PASSWORD"),
-                authSource=os.getenv("MONGO_AUTH_SOURCE"),
-            )
         return cls._instance
 
-    def get_user_by_id(self, user_id):
-        users_collection = self._db["social_media"]["users"]
-        return users_collection.find_one({"_id": ObjectId(user_id)})
+    def get_user_by_id(self, user_id: str) -> Optional[Any]:
+        users = self._get_users_collection()
+        user = users.find_one({"_id": ObjectId(user_id)})
+        return MongoUser(user) if user else None
 
-    def verify_user(self, username, password):
-        users_collection = self._db["social_media"]["users"]
-        user_data = users_collection.find_one(
-            {"username": username, "password": password}
+    def get_user(self, username: str, password: str) -> Optional[MongoUser]:
+        users = self._get_users_collection()
+        user = users.find_one({"username": username, "password": password})
+        return MongoUser(user) if user else None
+
+    def _get_users_collection(self) -> Collection:
+        return self._db["social_media"]["users"]
+
+    def _setup_database(self):
+        self._db = MongoClient(
+            host=os.getenv("MONGO_HOST"),
+            port=int(os.getenv("MONGO_PORT")),
+            username=os.getenv("MONGO_USERNAME"),
+            password=os.getenv("MONGO_PASSWORD"),
+            authSource=os.getenv("MONGO_AUTH_SOURCE"),
         )
-        if user_data:
-            return MongoUser(user_data)
-        return None
 
     def _mock_data(self):
-        users_collection = self._db["social_media"]["users"]
-        users_collection.delete_many({})
+        users = self._db["social_media"]["users"]
+        users.delete_many({})
+        neo4j = Neo4jRepository()
+        persons = neo4j.get_all_persons()
         mock_users = [
             {
-                "username": "Pepa",
+                "username": person.name,
                 "password": "123",
-                "age": 34,
-                "hobbies": ["programming", "running"],
-            },
-            {
-                "username": "Jana",
-                "password": "123",
-                "age": 30,
-                "hobbies": ["cats", "running"],
-            },
-            {
-                "username": "Michal",
-                "password": "123",
-                "age": 38,
-                "hobbies": ["partying", "cats"],
-            },
-            {
-                "username": "Alena",
-                "password": "123",
-                "age": 32,
-                "hobbies": ["kids", "cats"],
-            },
-            {
-                "username": "Richard",
-                "password": "123",
-                "age": 33,
-                "hobbies": ["partying", "cats"],
-            },
+                "age": person.age,
+                "hobbies": person.hobbies,
+            }
+            for person in persons
         ]
-        users_collection.insert_many(mock_users)
+        users.insert_many(mock_users)
 
 
 class RedisRepository:
     _instance = None
 
+    def __init__(self):
+        self._setup_database()
+
     def __new__(cls):
         if cls._instance is None:
             cls._instance = super().__new__(cls)
-            cls._instance._db = Redis(
-                host=os.getenv("REDIS_HOST"),
-                port=int(os.getenv("REDIS_PORT")),
-                password=os.getenv("REDIS_PASSWORD"),
-            )
         return cls._instance
+
+    def _setup_database(self):
+        self._db = Redis(
+            host=os.getenv("REDIS_HOST"),
+            port=int(os.getenv("REDIS_PORT")),
+            password=os.getenv("REDIS_PASSWORD"),
+        )
