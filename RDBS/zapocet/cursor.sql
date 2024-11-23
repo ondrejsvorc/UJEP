@@ -1,144 +1,81 @@
--- Tabulka polozkymenu, udělat tabulku polozkymenu_sleva za pomocí cursoru
--- Udělat funkci, iterovat polozkymenu pomocí FOR, pro každý řádek vygenerovat random slevu (5%-10%)
--- Přejmenovat sloupec Cena na cena_se_slevou
--- PostgreSQL
-
--- Udělat to jako proceduru
--- přidat 1x ošetření chyb (HANDLER / TRY…CATCH / RAISE / EXCEPTION
-
-CREATE TABLE IF NOT EXISTS Pivonka.PolozkyMenu_Sleva (
-  Id_PolozkaMenu INT PRIMARY KEY,
-  Nazev VARCHAR(40) NOT NULL,
-  Cena_Puvodni DECIMAL(7, 2) NOT NULL,
-  Cena_Se_Slevou DECIMAL(7, 2) NOT NULL,
-  Vyse_Slevy DECIMAL(4, 2) NOT NULL
-);
-
+-- 1x CURSOR a také 1x ošetření chyb
 CREATE OR REPLACE FUNCTION Pivonka.GenerujSlevyCursor()
-RETURNS VOID AS $$
+RETURNS TABLE (
+    Id_PolozkaMenu INT, -- Uvnitř RETURNS TABLE nelze použít PRIMARY KEY
+    Nazev VARCHAR(40),
+    Cena_Puvodni DECIMAL(7, 2),
+    Cena_Se_Slevou DECIMAL(7, 2),
+    Vyse_Slevy DECIMAL(4, 2)
+) AS $$
 DECLARE
-  menu_cursor CURSOR FOR 
-    SELECT Id_PolozkaMenu, Nazev, Cena 
-    FROM Pivonka.PolozkyMenu;
-  
-  polo RECORD;
-  nahodna_sleva NUMERIC(4, 2);
-  zlevnena_cena NUMERIC(7, 2);
+    menu_cursor CURSOR FOR 
+        SELECT polozkyMenu.Id_PolozkaMenu AS cursor_Id_PolozkaMenu,
+               polozkyMenu.Nazev AS cursor_Nazev,
+               polozkyMenu.Cena AS cursor_Cena
+        FROM Pivonka.PolozkyMenu AS polozkyMenu;
+    zaznam RECORD;
+    nahodna_sleva NUMERIC(4, 2);
+    zlevnena_cena NUMERIC(7, 2);
 BEGIN
-  TRUNCATE TABLE Pivonka.PolozkyMenu_Sleva;
-  
-  OPEN menu_cursor;
-  
-  LOOP
-    FETCH menu_cursor INTO polo;
+    OPEN menu_cursor;
     
-    EXIT WHEN NOT FOUND;
+    LOOP
+        FETCH menu_cursor INTO zaznam;
+        EXIT WHEN NOT FOUND;
+
+		IF zaznam.cursor_Cena <= 0 THEN
+            RAISE EXCEPTION 'Neplatná cena pro položku menu s ID %: %', 
+                          zaznam.cursor_Id_PolozkaMenu,
+                          zaznam.cursor_Cena::TEXT;
+        END IF;
+		
+        nahodna_sleva := ROUND((RANDOM() * 0.05 + 0.05)::NUMERIC, 2);
+        zlevnena_cena := ROUND((zaznam.cursor_Cena * (1 - nahodna_sleva))::NUMERIC, 2);
+        
+        Id_PolozkaMenu := zaznam.cursor_Id_PolozkaMenu;
+        Nazev := zaznam.cursor_Nazev;
+        Cena_Puvodni := zaznam.cursor_Cena;
+        Cena_Se_Slevou := zlevnena_cena;
+        Vyse_Slevy := nahodna_sleva * 100;
+        
+        RETURN NEXT;
+    END LOOP;
     
-    nahodna_sleva := ROUND((RANDOM() * 0.05 + 0.05)::NUMERIC, 2);
-    zlevnena_cena := ROUND((polo.Cena * (1 - nahodna_sleva))::NUMERIC, 2);
-    
-    INSERT INTO Pivonka.PolozkyMenu_Sleva (
-      Id_PolozkaMenu, 
-      Nazev, 
-      Cena_Puvodni, 
-      Cena_Se_Slevou, 
-      Vyse_Slevy
-    ) VALUES (
-      polo.Id_PolozkaMenu, 
-      polo.Nazev, 
-      polo.Cena, 
-      zlevnena_cena,
-      nahodna_sleva * 100
-    );
-  END LOOP;
-  
-  CLOSE menu_cursor;
+    CLOSE menu_cursor;
+    RETURN;
+EXCEPTION
+	WHEN OTHERS THEN
+        RAISE EXCEPTION 'Chyba při generování slev: % (SQL State: %)', SQLERRM, SQLSTATE;
 END;
 $$ LANGUAGE plpgsql;
 
-SELECT Pivonka.GenerujSlevyCursor();
-SELECT * FROM Pivonka.PolozkyMenu_Sleva;
+SELECT * FROM Pivonka.GenerujSlevyCursor();
+-- Situace:
+-- Chybí následující constraint:
 
+--ALTER TABLE pivonka.polozkymenu
+--ADD CONSTRAINT check_cena_positive CHECK (cena > 0);
 
+-- Je umožněno toto:
+--INSERT INTO pivonka.polozkymenu (id_polozkamenu, nazev, cena)
+--VALUES (26, 'test_exception', -100);
 
+-- Díky výjimkám toto odhalíme, např. při generování ceny.
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-CREATE OR REPLACE PROCEDURE Pivonka.GenerujSlevyCursor()
+-- 1× PROCEDURE
+CREATE OR REPLACE PROCEDURE Pivonka.VytvorTabulkuSlev()
 LANGUAGE plpgsql
 AS $$
-DECLARE
-  menu_cursor CURSOR FOR 
-    SELECT Id_PolozkaMenu, Nazev, Cena 
-    FROM Pivonka.PolozkyMenu;
-  
-  polo RECORD;
-  nahodna_sleva NUMERIC(4, 2);
-  zlevnena_cena NUMERIC(7, 2);
-  pocet_radku INT := 0;
 BEGIN
-  -- Kontrola existence zdrojové tabulky
-  IF NOT EXISTS (
-    SELECT 1 FROM Pivonka.PolozkyMenu
-  ) THEN
-    RAISE EXCEPTION 'Tabulka PolozkyMenu je prázdná!';
-  END IF;
-
-  TRUNCATE TABLE Pivonka.PolozkyMenu_Sleva;
-  
-  OPEN menu_cursor;
-  
-  LOOP
-    FETCH menu_cursor INTO polo;
+    DROP TABLE IF EXISTS Pivonka.PolozkyMenu_Sleva;
     
-    EXIT WHEN NOT FOUND;
+    CREATE TABLE Pivonka.PolozkyMenu_Sleva AS
+    SELECT * FROM Pivonka.GenerujSlevyCursor();
     
-    BEGIN
-      nahodna_sleva := ROUND((RANDOM() * 0.05 + 0.05)::NUMERIC, 2);
-      zlevnena_cena := ROUND((polo.Cena * (1 - nahodna_sleva))::NUMERIC, 2);
-      
-      INSERT INTO Pivonka.PolozkyMenu_Sleva (
-        Id_PolozkaMenu, 
-        Nazev, 
-        Cena_Puvodni, 
-        Cena_Se_Slevou, 
-        Vyse_Slevy
-      ) VALUES (
-        polo.Id_PolozkaMenu, 
-        polo.Nazev, 
-        polo.Cena, 
-        zlevnena_cena,
-        nahodna_sleva * 100
-      );
-      
-      pocet_radku := pocet_radku + 1;
-    EXCEPTION 
-      WHEN OTHERS THEN
-        RAISE WARNING 'Chyba při zpracování položky %: %', polo.Id_PolozkaMenu, SQLERRM;
-    END;
-  END LOOP;
-  
-  CLOSE menu_cursor;
-
-  -- Výstup o počtu zpracovaných řádků
-  RAISE NOTICE 'Bylo zpracováno % položek', pocet_radku;
+    ALTER TABLE Pivonka.PolozkyMenu_Sleva 
+    ADD PRIMARY KEY (Id_PolozkaMenu);
 END;
 $$;
 
--- Volání procedury
-CALL Pivonka.GenerujSlevyCursor();
-
--- Zobrazení výsledků
+CALL Pivonka.VytvorTabulkuSlev();
 SELECT * FROM Pivonka.PolozkyMenu_Sleva;
