@@ -1,0 +1,1 @@
+SELECT * FROM Pivonka.stoly_locked;
