@@ -180,3 +180,102 @@ LANGUAGE PLPGSQL;
 ```postgresql
 SELECT * FROM fetch_film_titles_and_years();
 ```
+
+## USER
+- lze vytvářet uživatele a přidělovat jim oprávnění
+- databázoví uživatelé nemají nic společného s uživateli operačního systému
+- uživatel není nic jiného než záznam v tabulce uživatelé daného databázového systému
+
+### Vytvoření uživatele
+```postgresql
+CREATE USER name;
+```
+
+### Vytvoření uživatele s heslem
+```postgresql
+CREATE USER name WITH PASSWORD 'Aa123456';
+```
+
+### Úprava uživatele s novým heslem
+```postgresql
+ALTER USER name WITH PASSWORD 'Aa123456';
+```
+
+### Smazání uživatele
+```postgresql
+DROP USER name;
+```
+### Přidělování oprávnění
+```postgresql
+GRANT oprávnění ON databáze TO nazev_uzivatele;
+GRANT oprávnění ON databáze.tabulka TO nazev_uzivatele;
+GRANT oprávnění ON databáze.schéma.tabulka TO nazev_uzivatele;
+```
+
+### Odstraňování existujících oprávnění
+```postgresql
+REVOKE oprávnění ON databáze FROM nazev_uzivatele;
+REVOKE oprávnění ON databáze.tabulka FROM nazev_uzivatele;
+REVOKE oprávnění ON databáze.schéma.tabulka FROM nazev_uzivatele;
+```
+
+### ROLE
+- lepší je udělat si roli a roli přidělovat uživateli než nastavovat oprávnění na samotném uživateli
+- role se chová jako uživatel
+
+```postgresql
+CREATE ROLE nazev_role;
+```
+
+### Přidělení oprávnění roli
+```postgresql
+GRANT ... ON ... TO nazev_role;
+```
+
+### Přidělení role uživateli
+```postgresql
+GRANT nazev_role TO nazev_uzivatele;
+```
+
+### LOCK
+- v základu slouží k uzamykání tabulek
+- některé databázové systémy podporují i uzamykání záznamů
+- tabulky uzamykáme ve vztahu k ostatním uživatelům
+- transakce je vyšší level zamykání tabulek
+- zamknu tabulku, provedu update, odemknu tabulku
+- https://www.sallyx.org/sally/psql/transakce-prakticky.php
+- mód je implicitně ACCESS EXCLUSIVE, který ostatním neopovolí vůbec nic (ani zápis do tabulky, ani její čtení)
+
+#### Varianty
+- ACCESS EXCLUSIVE
+- ACCESS SHARE
+- EXCLUSIVE
+- ROW SHARE
+- ROW EXCLUSIVE
+- SHARE ROW EXCLUSIVE
+- SHARE
+- SHARE UPDATE EXCLUSIVE
+
+```postgresql
+LOCK TABLE tabulka IN typ_zamku;
+```
+
+```postgresql
+UNLOCK TABLE table;
+UNLOCK TABLES;
+```
+
+### Přihlášení jako uživatel
+1. Servers
+2. Pravé tlačítko
+3. Register
+4. Server...
+5. Name = libovolný
+6. Překliknout na Connection
+7. Host name/address = localhost
+8. Vyplnit uživatelské údaje uživatele
+
+### Získání všech uživatelů
+```postgresql
+SELECT * FROM pg_user;
+```
