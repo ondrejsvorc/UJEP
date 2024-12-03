@@ -316,7 +316,7 @@ VALUES
     ('Krevety na grilu', 320.00),
     ('Grilovaný halibut', 290.00);
 
--- MenuPolozkyMenu (130 z znam )
+-- MenuPolozkyMenu (130 záznamů)
 INSERT INTO Pivonka.MenuPolozkyMenu (Id_Menu, Id_PolozkaMenu)
 VALUES 
     (1, 1),
@@ -665,6 +665,22 @@ CREATE TRIGGER trg_pozice_before_delete
 BEFORE DELETE ON Pivonka.Pozice
 FOR EACH ROW
 EXECUTE FUNCTION trg_pozice_before_delete();
+
+-- Otestování funkčnosti triggeru
+-- SELECT * FROM Pivonka.Pozice;
+-- DELETE FROM Pivonka.Pozice WHERE Id_Pozice = 1;
+-- SELECT * FROM Pivonka.Pozice;
+
+-- Přidání fulltextového indexu na sloupec Nazev
+CREATE INDEX idx_pozice_nazev_fulltext_czech
+ON Pivonka.Pozice
+USING gin (to_tsvector('simple', Nazev));
+
+-- SELECT * FROM Pivonka.Pozice;
+
+-- SELECT *
+-- FROM Pivonka.Pozice
+-- WHERE to_tsvector('simple', Nazev) @@ to_tsquery('Maj:*');
 
 -- Vytvoření pohledu Pohled_Cisnici
 CREATE OR REPLACE VIEW Pivonka.Pohled_Cisnici AS

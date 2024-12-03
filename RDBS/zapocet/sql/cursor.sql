@@ -57,8 +57,8 @@ SELECT * FROM Pivonka.GenerujSlevyCursor();
 --ADD CONSTRAINT check_cena_positive CHECK (cena > 0);
 
 -- Je umožněno toto:
---INSERT INTO pivonka.polozkymenu (id_polozkamenu, nazev, cena)
---VALUES (26, 'test_exception', -100);
+-- INSERT INTO pivonka.polozkymenu (id_polozkamenu, nazev, cena)
+-- VALUES (26, 'test_exception', -100);
 
 -- Díky výjimkám toto odhalíme, např. při generování ceny.
 
