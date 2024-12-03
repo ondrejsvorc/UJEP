@@ -37,16 +37,9 @@ class Database:
             results = cursor.fetchall()
         return [result_type(*row) for row in results]
 
-    def execute_query_and_save_to_json(
+    def get_employees_and_save_to_json(
         database: "Database", query: str, filename: str
     ) -> None:
-        """
-        Execute SQL query, map results to objects, and save to JSON file.
-
-        Args:
-            query (str): SQL query to execute.
-            filename (str): Name of the file to save the JSON data.
-        """
         result: List[Employee] = database.execute_query(query, Employee)
         with open(filename, "w", encoding="utf-8") as file:
             json.dump(result, file, cls=EmployeeEncoder, ensure_ascii=False, indent=4)

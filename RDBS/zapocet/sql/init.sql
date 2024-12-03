@@ -16,7 +16,7 @@ CREATE TABLE Pivonka.Predcisli (
 
 CREATE TABLE Pivonka.Zamestnanci (
   Id_Zamestnanec SERIAL PRIMARY KEY,
-  Id_Pozice INT NOT NULL,
+  Id_Pozice INT NULL,
   Jmeno VARCHAR(25) NOT NULL,
   Prijmeni VARCHAR(25) NOT NULL,
   Email VARCHAR(40) NOT NULL,
@@ -651,6 +651,11 @@ VALUES
 CREATE OR REPLACE FUNCTION trg_pozice_before_delete()
 RETURNS TRIGGER AS $$
 BEGIN
+    -- Nastavení Id_Pozice na NULL pro související zaměstnance.
+    UPDATE Pivonka.Zamestnanci
+    SET Id_Pozice = NULL
+    WHERE Id_Pozice = OLD.Id_Pozice;
+
     -- Nastavení Id_PoziceNadrizeny na NULL pro podřízené pozice.
     UPDATE Pivonka.Pozice
     SET Id_PoziceNadrizeny = NULL

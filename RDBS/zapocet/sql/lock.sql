@@ -5,6 +5,7 @@ CREATE TABLE Pivonka.stoly_locked AS (SELECT * FROM Pivonka.Stoly);
 -- Přidání oprávnění roli čišník
 GRANT SELECT ON Pivonka.stoly_locked TO cisnik;
 
+-- ACCESS EXCLUSIVE MODE = Ostatní transakce, které se pokusí přistupovat k této tabulce, musí čekat, dokud se tento zámek neuvolní
 BEGIN;
 	LOCK TABLE Pivonka.stoly_locked IN ACCESS EXCLUSIVE MODE;
 	UPDATE Pivonka.stoly_locked SET PocetMist = PocetMist + 1;
