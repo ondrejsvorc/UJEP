@@ -1,5 +1,7 @@
+from abc import ABC
+from enum import Enum
 import os
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional
 from bson import ObjectId
 from pymongo import MongoClient
 from pymongo.collection import Collection
@@ -8,7 +10,11 @@ from redis import Redis
 from models import MongoUser, Person
 
 
-class Neo4jRepository:
+class Repository(ABC):
+    pass
+
+
+class Neo4jRepository(Repository):
     _instance: "Neo4jRepository" = None
 
     def __init__(self):
@@ -77,7 +83,7 @@ class Neo4jRepository:
         richard.likes.connect(alena)
 
 
-class MongoRepository:
+class MongoRepository(Repository):
     _instance = None
 
     def __init__(self):
@@ -128,7 +134,7 @@ class MongoRepository:
         users.insert_many(mock_users)
 
 
-class RedisRepository:
+class RedisRepository(Repository):
     _instance = None
 
     def __init__(self):
@@ -145,3 +151,21 @@ class RedisRepository:
             port=int(os.getenv("REDIS_PORT")),
             password=os.getenv("REDIS_PASSWORD"),
         )
+
+
+class DbType(Enum):
+    MONGO = "mongo"
+    NEO4J = "neo4j"
+    REDIS = "redis"
+
+
+class DbFactory:
+    def __init__(self):
+        self._dbs: Dict[DbType, Repository] = {
+            DbType.MONGO: MongoRepository,
+            DbType.NEO4J: Neo4jRepository,
+            DbType.REDIS: RedisRepository,
+        }
+
+    def create_db(self, type: DbType) -> Repository:
+        return self._dbs[type]()

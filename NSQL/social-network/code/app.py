@@ -2,7 +2,8 @@ import os
 import random
 from dotenv import load_dotenv
 from flask import Flask, render_template, request, redirect, url_for
-from repositories import MongoRepository, Neo4jRepository, RedisRepository
+from flask_mail import Mail, Message
+from repositories import DbFactory, DbType
 from flask_login import (
     LoginManager,
     login_user,
@@ -14,15 +15,17 @@ from flask_login import (
 load_dotenv()
 
 app = Flask(__name__)
+mail = Mail(app)
 app.secret_key = os.getenv("SECRET_SESSION_KEY")
 
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = "login"
 
-neo4j = Neo4jRepository()
-mongo = MongoRepository()
-redis = RedisRepository()
+db_factory = DbFactory()
+neo4j = db_factory.create_db(DbType.NEO4J)
+mongo = db_factory.create_db(DbType.MONGO)
+redis = db_factory.create_db(DbType.REDIS)
 
 
 @login_manager.user_loader
@@ -102,7 +105,18 @@ def search_post():
     elif choice == "dislike":
         user.dislikes.connect(friend)
 
-    return redirect(url_for("search_get"))
+    return redirect(url_for("search"))
+
+
+# TODO: Observer Pattern (při match odeslat e-mailovou notifikaci)
+@app.route("/send-notification", methods=["POST"])
+def send_notification():
+    msg = Message(
+        subject="Hello",
+        sender="",
+        recipients=[""],
+    )
+    mail.send(msg)
 
 
 @app.route("/<path:invalid_path>")

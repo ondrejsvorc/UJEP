@@ -18,7 +18,7 @@ class DislikeStrategy(RelationshipStrategy):
         user.dislikes.connect(other)
 
 
-class UserRelationshipContext:
+class RelationshipContext:
     def __init__(self, strategy: RelationshipStrategy):
         self._strategy = strategy
 
