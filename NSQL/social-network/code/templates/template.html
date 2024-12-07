@@ -19,7 +19,7 @@
                         <li><a href="/matches" class="text-light text-decoration-none">Shody</a></li>
                     </ul>
                 </nav>
-                <form action="{{ url_for('logout_post') }}" method="POST" class="d-inline">
+                <form action="{{ url_for('auth.logout_post') }}" method="POST" class="d-inline">
                     <button type="submit" class="btn btn-outline-light">Odhlásit se</button>
                 </form>
             </div>

@@ -17,7 +17,7 @@
                         <h4>Přihlásit se</h4>
                     </div>
                     <div class="card-body">
-                        <form method="post" action="{{ url_for('login') }}">
+                        <form method="post" action="{{ url_for('auth.login') }}">
                             <div class="form-group mb-3">
                                 <label for="username" class="mb-2">Uživatelské jméno</label>
                                 <input type="text" id="username" name="username" class="form-control bg-dark text-light border-secondary" autofocus required>
