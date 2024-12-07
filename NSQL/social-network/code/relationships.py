@@ -18,6 +18,11 @@ class DislikeStrategy(RelationshipStrategy):
         user.dislikes.connect(other)
 
 
+class SleepsWithStrategy(RelationshipStrategy):
+    def connect(self, user: Person, other: Person):
+        user.sleepsWith.connect(other)
+
+
 class RelationshipContext:
     def __init__(self, strategy: RelationshipStrategy):
         self._strategy = strategy

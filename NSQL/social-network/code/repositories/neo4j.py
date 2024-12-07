@@ -50,6 +50,16 @@ class Neo4jRepository(Repository):
         available_matches = self._convert_query_results(results)
         return available_matches
 
+    def get_sleeps_with(self, username: str) -> List[Person]:
+        query = """
+        MATCH (friend:Person)-[:LIKES]->(user:Person), (user:Person)-[:SLEEPSWITH]->(friend:Person)
+        WHERE user.name = $username
+        RETURN friend
+        """
+        results, _ = self._db.cypher_query(query, {"username": username})
+        sleeps_with = self._convert_query_results(results)
+        return sleeps_with
+
     def get_user_node(self, username: str) -> Person:
         return Person.nodes.get(name=username)
 
@@ -69,6 +79,7 @@ class Neo4jRepository(Repository):
         richard = Person(name="Richard", age=33, hobbies=["partying", "cats"]).save()
         pepa.likes.connect(jana)
         jana.likes.connect(pepa)
+        pepa.sleepsWith.connect(jana)
         michal.likes.connect(alena)
         alena.dislikes.connect(michal)
         alena.likes.connect(pepa)

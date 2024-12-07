@@ -16,6 +16,7 @@ class Person(StructuredNode):
 
     likes = RelationshipTo("Person", "LIKES")
     dislikes = RelationshipTo("Person", "DISLIKES")
+    sleepsWith = RelationshipTo("Person", "SLEEPSWITH")
 
 
 # MongoDB
