@@ -1,15 +1,8 @@
 from abc import ABC, abstractmethod
-from enum import Enum
 from repositories.mongo import MongoRepository
 from repositories.neo4j import Neo4jRepository
 from repositories.redis import RedisRepository
 from repositories.repository import Repository
-
-
-class RepositoryType(Enum):
-    MONGO = "mongo"
-    NEO4J = "neo4j"
-    REDIS = "redis"
 
 
 class RepositoryFactory(ABC):
