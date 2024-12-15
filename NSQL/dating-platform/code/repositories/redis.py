@@ -33,6 +33,12 @@ class RedisRepository(Repository):
     def set(self, key: str, value, ex=3600):
         self._db.set(key, value, ex)
 
+    def decr(self, key: str):
+        self._db.decr(key)
+
+    def incr(self, key: str):
+        self._db.incr(key)
+
     def _setup_database(self):
         self._db = Redis(
             host=os.getenv("REDIS_HOST"),
