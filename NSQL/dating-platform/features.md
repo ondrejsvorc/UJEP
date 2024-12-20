@@ -1,6 +1,6 @@
 ## Repository
 - abstrakce nad databázovou vrstvou databází Redis, MongoDB a Redis
-- návrhový vzor: Abstract Factory
+- návrhový vzor: Abstract Factory, Singleton
 
 ## Blueprint
 - roztřídění endpointů do samostatných souborů
@@ -15,8 +15,15 @@
 - app_builder.py
 - přihlašování uživatele
 - error.py
-- search_memento.py - nedokončené
 
 ## Redis
 - search.py
 - home.py
+
+
+# Design Patterns
+- Abstract Factory (Creational)
+- Singleton (Creational)
+- Template Method (Behavior)
+- Strategy (Behavior)
+- Memento (Behavior)
