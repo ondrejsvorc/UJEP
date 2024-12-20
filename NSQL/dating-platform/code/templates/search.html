@@ -20,7 +20,6 @@
   <div class="d-flex justify-content-center mb-4">
     <form action="/search" method="post" style="width: 26rem">
       <input type="hidden" name="friend_name" value="{{ profile.name }}">
-
       <div class="d-flex justify-content-between">
         <button type="submit" class="btn btn-success flex-fill me-2" name="date_choice" value="like">
           <i class="bi bi-hand-thumbs-up"></i> Like
@@ -29,6 +28,13 @@
           <i class="bi bi-hand-thumbs-down"></i> Dislike
         </button>
       </div>
+      {% if undo_possible %}
+      <div class="d-flex justify-content-center mt-3">
+        <button type="submit" class="btn btn-secondary flex-fill" name="undo" value="true">
+          <i class="bi bi-arrow-counterclockwise"></i> Undo
+        </button>
+      </div>
+    {% endif %}
     </form>
   </div>
 

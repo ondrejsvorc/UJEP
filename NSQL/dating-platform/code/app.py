@@ -1,8 +1,8 @@
 from app_builder import AppBuilder
-from blueprint_loader import BlueprintLoader
+from blueprint_loader import FileBlueprintLoader
 
 app, mail, neo4j, mongo, redis = AppBuilder().build()
-BlueprintLoader(app).load_blueprints()
+FileBlueprintLoader(app).load_blueprints()
 
 
 @app.login_manager.user_loader

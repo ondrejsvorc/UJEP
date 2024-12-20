@@ -13,16 +13,17 @@ blueprint = Blueprint("search", __name__)
 def search():
     available_matches = neo4j.get_available_matches(current_user.username)
     random_profile = random.choice(available_matches) if available_matches else None
-    return render_template("search.html", profile=random_profile)
+    return render_template("search.html", profile=random_profile, undo_possible=False)
 
 
 @blueprint.route("/search", methods=["POST"])
 @login_required
 def search_post():
-    username = current_user.username
     friend_name = request.form.get("friend_name")
     choice = request.form.get("date_choice")
+    undo = request.form.get("undo")
 
+    username = current_user.username
     user = neo4j.get_user_node(username)
     friend = neo4j.get_user_node(friend_name)
 

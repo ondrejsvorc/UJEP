@@ -2,24 +2,55 @@
 
 {% block content %}
 
-{% if profiles %}
-  <div class="row justify-content-center">
-    {% for friend in profiles %}
-      <div class="col-md-6 col-lg-4 mb-4">
-        <article class="card text-white bg-dark h-100">
-          <section class="card-body">
-            <h3 class="card-title">{{ friend.name }}</h3>
-            <ul class="list-group list-group-flush">
-              <li class="list-group-item bg-dark text-light"><strong>Věk:</strong> {{ friend.age }}</li>
-              <li class="list-group-item bg-dark text-light"><strong>Záliby:</strong> {{ friend.hobbies | join(", ") }}</li>
-            </ul>
-          </section>
-        </article>
-      </div>
+<div class="container">
+
+  {% if matches %}
+  <form method="POST" action="{{ url_for('matches.sleepsWith_post') }}">
+    <div class="mb-3">
+      <label for="friend-combobox" class="form-label">Vyberte osobu, se kterou spíte</label>
+      <select id="friend-combobox" name="friend_name" class="form-select">
+        {% for match in matches %}
+        <option value="{{ match.name }}">{{ match.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="d-flex justify-content-end">
+      <button type="submit" name="date_choice" class="btn btn-success me-2">Přidat</button>
+    </div>
+  </form>
+  {% else %}
+  <p class="text-center mt-5 fst-italic">S nikým nespíte a zatím ani nemůžete spát, protože nemáte žádný match.</p>
+  {% endif %}
+
+  <hr class="my-4">
+
+  {% if sleepsWith %}
+  <h3>Lidé, se kterými spíte</h3>
+  <div class="row">
+    {% for person in sleepsWith %}
+    <div class="col-md-6 col-lg-4 mb-4">
+      <article class="card text-white bg-primary h-100">
+        <section class="card-body">
+          <h4 class="card-title">{{ person.name }}</h4>
+          <ul class="list-group list-group-flush">
+            <li class="list-group-item bg-primary text-light"><strong>Věk:</strong> {{ person.age }}</li>
+            <li class="list-group-item bg-primary text-light"><strong>Záliby:</strong> {{ person.hobbies | join(", ") }}</li>
+          </ul>
+          <form method="POST" action="{{ url_for('matches.sleepsWith_delete', friend_name=person.name) }}">
+            <button type="submit" class="btn btn-danger btn-sm mt-2">✖️ Odebrat</button>
+          </form>
+        </section>
+      </article>
+    </div>
+    <form action="{{ url_for('matches.potential_disease') }}" method="POST">
+      <button type="submit" class="btn btn-danger">Jsem nakažen!</button>
+    	</form>
     {% endfor %}
   </div>
-{% else %}
-  <p class="text-center mt-5 fst-italic">Bohužel s nikým nespíte.</p>
-{% endif %}
+  {% else %}
+  <p class="text-center mt-5 fst-italic">S nikým momentálně nespíte.</p>
+  {% endif %}
+
+</div>
 
 {% endblock %}

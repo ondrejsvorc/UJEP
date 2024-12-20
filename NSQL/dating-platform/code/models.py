@@ -5,6 +5,7 @@ from neomodel import (
     IntegerProperty,
     ArrayProperty,
     RelationshipTo,
+    BooleanProperty,
 )
 
 
@@ -13,6 +14,8 @@ class Person(StructuredNode):
     name = StringProperty(unique_index=True, required=True)
     age = IntegerProperty(required=True)
     hobbies = ArrayProperty()
+    hasDisease = BooleanProperty(default=False)
+    hasPotentialDisease = BooleanProperty(default=False)
 
     likes = RelationshipTo("Person", "LIKES")
     dislikes = RelationshipTo("Person", "DISLIKES")
