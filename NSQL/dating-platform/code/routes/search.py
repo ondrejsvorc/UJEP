@@ -29,7 +29,7 @@ def search_post():
 
     strategy = LikeStrategy() if choice == "like" else DislikeStrategy()
     context = RelationshipContext(strategy)
-    context.connect_users(user, friend)
+    context.connect(user, friend)
 
     redis.decr(redis.generate_key(RedisKey.AVAILABLE_MATCHES, username))
 

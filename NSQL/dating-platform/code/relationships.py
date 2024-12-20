@@ -40,8 +40,8 @@ class RelationshipContext:
     def __init__(self, strategy: RelationshipStrategy):
         self._strategy = strategy
 
-    def connect_users(self, user: Person, other: Person):
+    def connect(self, user: Person, other: Person):
         return self._strategy.connect(user, other)
 
-    def disconnect_users(self, user: Person, other: Person):
+    def disconnect(self, user: Person, other: Person):
         return self._strategy.disconnect(user, other)

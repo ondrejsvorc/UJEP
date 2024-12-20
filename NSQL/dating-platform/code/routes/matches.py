@@ -42,7 +42,7 @@ def sleepsWith_post():
 
     strategy = SleepsWithStrategy()
     context = RelationshipContext(strategy)
-    context.connect_users(user, friend)
+    context.connect(user, friend)
 
     return redirect(url_for("matches.sleepsWith"))
 
@@ -56,7 +56,7 @@ def sleepsWith_delete(friend_name):
 
     strategy = SleepsWithStrategy()
     context = RelationshipContext(strategy)
-    context.disconnect_users(user, friend)
+    context.disconnect(user, friend)
 
     return redirect(url_for("matches.sleepsWith"))
 
