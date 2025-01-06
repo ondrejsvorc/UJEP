@@ -29,7 +29,7 @@ print(odlehla_pozorovani)
 
 # Otázka č. 1
 n <- 7       # Počet dnů (pokusů)
-p <- 5/8     # pravdepodobnostěpodobnost úspěchu (žlutý hrníček)
+p <- 5/8     # Pravděpodobnost úspěchu (žlutý hrníček)
 
 # Pravděpodobnost alespoň 5 úspěchů
 pravdepodobnost <- 1 - pbinom(4, size = n, prob = p)
