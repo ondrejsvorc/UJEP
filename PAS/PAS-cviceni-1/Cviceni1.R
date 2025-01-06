@@ -41,6 +41,7 @@ data("esoph")
 
 # datovy soubor ChickWeight
 data("ChickWeight")
+
 #   vaha kurat spolu s jejich vekem a stravou, kterou dostavala
 #   promenne: weight - vaha, time - vek kurete ve dnech, chick - identifikator kurete, diet - oznaceni vyzivy
 #   co mohu z takovychto dat zjistit? 
@@ -90,13 +91,14 @@ data("ChickWeight")
 
 ## nominalni promenna
 # vypoctete absolutni a relativni cetnosti promenne Hoch
-Kojeni <- load("Kojeni.RData") 
+load("Kojeni.RData") 
 View(Kojeni)
 
-Okresy <- load("Okresy03.RData")
+load("Okresy03.RData")
 View(Okresy)
 
 Hoch <- Kojeni$Hoch
+
 
 # absolutni cetnosti
 table(Hoch)
@@ -108,6 +110,7 @@ prop.table(table(Hoch))*100
 round(prop.table(table(Hoch))*100,2)
 
 cbind("absolutni"=table(Hoch),"relativni"=round(prop.table(table(Hoch))*100,2))
+
 
   # v jedne tabulce
   # ma smysl resit kumulativni cetnosti?
@@ -147,6 +150,8 @@ round(prop.table(table(Por.poh)) * 100, 2)
 # kolik studentů prošlo u zkoušky
 # kolik studentů šlo celkem ke zkoušce
 # př. kolik jsme měli maminek, kteří měli max. maturitu?
+
+cumsum()
 
 # Jaky graf byste pouzili pro nominalni promennou?
 ## POZOR: Kazdy graf musi mit nazev a oznaceni os, jinak se krati body!!!
@@ -193,3 +198,28 @@ data("mtcars")
 #             gear - pocet rychlosti, carb - pocet karburatoru 
 # urcete v nich typy promennych a pro ty kategoricke (nominalni i ordinalni)
 #   spocitejte popisne statistiky
+
+
+plot(mtcars$hp, mtcars$mpg,
+     main = "Vztah mezi výkonem motoru a spotřebou paliva",
+     xlab = "Výkon motoru (hp)",
+     ylab = "Spotřeba paliva (mpg)",
+     pch = 20, col = "blue")
+
+# Přidání lineární regrese
+abline(lm(mpg ~ hp, data = mtcars), col = "red", lwd = 2)
+
+# Přidání LOESS křivky pro nelineární trend
+lines(lowess(mtcars$hp, mtcars$mpg), col = "green", lwd = 2)
+
+# Přidání legendy
+legend("topright", 
+       legend = c("Data", "Lineární regrese", "LOESS křivka"),
+       col = c("blue", "red", "green"),
+       pch = c(20, NA, NA),
+       lty = c(NA, 1, 1),
+       lwd = c(NA, 2, 2))
+
+# Přidání mřížky
+grid()
+

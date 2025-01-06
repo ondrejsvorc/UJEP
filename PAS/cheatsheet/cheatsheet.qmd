@@ -5,6 +5,9 @@ format: html
 editor: visual
 ---
 
+<https://www.datova-akademie.cz/popisna-statistika-miry-polohy/>\
+<https://www.datova-akademie.cz/popisna-statistika-miry-variability/>
+
 ```{r}
 rm(list=ls())
 ```
@@ -22,28 +25,42 @@ prop.table(table(sloupec)) # v desetinných číslech
 round(prop.table(table(sloupec))*100, 2) # v procentech, zaokrouhlené na 2 des. místa
 ```
 
-## Absolutní i relativní četnost v jednom
+## Kumulativní četnost
 
 ```{r}
-data.frame(cbind("Absolutni"=table(sloupec),"Procenta"=prop.table(table(sloupec))))
+cumsum(table(sloupec))
+```
+
+## Absolutní, relativní a kumulativní četnost v jednom
+
+```{r}
+data.frame(cbind(
+  "Absolutni"=table(sloupec),
+  "Procenta"=prop.table(table(sloupec))),
+  "Kumulativni"=cumsum(table(sloupec)))
 ```
 
 ## Zobrazování dat
 
 -   tabulka - `kable()` - balíček `knitr`
 
--   frekvenční polygon - `plot()`
+-   frekvenční polygon / korelační diagram / bodový graf - `plot()`
+
+    -   využíváme pro vyjádření vztahu mezi dvěma veličinami (např. vztah mezi výškou a hmotností žáků ve třídě)
 
 -   sloupcový graf - `barplot()`
 
 -   koláčový graf - `pie()`
 
+    -   vhodný pro zobrazování relativní četnosti
+
+    -   rozdělí 100 % na výseče
+
 -   histogram - `hist()`
 
--   krabicový graf - `boxplot()`
+    -   používají se pro vyjádření rozložení hodnot spojité veličiny rozdělené do intervalů (např. rozložení hmotnosti v populaci)
 
-```{r}
-```
+-   krabicový graf - `boxplot()`
 
 ## Popisná statistika
 

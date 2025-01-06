@@ -58,14 +58,14 @@ pie(rc,lab=popis,col=2:7,main="Relativni cetnosti studijnich oboru")
 ## popisne statistiky pro ordinalni promennou
 # - můžeme přidat komulativní četnosti (cumsum)
 # popiste, jake mely vozy Airbagy
+
 ab <- Cars93$AirBags
 unique(ab) # ordinální, uspořádané, protože 3 kategorie (bez airbagu, jen u řidiče, u řidiče i u spolujezdce)
 (ac <- table(ab))
 (kac<-cumsum(ac))
 (rc<-round(prop.table(table(ab)),2))
 (krc<-cumsum(rc))
-data.frame(cbind("n(i)"=ac,"N(i)"=kac,"f(i)"=rc,"F(i)"=krc))
-  # frekvencni rozdeleni - co z nej vidite?
+data.frame(cbind("n(i)"=ac,"N(i)"=kac,"f(i)"=rc,"F(i)"=krc)) # Frekvenční rozdělení
 
 # Jaká část má alespoň 1. airbag
 
