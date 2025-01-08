@@ -2,7 +2,7 @@
 
 ---
 
-## **1. Hlavní témata (s vysvětlením)**
+## **1. Hlavní témata**
 
 ### **1.1 Popisná statistika**
 
@@ -194,4 +194,333 @@ fivenum(x) # Pětinásobné shrnutí (minimum, Q1, medián, Q3, maximum)
 CoefVar(x) # Variabilita
 ```
 
+# Rozdělení pravděpodobnosti
+
+## Pravděpodobnostní funkce
+- Vyjadřuje pravděpodobnost, že náhodná proměnná nabyde právě dané hodnoty x (=)
+- Příklad: Pokud hodíme kostkou, jaká bude pravděpodobnost, že padne právě číslo 4 (x = 4)
+
+## Distribuční funkce
+- Vyjadřuje pravděpodobnost, že náhodná proměnná nabyde menší nebo rovno dané hodnoty x (<=)
+- Příklad: Pokud hodíme kostkou, jaká bude pravděpodobnost, že padne číslo menší nebo rovno 4 (x <= 4)
+
+# Diskrétní rozdělení
+- mají integer hodnoty (diskrétní)
+- Příklad: Počet mincí, počet událostí, počet úspěchů v sérii pokusů
+
+## Binomické rozdělení
+- Určuje pravděpodobnost že nastane určitý počet úspěchů v určitém počtu pokusů, kde každý pokus má stejnou pravděpodobnost úspěchu
+
+### Parametry
+`k` = Počet úspěchů, který nás zajímá  
+`n` = Celkový počet pokusů  
+`p` = Pravděpodobnost úspěchu v jednom pokusu (0 ≤ p ≤ 1)  
+
+### Funkce v R
+`dbinom(k, n, p)` = Vrací pravděpodobnost, že náhodná proměnná s binomickým rozdělením nabude přesně k úspěchů při n pokusech, kde každý pokus má pravděpodobnost úspěchu p  
+`pbinom(k, n, p)` = Vrací pravděpodobnost, že náhodná proměnná s binomickým rozdělením nabude maximálně k úspěchů (≤ k) při n pokusech, kde každý pokus má pravděpodobnost úspěchu p  
+
+### Příklad (`dbinom`)
+Jaká je šance, že při 10 hodech kostkou padne šestka třikrát?
+```r
+k <- 3    # Počet úspěchů (třikrát šestka)
+n <- 10   # Celkový počet pokusů (hodů)
+p <- 1/6  # Pravděpodobnost šestky v jednom pokusu (hodu)
+
+pravdepodobnost <- dbinom(k, n, p) # Pravděpodobnostní funkce
+print(pravdepodobnost) # 0.1550454
+```
+Pravděpodobnost, že při 10 hodech kostkou padne šestka přesně třikrát, je přibližně 15,5 %.
+
+### Příklad (`pbinom`)
+Jaká je pravděpodobnost, že při 10 hodech kostkou padne šestka nejvýše třikrát?
+
+```r
+k <- 3    # Nejvýše třikrát šestka
+n <- 10   # Celkový počet pokusů (hodů)
+p <- 1/6  # Pravděpodobnost šestky v jednom pokusu (hodu)
+
+pravdepodobnost <- pbinom(k, n, p) # Distribuční funkce
+print(pravdepodobnost) # 0.9302722
+```
+Pravděpodobnost, že při 10 hodech kostkou padne šestka nejvýše třikrát, je přibližně 93,0 %
+
+## **Poissonovo rozdělení**  
+- Určuje pravděpodobnost, že nastane k událostí v pevně stanoveném časovém úseku nebo prostoru, pokud je průměrná frekvence výskytu známá.
+
+### Parametry 
+- `k` = Počet událostí, který nás zajímá
+- `λ (lambda)` = Průměrný počet událostí za jednotku času nebo prostoru (λ > 0)
+
+### Funkce v R:
+- `dpois(k, lambda)` = Vrací pravděpodobnost, že nastane přesně k událostí při průměrné frekvenci výskytu **λ**
+- `ppois(k, lambda)` = Vrací pravděpodobnost, že nastane nejvýše k událostí při průměrné frekvenci výskytu **λ**
+
+
+## Příklad (`dpois`)  
+Jaká je pravděpodobnost, že určitým bodem na silnici projede za hodinu přesně 20 aut, pokud průměrně projede 15 aut?
+
+```r
+k <- 20       # Počet aut (přesně 20)
+lambda <- 15  # Průměrný počet aut za hodinu
+
+pravdepodobnost <- dpois(k, lambda) # Pravděpodobnostní funkce
+print(pravdepodobnost) # 0.0516
+```
+Pravděpodobnost, že určitým bodem projede přesně 20 aut za hodinu, je přibližně 5,2 %.
+
+## Příklad (`ppois`)  
+Jaká je pravděpodobnost, že určitým bodem na silnici projede za hodinu nejvýše 20 aut, pokud průměrně projede 15 aut?
+
+```r
+k <- 20       # Nejvýše 20 aut
+lambda <- 15  # Průměrný počet aut za hodinu
+
+pravdepodobnost <- ppois(k, lambda) # Distribuční funkce
+print(pravdepodobnost) # 0.8686
+```
+Pravděpodobnost, že určitým bodem projede nejvýše 20 aut za hodinu, je přibližně 86,9 %.
+
+## Hypergeometrické rozdělení
+- Určuje pravděpodobnost, že při **výběru n prvků bez vracení** z celkového souboru bude právě **k prvků požadovaného typu**.
+
+### Parametry
+- `k` = Počet úspěchů, který nás zajímá ve výběru.  
+- `w` = Počet prvků v kolekci, jejichž výběr považujeme za úspěch.  
+- `b` = Počet prvků v kolekci, jejichž výběr považujeme za neúspěch.  
+- `n` = Počet vybraných prvků.
+
+### Funkce v R
+
+- `dhyper(k, w, b, n)` = Vrací pravděpodobnost, že při **výběru n prvků** bude přesně **k úspěchů** z celkového souboru s **w úspěšnými a b neúspěšnými prvky**.  
+- `phyper(k, w, b, n)` = Vrací pravděpodobnost, že při **výběru n prvků** bude **nejvýše k úspěchů** z celkového souboru s **w úspěšnými a b neúspěšnými prvky**.  
+
+## Příklad (`dhyper`)
+Jaká je pravděpodobnost, že při výběru 5 karet z balíčku, kde je 15 modrých, 20 červených a 25 zelených karet, budou přesně 3 karty modré?
+
+```r
+k <- 3        # Počet modrých karet (přesně 3)
+w <- 15       # Počet modrých karet v balíčku
+b <- 20 + 25  # Počet červených a zelených karet (45)
+n <- 5        # Počet vybraných karet
+
+pravdepodobnost <- dhyper(k, w, b, n) # Pravděpodobnostní funkce
+print(pravdepodobnost) # 0.2279
+```
+Pravděpodobnost, že mezi 5 vybranými kartami budou přesně 3 modré karty, je přibližně 22,8 %.
+
+## Příklad (`phyper`)
+Jaká je pravděpodobnost, že při výběru 5 karet z balíčku, kde je 15 modrých, 20 červených a 25 zelených karet, budou nejvýše 3 karty modré?
+
+```r
+k <- 3        # Nejvýše 3 modré karty
+w <- 15       # Počet modrých karet v balíčku
+b <- 20 + 25  # Počet červených a zelených karet (45)
+n <- 5        # Počet vybraných karet
+
+pravdepodobnost <- phyper(k, w, b, n) # Distribuční funkce
+print(pravdepodobnost) # 0.8901
+```
+Pravděpodobnost, že mezi 5 vybranými kartami budou nejvýše 3 modré karty, je přibližně 89,0 %.
+
+## Příklad (`1 - phyper`)
+Jaká je pravděpodobnost, že při výběru 5 karet z balíčku, kde je 15 modrých, 20 červených a 25 zelených karet, budou více než 3 karty modré?
+
+```r
+k <- 3        # Více než 3 modré karty
+w <- 15       # Počet modrých karet v balíčku
+b <- 20 + 25  # Počet červených a zelených karet (45)
+n <- 5        # Počet vybraných karet
+
+pravdepodobnost <- 1 - phyper(k, w, b, n) # Doplněk distribuční funkce
+print(pravdepodobnost) # 0.1099
+```
+Pravděpodobnost, že mezi 5 vybranými kartami budou více než 3 modré karty, je přibližně 10,9 %.
+
+## Geometrické rozdělení
+- Určuje pravděpodobnost, že **první úspěch nastane po k neúspěšných pokusech** v sérii nezávislých pokusů, kde každý pokus má stejnou pravděpodobnost úspěchu **p**.  
+
+### Parametry  
+- `k` = Počet neúspěšných pokusů před úspěšným pokusem (k ≥ 0)  
+- `p` = Pravděpodobnost úspěchu v jednom pokusu (0 ≤ p ≤ 1) 
+
+### Funkce v R  
+- `dgeom(k, p)` = Vrací pravděpodobnost, že první úspěch nastane `přesně po k neúspěšných pokusech`.  
+- `pgeom(k, p)` = Vrací pravděpodobnost, že první úspěch nastane `nejvýše po k neúspěšných pokusech`.  
+
+## Příklad (`dgeom`)  
+Jaká je pravděpodobnost, že při házení mincí padne hlava poprvé při 8. pokusu (po 7 neúspěšných pokusech), pokud je pravděpodobnost úspěchu v jednom hodu 50 %?
+
+```r
+k <- 7       # 7 neúspěšných pokusů před úspěchem
+p <- 0.50    # Pravděpodobnost úspěchu (hlava) v jednom hodu
+
+pravdepodobnost <- dgeom(k, p) # Pravděpodobnostní funkce
+print(pravdepodobnost) # 0.0078
+```
+Pravděpodobnost, že hlava padne poprvé při 8. pokusu, je přibližně 0,78 %.
+
+## Příklad (`pgeom`)
+Jaká je pravděpodobnost, že při házení mincí padne hlava nejvýše při 8. pokusu (po 7 nebo méně neúspěšných pokusech), pokud je pravděpodobnost úspěchu v jednom hodu 50 %?
+
+```r
+k <- 7       # Nejvýše 7 neúspěšných pokusů
+p <- 0.50    # Pravděpodobnost úspěchu (hlava) v jednom hodu
+
+pravdepodobnost <- pgeom(k, p) # Distribuční funkce
+print(pravdepodobnost) # 0.9922
+```
+Pravděpodobnost, že hlava padne nejvýše při 8. pokusu, je přibližně 99,2 %.
+
+## Negativní (Pascalovo) binomické rozdělení
+- Určuje pravděpodobnost, že **nastane k neúspěchů před dosažením n úspěchů** v sérii nezávislých pokusů, kde každý pokus má pravděpodobnost úspěchu **p**.  
+- Je zobecněním geometrického rozdělení pro **více než jeden úspěch**.  
+
+### Parametry  
+- `k` = Počet neúspěchů, které nás zajímají před dosažením `n` úspěchů (k ≥ 0)
+- `n` = Počet požadovaných úspěchů (n > 0)
+- `p` = Pravděpodobnost úspěchu v jednom pokusu (0 ≤ p ≤ 1) 
+
+### Funkce v R  
+- `dnbinom(k, n, p)` = Vrací pravděpodobnost, že před dosažením **n úspěchů** nastane **přesně k neúspěchů**.  
+- `pnbinom(k, n, p)` = Vrací pravděpodobnost, že před dosažením **n úspěchů** nastane **nejvýše k neúspěchů**.  
+- `1 - pnbinom(k, n, p)` = Vrací pravděpodobnost, že před dosažením **n úspěchů** nastane **více než k neúspěchů**.  
+
 ---
+
+## Příklad (`dnbinom`)  
+Jaká je pravděpodobnost, že parta tří lidí vykrade banku přesně 5krát, než budou všichni tři chyceni, pokud je pravděpodobnost zatčení při každé loupeži 40 %?
+
+```r
+k <- 5       # Počet neúspěšných pokusů (5 úspěšných loupeží)
+n <- 3       # Počet úspěchů (3 zatčení)
+p <- 0.40    # Pravděpodobnost úspěchu (zatčení při loupeži)
+
+pravdepodobnost <- dnbinom(k, n, p) # Pravděpodobnostní funkce
+print(pravdepodobnost) # 0.0731
+```
+Pravděpodobnost, že parta vykrade banku přesně 5krát předtím, než budou všichni chyceni, je přibližně 7,3 %.
+
+## Příklad (`pnbinom`)
+Jaká je pravděpodobnost, že parta tří lidí vykrade banku nejvýše 5krát předtím, než budou všichni tři chyceni, pokud je pravděpodobnost zatčení při každé loupeži 40 %?
+
+```r
+k <- 5       # Nejvýše 5 úspěšných loupeží
+n <- 3       # Počet úspěchů (3 zatčení)
+p <- 0.40    # Pravděpodobnost úspěchu (zatčení při loupeži)
+
+pravdepodobnost <- pnbinom(k, n, p) # Distribuční funkce
+print(pravdepodobnost) # 0.8813
+```
+Pravděpodobnost, že parta vykrade banku nejvýše 5krát předtím, než budou všichni chyceni, je přibližně 88,1 %.
+
+## Příklad (`1 - pnbinom`)
+Jaká je pravděpodobnost, že parta tří lidí vykrade banku alespoň 6krát předtím, než budou všichni tři chyceni, pokud je pravděpodobnost zatčení při každé loupeži 40 %?
+
+```r
+k <- 5       # Více než 5 úspěšných loupeží
+n <- 3       # Počet úspěchů (3 zatčení)
+p <- 0.40    # Pravděpodobnost úspěchu (zatčení při loupeži)
+
+pravdepodobnost <- 1 - pnbinom(k, n, p) # Doplněk distribuční funkce
+print(pravdepodobnost) # 0.1187
+```
+Pravděpodobnost, že parta vykrade banku alespoň 6krát předtím, než budou všichni chyceni, je přibližně 11,9 %.
+
+# Spojitá rozdělení
+- Popisují spojité (nepřetržité) hodnoty
+- Mezi dvěma libovolnými hodnotami existuje nekonečně mnoho dalších hodnot
+- Hodnoty mohou být reálná čísla
+- **Pravděpodobnost, že náhodná proměnná nabude přesně jedné hodnoty, je 0**
+- Místo toho se pravděpodobnost vyjadřuje jako plocha pod křivkou hustoty pravděpodobnosti v určitém intervalu
+- Spojitá rozdělení vyžadují jasně definovaný typ rozdělení (např. normální, exponenciální) a všechny potřebné parametry (střední hodnota, rozptyl)
+
+## Normální rozdělení` 
+- Popisuje rozložení hodnot náhodné proměnné kolem střední hodnoty (mean) se specifickým rozptylem (variance).
+
+### Parametry  
+- `μ` = Střední hodnota (např. průměrná výška)  
+- `σ²` = Rozptyl (variance)
+- `σ` = Směrodatná odchylka (standard deviation)
+
+### Funkce v R
+- `pnorm(x, mean, sd)` = Vrací pravděpodobnost, že náhodná proměnná bude **menší nebo rovna x**
+- `1 - pnorm(x, mean, sd)` = Vrací pravděpodobnost, že náhodná proměnná bude **větší než x**
+
+---
+
+## Příklad (`pnorm`)
+Jaká je pravděpodobnost, že náhodně vybraný muž je menší než 170 cm, pokud je průměrná výška mužů 180 cm a rozptyl je 49 cm²?
+
+```r
+mean <- 180    # Střední hodnota
+sd <- sqrt(49) # Směrodatná odchylka (odmocnina z rozptylu)
+x <- 170       # Hledaná výška
+
+pravdepodobnost <- pnorm(x, mean, sd) # Distribuční funkce
+print(pravdepodobnost) # 0.1587
+```
+Pravděpodobnost, že náhodně vybraný muž je menší než 170 cm, je přibližně 15,9 %.
+
+## Příklad (`1 - pnorm`)
+Jaká je pravděpodobnost, že náhodně vybraný muž bude vyšší než průměrný hráč NBA (195 cm), pokud je průměrná výška mužů 180 cm a rozptyl je 49 cm²?
+
+```r
+mean <- 180    # Střední hodnota
+sd <- sqrt(49) # Směrodatná odchylka (odmocnina z rozptylu)
+x <- 195       # Hledaná výška
+
+pravdepodobnost <- 1 - pnorm(x, mean, sd) # Doplněk distribuční funkce
+print(pravdepodobnost) # 0.0668
+```
+Pravděpodobnost, že náhodně vybraný muž bude vyšší než 195 cm, je přibližně 6,7 %.
+
+## Lognormální rozdělení 
+- Popisuje hodnoty, jejichž **logaritmus je normálně rozdělen**.  
+- Hodí se pro modelování dat, která jsou **kladná a mají výrazně pravostranné rozložení** (např. příjmy, ceny akcií). 
+
+### Parametry  
+- `μ` = Střední hodnota logaritmované proměnné  
+- `σ` = Směrodatná odchylka logaritmované proměnné  
+
+### Funkce v R
+- `dlnorm(x, meanlog, sdlog)` = Vrací pravděpodobnost hustoty pro hodnotu `x` s danými parametry  
+- `plnorm(x, meanlog, sdlog)` = Vrací pravděpodobnost, že náhodná proměnná bude **menší nebo rovna x**  
+- `qlnorm(p, meanlog, sdlog)` = Vrací hodnotu odpovídající pravděpodobnosti `p` 
+- `rlnorm(n, meanlog, sdlog)` = Generuje `n` náhodných hodnot z lognormálního rozdělení  
+
+### Příklad (`plnorm`)
+Jaká je pravděpodobnost, že cena akcie nepřekročí 50 jednotek, pokud logaritmus ceny sleduje normální rozdělení se střední hodnotou 3 a směrodatnou odchylkou 0.5?
+
+```r
+meanlog <- 3  # Střední hodnota logaritmované proměnné
+sdlog <- 0.5  # Směrodatná odchylka logaritmované proměnné
+x <- 50       # Hledaná hodnota
+
+pravdepodobnost <- plnorm(x, meanlog, sdlog) # Distribuční funkce
+print(pravdepodobnost) # 0.6915
+```
+Pravděpodobnost, že cena akcie nepřekročí 50 jednotek, je přibližně 69,2 %.
+
+## Exponenciální rozdělení  
+- Popisuje **čas nebo vzdálenost mezi dvěma po sobě jdoucími událostmi**, které nastávají **nezávisle a konstantní průměrnou rychlostí**. 
+
+### Parametry
+- `λ (lambda)` = Intenzita události *(počet událostí za jednotku času nebo prostoru, λ > 0)*  
+
+### Funkce v R  
+- `dexp(x, rate)` = Vrací **hustotu pravděpodobnosti** pro hodnotu `x` s parametrem `λ`
+- `pexp(x, rate)` = Vrací pravděpodobnost, že náhodná proměnná bude **menší nebo rovna x** 
+- `qexp(p, rate)` = Vrací hodnotu, která odpovídá pravděpodobnosti `p` *(kvantil)*
+- `rexp(n, rate)` = Generuje `n` náhodných hodnot z exponenciálního rozdělení
+
+## Příklad (`pexp`)  
+Jaká je pravděpodobnost, že zákazník přijde do `5 minut`, pokud je průměrná frekvence příchodů `1 zákazník za 4 minuty` (λ = 0.25)?
+
+```r
+rate <- 0.25  # Intenzita události (1/4 zákazníci za minutu)
+x <- 5        # Hledaný čas
+
+pravdepodobnost <- pexp(x, rate) # Distribuční funkce
+print(pravdepodobnost) # 0.7135
+```
