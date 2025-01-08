@@ -147,12 +147,14 @@ cat("Pravděpodobnost, že budu pít ze žlutého hrníčku alespoň 5krát za t
 a) P(x <= 84)  
 b) 1 - P(x <= 129)  
 c) P(x <= 125) - P(x <= 109)  
-d) P(x <= 99)  
+d) P(x <= 99)
 
 a) 0.1430612 (14,3 %)  
 b) 0.02659757 (2,27 %)  
 c) 0.2264628 (22,65 %)  
 d) 0.2241298 (22,41 %)
+
+<img width="712" alt="image" src="https://github.com/user-attachments/assets/066c77e2-91aa-446a-9c4c-4f45d7935e47" />
 
 ```r
 stredni_hodnota <- 100    # Střední hodnota IQ
