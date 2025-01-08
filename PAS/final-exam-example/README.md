@@ -56,7 +56,18 @@ SATM: variační koeficient (SD) kolem 6.64, IQR ≈ 9. PlcmtScore: SD ≈ 8
 ![PlctmScore Boxplot](https://github.com/user-attachments/assets/67fa3f1c-c904-4fc6-8952-f11aa5a10da2)
 
 ## Otázka č. 5
-Z jádrové křivky hustoty i tvaru histogramu je patrné, že proměnná Size je vícemodální, a dle mého názoru vykazuje tři lokální maxima (tedy tři vrcholy neboli módy). Zde si ale nejsem jistý odpovědí.
+Z jádrové křivky hustoty i tvaru histogramu je patrné, že proměnná Size je vícemodální, a dle mého názoru vykazuje tři lokální maxima (tedy tři vrcholy neboli módy).
+
+Zde si ale nejsem jistý odpovědí. Úkolem bylo interpretovat pouze z histogramu a z jádrového odhadu hustoty (vyznačená křivka). Nicméně, když jsem si zkusil zjistit módy pomocí příkazu (viz kód níže), výsledkem byly 2 módy, přičemž každý se nacházel právě 4krát. Hodnota 525 jako samostatný mód vizuálně neodpovídá histogramu. Je tedy pravděpodobné, že numerický výstup odráží detaily dat, které histogram agregoval do širšího intervalu.
+
+Soudě z histogramu jako takového bych řekl, že proměnná Size je vícemodální, soudě z numerického výstupu, že je bimodální.
+
+```r
+Mode(Math$Size)
+# [1] 350 525
+# attr(,"freq")
+# [1] 4
+```
 
 ![Vícemodální](https://github.com/user-attachments/assets/0a21b895-04b5-4a92-b728-917bdfaef283)
 
