@@ -201,3 +201,31 @@ boxplot(data$matzem, data$geol,
 # Nejlepší čtvrtina studentů v matematické geografii má lepší známky než nejlepší čtvrtina v geologii
 # Studenti dosahují výrazně lepších známek v matematické geografii než v geologii.
 # V matzem většina studentů dosáhla známek 1 nebo 2, zatímco v geol je běžná známka 2 nebo 3.
+
+# Úlohy na pravděpodobnostní rozdělení
+
+# Otázka č. 2
+
+mean_height <- 180  # střední hodnota
+sd_height <- 7      # směrodatná odchylka
+
+# U spojitého rozdělení (např. normální rozdělení) není rozdíl mezi pravděpodobnostmi pro < (menší než) a ≤ (menší nebo rovno), protože pravděpodobnost pro konkrétní bod je nulová
+# Takže např. P(x < 170) = P(x <= 170)
+
+# (a) Pravděpodobnost, že muž je menší než 170 cm
+# P(x < 170) = P(x <= 170)
+# Pravděpodobnost, že náhodně vybraný muž bude menší než 170 cm, je přibližně 7.66 %.
+p_a <- pnorm(170, mean = mean_height, sd = sd_height)
+print(paste("Pravděpodobnost, že muž je menší než 170 cm:", round(p_a, 4)))
+
+# (b) Pravděpodobnost, že muž je vyšší než 195 cm
+# P(x > 195) = 1 - P(x <= 195)
+# Pravděpodobnost, že náhodně vybraný muž bude vyšší než 195 cm, je přibližně 1.61 %.
+p_b <- 1 - pnorm(195, mean = mean_height, sd = sd_height)
+print(paste("Pravděpodobnost, že muž je vyšší než 195 cm:", round(p_b, 4)))
+
+# (c) Pravděpodobnost, že první muž je vyšší než 195 cm a druhý muž je menší než 170 cm
+# P(x > 195) AND P(x < 170) = (1 - P(x <= 195)) * P(x <= 170)
+# Pravděpodobnost, že první muž bude vyšší než 195 cm a druhý muž bude menší než 170 cm, je přibližně 0.12 %.
+p_c <- p_b * p_a
+print(paste("Pravděpodobnost, že první muž je vyšší než 195 cm a druhý menší než 170 cm:", round(p_c, 4)))
