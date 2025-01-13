@@ -237,7 +237,8 @@ sum(dbinom(x = 0:k, size = n, prob = p))
 
 ## Binomické rozdělení
 - Určuje pravděpodobnost že nastane určitý počet úspěchů v určitém počtu pokusů, kde každý pokus má stejnou pravděpodobnost úspěchu
-- Rozdělení si můžeme zapamatovat dle začátku názvu "bi", které naznačuje, že mohou nastat pouze dva případy (úspěch/neúspěch)  
+- Rozdělení si můžeme zapamatovat dle začátku názvu "bi", které naznačuje, že mohou nastat pouze dva případy (úspěch/neúspěch)
+- Vybíráme s vracením (narozdíl od hypergeometrického rozdělení)
 
 ### Parametry
 `k` = Počet úspěchů, který nás zajímá  
@@ -275,6 +276,7 @@ Pravděpodobnost, že při 10 hodech kostkou padne šestka nejvýše třikrát, 
 
 ## **Poissonovo rozdělení**  
 - Určuje pravděpodobnost, že nastane k událostí v pevně stanoveném časovém úseku nebo prostoru, pokud je průměrná frekvence výskytu známá.
+- Neznáme přesný počet pokusů
 
 ### Parametry 
 - `k` = Počet událostí, který nás zajímá
@@ -311,6 +313,9 @@ Pravděpodobnost, že určitým bodem projede nejvýše 20 aut za hodinu, je př
 
 ## Hypergeometrické rozdělení
 - Určuje pravděpodobnost, že při **výběru n prvků bez vracení** z celkového souboru bude právě **k prvků požadovaného typu**.
+- Vybíráme bez vracení (narozdíl od binomického)
+- Kvůli tomu jsou pokusy na sobě závislé - výběrem jednoho prvku ovlivňujeme pravděpodobnost dalších výběrů
+- Ze všech prvků nás zajímá, kolik prvků má námi určenou vlastnost
 
 ### Parametry
 - `k` = Počet úspěchů, který nás zajímá ve výběru.  
@@ -366,7 +371,9 @@ print(pravdepodobnost) # 0.1099
 Pravděpodobnost, že mezi 5 vybranými kartami budou více než 3 modré karty, je přibližně 10,9 %.
 
 ## Geometrické rozdělení
-- Určuje pravděpodobnost, že **první úspěch nastane po k neúspěšných pokusech** v sérii nezávislých pokusů, kde každý pokus má stejnou pravděpodobnost úspěchu **p**.  
+- Určuje pravděpodobnost, že **první úspěch nastane po k neúspěšných pokusech** v sérii nezávislých pokusů, kde každý pokus má stejnou pravděpodobnost úspěchu **p**.
+- První úspěch nastane až po určitém počtu neúspěšných pokusů
+- Kolikrát musím něco zkusit, než poprvé uspěji?  
 
 ### Parametry  
 - `k` = Počet neúspěšných pokusů před úspěšným pokusem (k ≥ 0)  
