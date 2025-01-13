@@ -204,6 +204,33 @@ CoefVar(x) # Variabilita
 - Vyjadřuje pravděpodobnost, že náhodná proměnná nabyde menší nebo rovno dané hodnoty x (<=)
 - Příklad: Pokud hodíme kostkou, jaká bude pravděpodobnost, že padne číslo menší nebo rovno 4 (x <= 4)
 
+## Pravděpodobností vs Distribuční funkce
+- distribuční funkce není nic jiného než suma pravděpodobnostních funkcí
+- P(x ≤ 3) = P(x = 0) + P(x = 1) + P(x = 2) + P(x = 3)
+- čili, jakákoliv úloha, kterou lze vyřešit pomocí distribuční funkce lze zároveň převést na řešení pomocí pravděpodobnostních funkcí
+- distribuční funkce P(x ≤ 3) vlastně vypočítává pravděpodobnost, že čtyřka padne 0, 1, 2 nebo 3 krát
+- výstup distribuční funkce se též někdy nazývá kumulativní pravděpodobnost (což nyní dává smysl - kumuluje výsledky pravděpodobnostních funkcí, které postupně sčítá)
+
+```r
+# Pravděpodobnost, že když hodím kostkou 10krát, tak padne např. čtyřka maximálně 3krát (binomické rozdělení).
+
+k = 3
+n = 10
+p = 1/6
+
+# Vypočítáno distribuční funkcí
+# Výsledek: 0.9302722
+pbinom(q = k, size = n, prob = p)
+
+# Vypočítáno sumou/součtem pravděpodobnostních funkcí
+# Výsledek: 0.9302722
+dbinom(x = 0, size = n, prob = p) + dbinom(x = 1, size = n, prob = p) + dbinom(x = 2, size = n, prob = p) + dbinom(x = 3, size = n, prob = p)
+
+# Zkrácený zápis případu výše
+# Výsledek: 0.9302722
+sum(dbinom(x = 0:k, size = n, prob = p))
+```
+
 # Diskrétní rozdělení
 - mají integer hodnoty (diskrétní)
 - Příklad: Počet mincí, počet událostí, počet úspěchů v sérii pokusů
