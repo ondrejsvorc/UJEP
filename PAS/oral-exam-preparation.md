@@ -448,9 +448,77 @@ Více informací [zde](https://github.com/ondrejsvorc/UJEP/blob/main/PAS/summary
 ## Tradiční versus robustní přístupy k odhadování
 ## Bodový versus intervalový odhad
 ## Tradiční versus bootstrapový přístup k statistické inferenci
+
 ## Zákon velkých čísel a jeho využití, centrální limitní věta a její využití
+
+### Zákon velkých čísel
+- Říká, že výběrový průměr se s rostoucí velikostí výběru blíží populačnímu průměru.
+- Čím více pozorování, tím přesněji odhadujeme skutečný populační průměr.
+- Výběrový průměr může být při dostatečné velikosti spolehlivým odhadem populačního průměru.
+- Využití: Kontrola kvality výrobků (Kontrola kvality často neumožňuje prověřit všechny výrobky, proto se odebírá náhodný vzorek a sledují se vlastnosti, jako jsou rozměry, hmotnost, nebo funkčnost).
+
+### Centrální limitní věta
+- Pokud opakujeme měření nebo výpočty na náhodných výběrových datech a spočítáme průměr těchto hodnot, pak se tento průměr bude při velkém počtu měření chovat jako data z normálního rozdělení - bez ohledu na to, jak původní data vypadala
+- Když měříš stejnou věc znovu a znovu, průměry těchto měření se postupně rozloží podle zvonovité křivky (normální rozdělení).
+- To platí, i když původní data nebyla normálně rozložená.
+
+```r
+# Hodíš kostkou jednou → výsledek je náhodný (1–6, není normální).
+# Hodíš kostkou 50× a spočítáš průměr hodů → opakuješ to 1000×.
+# Rozložení těchto průměrů bude mít tvar zvonovité křivky (normální rozdělení).
+
+set.seed(123)
+pocet_hodu <- 50         # Počet hodů kostkou v jednom pokusu
+pocet_opakovani <- 1000  # Kolikrát provedeme sérii hodů
+
+# Simulace hodů kostkou a výpočet průměrů
+prumery <- replicate(pocet_opakovani, mean(sample(1:6, pocet_hodu, replace = TRUE)))
+
+# Vykreslení histogramu průměrů
+hist(prumery, breaks = 30, col = "lightblue", probability = TRUE,
+     main = "Centrální limitní věta - Hod kostkou",
+     xlab = "Průměrné hodnoty hodů", ylab = "Hustota")
+
+# Přidání normální křivky pro srovnání
+curve(dnorm(x, mean = mean(prumery), sd = sd(prumery)),
+      col = "red", lwd = 2, add = TRUE)
+
+# Přidání jádrového odhadu hustoty
+lines(density(prumery), col = "darkgreen", lwd = 2)
+
+# Legenda
+legend("topright", legend = c("Histogram průměrů", "Normální rozdělení", "Jádrový odhad hustoty"),
+       col = c(rgb(0.2, 0.5, 0.8, 0.5), "red", "darkgreen"),
+       lwd = c(10, 2, 2), bty = "n")
+```
+![image](https://github.com/user-attachments/assets/9f03d3bd-54f1-48d7-abc7-d3ea9f77ce04)
+
 ## Přístupy k testování statistických hypotéz
+
 ## Interpretační problémy a aspekty intervalového odhadu a p-hodnoty
+
+### Intervalový odhad
+- **Intervalový odhad** poskytuje interval, ve kterém se s určitou pravděpodobností (spolehlivostí) nachází **neznámý populační parametr**.  
+- Typicky se používá **95% interval spolehlivosti (CI)**.
+
+#### Interpretační problémy intervalového odhadu
+- **Chybná interpretace:** Interval neznamená, že s pravděpodobností 95 % parametr leží uvnitř intervalu. Znamená to, že **95 % všech takto vypočtených intervalů** pokryje skutečný parametr.  
+- **Záměna s predikčním intervalem:** Intervalový odhad se vztahuje na **parametr**, nikoli na budoucí pozorování.  
+- **Citlivost na velikost vzorku:** Malý vzorek → širší interval; velký vzorek → užší interval.
+
+### p-hodnota
+- **p-hodnota** je pravděpodobnost, že při platnosti **nulové hypotézy (H₀)** získáme **stejně extrémní nebo extrémnější výsledek**, než jaký jsme pozorovali.  
+- Slouží k rozhodování, zda **zamítnout** nulovou hypotézu.
+
+**Rozhodovací pravidlo:**  
+- Pokud **p ≤ α** (např. 0,05), **zamítáme** nulovou hypotézu.  
+- Pokud **p > α**, **nezamítáme** nulovou hypotézu.
+
+#### Interpretační problémy p-hodnoty
+- **p-hodnota není pravděpodobnost, že nulová hypotéza platí.**  
+- **Malá p-hodnota** neznamená automaticky **prakticky významný** výsledek.  
+- Výsledek **závisí na velikosti vzorku** – velké vzorky mohou odhalit i nevýznamné rozdíly jako statisticky významné.  
+- **Nadměrné spoléhání** na arbitrární hranici (např. α = 0,05) může vést k chybným závěrům.
 
 ## Kovariance a korelace
 
