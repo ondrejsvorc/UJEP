@@ -451,8 +451,78 @@ Více informací [zde](https://github.com/ondrejsvorc/UJEP/blob/main/PAS/summary
 ## Zákon velkých čísel a jeho využití, centrální limitní věta a její využití
 ## Přístupy k testování statistických hypotéz
 ## Interpretační problémy a aspekty intervalového odhadu a p-hodnoty
+
 ## Kovariance a korelace
+
+### Kovariance
+- Kovariance měří, **jak dvě proměnné společně kolísají** (mění se).  
+- Pokud mají obě proměnné tendenci **růst nebo klesat společně**, kovariance je **kladná**.  
+- Pokud jedna roste a druhá klesá, kovariance je **záporná**.  
+- **Nevýhoda:** Kovariance je závislá na jednotkách měření, a proto není snadno interpretovatelná.
+
+### Korelace
+- Korelace měří **sílu a směr lineárního vztahu** mezi dvěma proměnnými.  
+- Na rozdíl od kovariance je **normalizovaná** (nemá jednotky) a je snadno interpretovatelná.  
+- Korelace je tedy **standardizovaná kovariance**.
+
+### Korelační koeficient
+- **r** náleží na intervalu **<-1, 1>**
+- **r > 0**: Přímá závislost.
+- **r < 0**: Nepřímá závislost.
+- **|r|** blízké 1: Silná závislost.
+- **|r|** blízké 0: Slabá závislost.
+
+```r
+set.seed(123)
+x <- rnorm(100, mean = 50, sd = 10)
+y <- 2 * x + rnorm(100, mean = 0, sd = 5)  # Přímá lineární závislost
+
+kovariance <- cov(x, y)
+korelace <- cor(x, y)
+
+cat("Kovariance:", kovariance, "\n")
+cat("Korelace:", korelace, "\n")
+
+plot(x, y, main = "Vztah mezi X a Y", xlab = "X", ylab = "Y", pch = 19, col = "blue")
+abline(lm(y ~ x), col = "red", lwd = 2)
+```
+
 ## Jádrový odhad hustoty a modus
+
+### Jádrový odhad hustoty
+- spojitá vizualizace diskrétních dat
+- nemá pevně dané intervaly jako histogram
+- dokáže lépe identifikovat módy (lokální maxima)
+
+### Modus
+- Nejčastěji se vyskytující hodnota v datové sadě.
+- **Unimodální rozdělení:** Má jeden výrazný vrchol.
+- **Bimodální rozdělení:** Má dva výrazné vrcholy.
+- **Multimodální (polymodální) rozdělení:** Má více než dva vrcholy.
+- **Amodální rozdělení:** Nemá žádný výrazný vrchol (rovnoměrné rozdělení).
+
+```r
+set.seed(123)
+data <- c(rnorm(100, mean = 50, sd = 5),
+          rnorm(100, mean = 65, sd = 5))
+
+hist(data, breaks = 20, col = rgb(0.2, 0.5, 0.8, 0.5),
+     main = "Histogram vs. Jádrový odhad hustoty",
+     xlab = "Hodnota", ylab = "Četnost", freq = FALSE)
+
+# Jádrový odhad hustoty
+density_data <- density(data)
+lines(density_data, col = "red", lwd = 2)
+
+# Módy
+modi <- density_data$x[which(diff(sign(diff(density_data$y))) == -2)]
+points(modi, rep(0, length(modi)), col = "darkgreen", pch = 19, cex = 1.5)
+
+legend("topright", legend = c("Histogram", "Jádrový odhad", "Modus"),
+       col = c(rgb(0.2, 0.5, 0.8, 0.5), "red", "darkgreen"),
+       lwd = c(10, 2, NA), pch = c(NA, NA, 19), bty = "n")
+```
+![image](https://github.com/user-attachments/assets/16fbe30a-5471-4f15-85f8-4b2dec6ea5d2)
 
 ## Populace, náhodný a nenáhodný výběr, populační a výběrové charakteristiky
 
