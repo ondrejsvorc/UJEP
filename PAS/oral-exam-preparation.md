@@ -454,7 +454,64 @@ Více informací [zde](https://github.com/ondrejsvorc/UJEP/blob/main/PAS/summary
 ## Kovariance a korelace
 ## Jádrový odhad hustoty a modus
 ## Populace, náhodný a nenáhodný výběr, populační a výběrové charakteristiky
+
 ## Frekvenční rozdělení a frekvenční křivka
+
+### Frekvenční rozdělení
+- **Absolutní četnost (`table`)**: Počet výskytů hodnot.
+- **Relativní četnost (`prop.table`)**: Podíl jednotlivých hodnot.
+- **Kumulativní četnost (`cumsum`)**: Postupný součet četností.
+```r
+znaky <- c('A', 'B', 'A', 'C', 'B', 'A')
+
+absolutni_cetnost <- table(znaky)
+kumulativni_absolutni_cetnost <- cumsum(absolutni_cetnost)
+relativni_cetnost <- prop.table(absolutni_cetnost)
+kumulativni_relativni_cetnost <- cumsum(relativni_cetnost)
+
+data.frame(
+  "Abs-četnost" = table(znaky),
+  "Kum-abs-četnost" = cumsum(absolutni_cetnost),
+  "Rel-četnost" = prop.table(absolutni_cetnost),
+  "Kum-relativní-četnost" = kumulativni_relativni_cetnost
+)
+```
+
+### Frekvenční polygon (křivka)
+- grafické znázornění četnosti dat, které propojuje střední body horních hranic sloupců histogramu čarou
+- může sloužit alternativa nebo jako doplněk k histogramu
+- než histogram je vhodnější při porovnávání více rozdělení (více čar je přehlednější než překrývající se histogramy)
+- když chceme lépe vidět změny a trendy v datech
+
+```r
+set.seed(123)
+data1 <- rnorm(100, mean = 50, sd = 10)
+data2 <- rnorm(100, mean = 55, sd = 10)
+
+par(mfrow = c(1, 2))
+
+# Porovnání pomocí histogramů
+hist(data1, breaks = 10, col = rgb(0.2, 0.5, 0.8, 0.5),
+     main = "Porovnání pomocí Histogramu",
+     xlab = "Hodnota", ylab = "Četnost",
+     xlim = c(20, 80))
+hist(data2, breaks = 10, col = rgb(0.8, 0.3, 0.3, 0.5), add = TRUE)
+legend("topright", legend = c("Data 1", "Data 2"),
+       fill = c(rgb(0.2, 0.5, 0.8, 0.5), rgb(0.8, 0.3, 0.3, 0.5)),
+       bty = "n")
+
+# Porovnání pomocí frekvenčních polygonů
+hist1 <- hist(data1, breaks = 10, plot = FALSE)
+hist2 <- hist(data2, breaks = 10, plot = FALSE)
+plot(hist1$mids, hist1$counts, type = "l", col = "blue", lwd = 2,
+     main = "Porovnání pomocí Frekvenčního Polygonu",
+     xlab = "Hodnota", ylab = "Četnost",
+     xlim = c(20, 80), ylim = c(0, max(c(hist1$counts, hist2$counts))))
+lines(hist2$mids, hist2$counts, col = "red", lwd = 2)
+legend("topright", legend = c("Data 1", "Data 2"),
+       col = c("blue", "red"), lwd = 2, bty = "n")
+```
+![image](https://github.com/user-attachments/assets/533690ff-9617-4e03-8a2b-62bfb2376add)
 
 ## Histogram a jeho citlivost na volbu offsetu a šířky okna
 - grafické zobrazení rozdělení dat, kde jsou hodnoty seskupeny do intervalů (binů).
