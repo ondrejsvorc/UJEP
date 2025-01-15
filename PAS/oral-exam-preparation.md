@@ -94,7 +94,6 @@ t.test(selected_var)
 ### Intervalový odhad rozdílu středních hodnot
 - interval, ve kterém se s určitou spolehlivostí nachází skutečný rozdíl průměrů
 
-
 ```r
 library(DescTools)
 data(mtcars)
@@ -283,6 +282,12 @@ beta1_model <- coefficients[2]  # Sklon
 cat("y = ", round(beta0, 2), " + ", round(beta1, 2), " * x", sep = "") # y = 2.2 + 0.6 * x
 cat("y = ", round(beta0_model, 2), " + ", round(beta1_model, 2), " * x", sep = "") # y = 2.2 + 0.6 * x
 ```
+![1_regrese](https://github.com/user-attachments/assets/803e95b6-c079-4bfa-bb7d-d349b43f2ec1)
+![2_regrese](https://github.com/user-attachments/assets/65e40a37-6bfc-4bb3-992f-45931f78267b)
+![3_regrese](https://github.com/user-attachments/assets/944e8918-be68-47b3-9f1a-d317e56284f5)
+![4_regrese](https://github.com/user-attachments/assets/b15a4c1c-b1bb-4c64-95c9-44e3763c5b30)
+![5_regrese](https://github.com/user-attachments/assets/988c08e8-2585-4f16-bcee-8d78557bcb4a)
+![6_regrese](https://github.com/user-attachments/assets/7e09b135-efe5-434e-958c-be0d7680c971)
 
 ## Identifikace vhodného podkladového rozdělení dat
 ```r
@@ -423,3 +428,5 @@ print(outliers) # 335
 odlehla_pozorovani <- Outlier(hp_data, method = "boxplot", na.rm = TRUE)
 print(odlehla_pozorovani) # 335
 ```
+
+![image](https://github.com/user-attachments/assets/6f5e1116-04ce-4407-bf13-a3576364b5d5)
