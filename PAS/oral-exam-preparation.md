@@ -430,3 +430,25 @@ print(odlehla_pozorovani) # 335
 ```
 
 ![image](https://github.com/user-attachments/assets/6f5e1116-04ce-4407-bf13-a3576364b5d5)
+
+# Okruh 3
+
+## Klasifikace proměnných a typů dat
+## Rozdělení náhodné veličiny
+## Spojité náhodné veličiny
+## Diskrétní náhodné veličiny
+## Tradiční versus robustní přístupy k odhadování
+## Bodový versus intervalový odhad
+## Tradiční versus bootstrapový přístup k statistické inferenci
+## Zákon velkých čísel a jeho využití, centrální limitní věta a její využití
+## Přístupy k testování statistických hypotéz
+## Interpretační problémy a aspekty intervalového odhadu a p-hodnoty
+## Kovariance a korelace
+## Jádrový odhad hustoty a modus
+## Populace, náhodný a nenáhodný výběr, populační a výběrové charakteristiky
+## Frekvenční rozdělení a frekvenční křivka
+## Histogram a jeho citlivost na volbu offsetu a šířky okna
+## Vlastnosti popisných statistik, jejich reakce na posunutí a změnu měřítka
+## Normování proměnné a význam
+## Regresní model, jeho účel a odhad
+## Předpoklady lineární regrese
