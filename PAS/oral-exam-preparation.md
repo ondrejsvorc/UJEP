@@ -455,7 +455,49 @@ Více informací [zde](https://github.com/ondrejsvorc/UJEP/blob/main/PAS/summary
 ## Jádrový odhad hustoty a modus
 ## Populace, náhodný a nenáhodný výběr, populační a výběrové charakteristiky
 ## Frekvenční rozdělení a frekvenční křivka
+
 ## Histogram a jeho citlivost na volbu offsetu a šířky okna
+- grafické zobrazení rozdělení dat, kde jsou hodnoty seskupeny do intervalů (binů).
+- Tvar histogramu silně závisí na šířce okna (bin width) a offsetu (posunutí začátku binů)
+
+## Šířka okna (bin width)
+- Určuje velikost intervalů (binů), do kterých jsou data rozdělena.  
+- Malá šířka znamená více binů a detailní, ale možná chaotické zobrazení.  
+- Velká šířka znamená méně binů a zjednodušené zobrazení, které může skrývat důležité informace.  
+
+## Offset (posun binů)
+- Offset určuje, kde začíná první interval (bin), a tím posouvá všechny následující biny. Nemění jejich šířku, ale mění jejich počáteční bod (a tedy konečný bod)
+- Posunutí může ovlivnit rozložení dat mezi biny a změnit tvar histogramu.  
+- Dva histogramy se stejnou šířkou binů, ale různým offsetem mohou vypadat zcela odlišně.
+
+`POZOR`: Když nastavíš offset na hodnotu 1, histogram začne dělit data od hodnoty 1. Ignorují se tím hodnoty mezi 0 a 1? Ano, ale jen pokud v datech existují hodnoty v intervalu <0;1).  
+V příkladových datech (1, 2, 3, ..., 10) žádné hodnoty mezi 0 a 1 nejsou, takže se nic neignoruje.
+Pokud bys měl v datech např. hodnotu 0.5, tak by se do histogramu nezahrnula, protože žádný bin nezačíná dříve než 1.  
+
+```r
+data <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+
+# 2x2 grafy vedle sebe
+par(mfrow = c(2, 2))  
+
+# Šířka binu = 2, Offset = 0
+# Intervaly: <0;2), <2;4), <4;6), <6;8), <8;10)
+hist(data, breaks = seq(0, 10, by = 2), main = "Šířka = 2, Offset = 0", col = "lightblue")
+
+# Šířka binu = 2, Offset = 1
+# Intervaly: <1;3), <3;5), <5;7), <7;9), <9;11)
+hist(data, breaks = seq(1, 11, by = 2), main = "Šířka = 2, Offset = 1", col = "lightgreen")
+
+# Šířka binu = 4, Offset = 0
+# Intervaly: <0;4), <4;8), <8;12)
+hist(data, breaks = seq(0, 12, by = 4), main = "Šířka = 4, Offset = 0", col = "orange")
+
+# Šířka binu = 4, Offset = 1
+# Intervaly: <1;5), <5;9), <9;13)
+hist(data, breaks = seq(1, 13, by = 4), main = "Šířka = 4, Offset = 1", col = "red")
+```
+
+![image](https://github.com/user-attachments/assets/2d11ec92-f325-48ec-8de0-f664e1526b77)
 
 ## Vlastnosti popisných statistik, jejich reakce na posunutí a změnu měřítka
 - chovají se vesměs odlišně při posunutí dat (přičtení konstanty) a při změně měřítka (vynásobení konstantou)
