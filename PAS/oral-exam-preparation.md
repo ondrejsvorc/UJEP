@@ -442,15 +442,49 @@ print(odlehla_pozorovani) # 335
 Více informací [zde](https://github.com/ondrejsvorc/UJEP/blob/main/PAS/summary.md#rozd%C4%9Blen%C3%AD-pravd%C4%9Bpodobnosti).
 
 ## Spojité náhodné veličiny
+- Mohou nabývat libovolné hodnoty v určitém intervalu (nekonečně mnoho možných hodnot).
+- Jejich pravděpodobnost je určena distribuční funkcí.
+- Nejznámější spojité rozdělení je normální (Gaussovo) rozdělení.
+- Další příklady: exponenciální, rovnoměrné, gamma nebo beta rozdělení.
+- Spojité veličiny se často používají při měření (délka, hmotnost, čas).
 
 ## Diskrétní náhodné veličiny
+- Mohou nabývat pouze určitých konkrétních hodnot (typicky celá čísla).
+- Jejich pravděpodobnost je určena pravděpodobnostní funkcí.
+- Typickými příklady jsou výsledky hodu kostkou, počet zákazníků ve frontě, počet chyb ve výrobě.
+- Nejznámější diskrétní rozdělení: binomické, Poissonovo, geometrické.
+- Každá hodnota má konkrétní, nenulovou pravděpodobnost.
 
 ## Tradiční versus robustní přístupy k odhadování
+### Tradiční přístup
+- Využívá **průměr** a **rozptyl** pro odhadování parametrů.  
+- **Citlivý na odlehlé hodnoty (extrémy)**.  
+
+### Robustní přístup
+- Odolný vůči **odlehlým hodnotám** a **extrémům**
+- Používá např. **medián**, **useknutý průměr**, nebo **mediánová absolutní odchylka**
+
+```r
+median(data)               # Medián (odolný vůči extrémům)
+mean(data, trim = 0.1)     # Trimovaný průměr (10 % krajních hodnot odstraněno)
+mad(data)                  # Mediánová absolutní odchylka (měří průměrnou odchylku dat od mediánu (ne od průměru, jako směrodatná odchylka))
+```
+
 ## Bodový versus intervalový odhad
+- viz Okruh II
+
 ## Tradiční versus bootstrapový přístup k statistické inferenci
+### Tradiční přístup
+- Využívá **vzorce** a **teoretická pravidla** (např. t-test).  
+- Počítá s **předpoklady** (např. normální rozdělení dat).  
+- **Rychlý**, ale méně flexibilní.
+
+### Bootstrapový přístup
+- Vzorkuje data **náhodně s navracením** a počítá statistiky.  
+- Nezávisí na **předpokladech** o rozdělení dat.  
+- **Flexibilní**, ale **výpočetně náročnější**.
 
 ## Zákon velkých čísel a jeho využití, centrální limitní věta a její využití
-
 ### Zákon velkých čísel
 - Říká, že výběrový průměr se s rostoucí velikostí výběru blíží populačnímu průměru.
 - Čím více pozorování, tím přesněji odhadujeme skutečný populační průměr.
