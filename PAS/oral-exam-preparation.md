@@ -482,6 +482,46 @@ Více informací [zde](https://github.com/ondrejsvorc/UJEP/blob/main/PAS/summary
 - nemění se v žádném případě
 - tyto statistiky vyjadřují tvar rozdělení, který zůstává stejný
 
+```r
+library(dplyr)
+library(DescTools)
+
+puvodni_data <- c(5, 7, 9, 11, 13)
+posunuta_data <- puvodni_data + 3
+meritkova_data <- puvodni_data * 2
+
+vypocet_statistik <- function(data) {
+  data.frame(
+    Prumer = mean(data),
+    Median = median(data),
+    Modus = as.numeric(names(sort(table(data), decreasing = TRUE))[1]),
+    Rozptyl = var(data),
+    Smerodatna_odchylka = sd(data),
+    Sikmost = Skew(data),
+    Spicatost = Kurt(data)
+  )
+}
+
+statistiky_puvodni <- vypocet_statistik(puvodni_data)
+statistiky_posunuta <- vypocet_statistik(posunuta_data)
+statistiky_meritkova <- vypocet_statistik(meritkova_data)
+
+cat("\n--- Původní data ---\n")
+print(statistiky_puvodni)
+# Prumer Median Modus Rozptyl Smerodatna_odchylka Sikmost Spicatost
+# 1      9      9     5      10            3.162278       0    -1.912
+
+cat("\n--- Data posunutá o +3 ---\n")
+print(statistiky_posunuta)
+# Prumer Median Modus Rozptyl Smerodatna_odchylka Sikmost Spicatost
+# 1     12     12     8      10            3.162278       0    -1.912
+
+cat("\n--- Data násobená 2 ---\n")
+print(statistiky_meritkova)
+# Prumer Median Modus Rozptyl Smerodatna_odchylka Sikmost Spicatost
+# 1     18     18    10      40            6.324555       0    -1.912
+```
+
 ## Normování proměnné a význam
 
 ### Z-Score normalizace
