@@ -258,6 +258,8 @@ pairs(mtcars[, c("hp", "mpg")],
 - smyslem je vlastně najít takovou přímku, která bude co nejblíže každému z bodů
 - každá taková přímka prochází bodem [x_prumer, y_prumer] (tedy průsečík je průměr vysvětlující a vysvětlované proměnné)
 
+[Lineární regrese](https://ksoc.ff.cuni.cz/wp-content/uploads/sites/76/2018/09/6.-Statistika2-Line%C3%A1rn%C3%AD-regrese.pdf)
+
 ```r
 x <- c(1, 2, 3, 4, 5)
 y <- c(2, 4, 5, 4, 5)
@@ -434,9 +436,15 @@ print(odlehla_pozorovani) # 335
 # Okruh 3
 
 ## Klasifikace proměnných a typů dat
+![image](https://github.com/user-attachments/assets/eb7d2bb2-03af-414d-8a07-4ce5dd6bd4db)
+
 ## Rozdělení náhodné veličiny
+Více informací [zde](https://github.com/ondrejsvorc/UJEP/blob/main/PAS/summary.md#rozd%C4%9Blen%C3%AD-pravd%C4%9Bpodobnosti).
+
 ## Spojité náhodné veličiny
+
 ## Diskrétní náhodné veličiny
+
 ## Tradiční versus robustní přístupy k odhadování
 ## Bodový versus intervalový odhad
 ## Tradiční versus bootstrapový přístup k statistické inferenci
@@ -449,6 +457,94 @@ print(odlehla_pozorovani) # 335
 ## Frekvenční rozdělení a frekvenční křivka
 ## Histogram a jeho citlivost na volbu offsetu a šířky okna
 ## Vlastnosti popisných statistik, jejich reakce na posunutí a změnu měřítka
+
 ## Normování proměnné a význam
+
+### Z-Score normalizace
+- Převádí data tak, aby měla průměr 0 a směrodatnou odchylku 1.
+- Zachovává tvar rozdělení dat, ale mění jejich měřítko.
+- Používá se, když data obsahují odlehlé hodnoty.
+- `z = (x - μ) / σ`
+  - x: původní hodnota  
+  - μ: průměr dat  
+  - σ: směrodatná odchylka
+ 
+### Z-skóre
+- Udává, kolik **směrodatných odchylek** leží hodnota od **průměru**.  
+- Bez Z-skóre bychom museli srovnávat hodnoty s průměrem ručně.
+- Pomáhá jednoznačně identifikovat, zda je hodnota **běžná** (průměrná) nebo **výjimečná** (nadprůměrná/podprůměrná).
+- **Příklad:** Z-skóre \( z = 2 \) znamená, že hodnota je **dvě směrodatné odchylky nad průměrem**.
+- `z ≈ 0`: Hodnota je přibližně průměrná
+- `z > 0`: Hodnota je nadprůměrná (Čím vyšší kladné Z-skóre, tím víc je hodnota nadprůměrná).
+- `z < 0`: Hodnota je podprůměrná (Čím je Z-skóre více záporné, tím víc je hodnota podprůměrná).
+- Čím větší absolutní hodnota Z-skóre, tím více se hodnota odchyluje od průměru.
+  
+```r
+data(mtcars)
+
+prumer_mpg <- mean(mtcars$mpg)
+sm_odch_mpg <- sd(mtcars$mpg)
+
+z_score_manual <- (mtcars$mpg - prumer_mpg) / sm_odch_mpg
+z_score_scale <- scale(mtcars$mpg)
+
+cat("Průměr mpg:", prumer_mpg, "\n")
+cat("Směrodatná odchylka mpg:", sm_odch_mpg, "\n\n")
+
+comparison <- data.frame(
+  Original = mtcars$mpg,
+  Z_Score_Manual = round(z_score_manual, 4),
+  Z_Score_Scale = round(z_score_scale[,1], 4)
+)
+
+print(head(comparison, 10))
+
+# Original Z_Score_Manual Z_Score_Scale
+# 1      21.0         0.1509        0.1509
+# 2      21.0         0.1509        0.1509
+# 3      22.8         0.4495        0.4495
+# 4      21.4         0.2173        0.2173
+# 5      18.7        -0.2307       -0.2307
+# 6      18.1        -0.3303       -0.3303
+# 7      14.3        -0.9608       -0.9608
+# 8      24.4         0.7150        0.7150
+# 9      22.8         0.4495        0.4495
+# 10     19.2        -0.1478       -0.1478
+
+# Filtrování hodnot s |z-score| > 2
+# (potencionální odlehlé hodnoty)
+odlehle_hodnoty <- mtcars$mpg[abs(z_score_manual) > 2]
+odlehle_z_score <- z_score_manual[abs(z_score_manual) > 2]
+
+cat("Hodnoty s |Z| > 2:\n")
+print(data.frame(mpg = odlehle_hodnoty, Z_Score = round(odlehle_z_score, 4)))
+```
+
 ## Regresní model, jeho účel a odhad
+
 ## Předpoklady lineární regrese
+- Vztah mezi závislou proměnnou a nezávislou by měl být **lineární** (tedy pak přímý/nepřímý).  
+- **Rezidua** (chyby modelu) by měla mít **normální rozdělení** s průměrem 0.  
+- Rozptyl reziduí by měl být **stejný** pro všechny hodnoty (tzv. **homoskedasticita**).  
+- **Prediktory** (vstupy modelu) by neměly být silně **korelované** mezi sebou (**žádná multikolinearita**).  
+- V datech by neměly být **odlehlé hodnoty**, které by mohly ovlivnit výsledky.  
+- **Prediktory** by neměly být propojené s **rezidui** (chyby by měly být náhodné).
+
+### Rezidua
+- `Reziduum = Skutečná hodnota - Predikovaná hodnota`  
+- Rozdíl mezi skutečnými a predikovanými hodnotami závislé proměnné.  
+- Vyjadřují chybu modelu při odhadu.  
+- Ideálně by měla mít normální rozdělení s průměrem 0.  
+- Rozptyl reziduí by měl být konstantní (homoskedasticita).  
+
+### Prediktory
+- Nezávislé proměnné, které slouží k předpovědi závislé proměnné.  
+- Jsou vstupy modelu, které ovlivňují výslednou predikci.  
+- Neměly by být silně korelované mezi sebou (bez multikolinearity).  
+- Neměly by být korelované s rezidui.  
+
+### Příklad
+Model předpovídá cenu auta na základě jeho stáří a počtu najetých kilometrů.  
+- **Prediktory:** stáří auta, počet najetých kilometrů.  
+- **Závislá proměnná:** cena auta.  
+- **Rezidua:** rozdíly mezi skutečnou cenou auta a cenou, kterou model vypočítal.  
