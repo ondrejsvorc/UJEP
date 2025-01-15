@@ -684,6 +684,30 @@ print(data.frame(mpg = odlehle_hodnoty, Z_Score = round(odlehle_z_score, 4)))
 ```
 
 ## Regresní model, jeho účel a odhad
+- Popisuje vztah mezi závislou proměnnou (vysvětlovanou) a jednou nebo více nezávislými proměnnými (vysvětlujícími).
+- Používá se k predikci hodnoty závislé proměnné na základě známých hodnot nezávislých proměnných.
+
+### Účel
+- Predikce: Odhad budoucích nebo neznámých hodnot.
+- Analýza vztahů: Zjištění, jak jednotlivé proměnné ovlivňují výsledek.
+- Identifikace trendů: Odhalení směrů vývoje v datech.
+
+### Odhad
+- Nejčastěji se používá metoda nejmenších čtverců.
+- Odhad najde přímku (nebo obecně model), která minimalizuje součet čtverců odchylek mezi skutečnými a predikovanými hodnotami.
+- viz Regresní přímka (Okruh II)
+
+```
+vyska <- c(150, 160, 170, 180, 190)  # v cm
+vaha <- c(50, 60, 65, 80, 90)        # v kg
+
+model <- lm(vaha ~ vyska)
+summary(model)
+
+plot(vyska, vaha, main = "Lineární regrese: Výška vs. Váha",
+     xlab = "Výška (cm)", ylab = "Váha (kg)", pch = 19)
+abline(model, col = "red", lwd = 2)
+```
 
 ## Předpoklady lineární regrese
 - Vztah mezi závislou proměnnou a nezávislou by měl být **lineární** (tedy pak přímý/nepřímý).  
