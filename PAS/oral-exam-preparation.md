@@ -456,7 +456,31 @@ Více informací [zde](https://github.com/ondrejsvorc/UJEP/blob/main/PAS/summary
 ## Populace, náhodný a nenáhodný výběr, populační a výběrové charakteristiky
 ## Frekvenční rozdělení a frekvenční křivka
 ## Histogram a jeho citlivost na volbu offsetu a šířky okna
+
 ## Vlastnosti popisných statistik, jejich reakce na posunutí a změnu měřítka
+- chovají se vesměs odlišně při posunutí dat (přičtení konstanty) a při změně měřítka (vynásobení konstantou)
+- průměr, medián i modus reagují stejně jak na posunutí, tak i na změnu měřítka
+
+### Průměr/Medián/Modus a jejich reakce na posunutí
+- Posunou se o stejnou konstantu.
+- Přičtení 5 ke všem hodnotám zvýší průměr/medián/modus o 5.
+- Pokud ale přidáme nebo změníme hodnotu, která není častá, modus se nemusí změnit vůbec.
+
+### Průměr / Medián / Modus / Směrodatná odchylka a jejich reakce na změnu měřítka
+- Násobí se stejnou konstantou.
+- Násobení 2 všech hodnot zdvojnásobí průměr/medián/modus.
+
+### Rozptyl / Směrodatná odchylka a jejich reakce na posunutí
+- **nemění se**, přičtení konstanty posouvá všechna data, ale rozdíly mezi nimi zůstávají stejné
+
+### Rozptyl a jeho reakce na změnu měřítka
+- všechny hodnoty se násobí konstantou na druhou
+- Např. násobení 3 → rozptyl se zvětší 9×
+- Když zvětšíš všechny hodnoty 3-krát zvětšíme, vzdálenost od průměru se také zvětší 3-krát, ale rozptyl tyto rozdíly umocňuje. Proto se změna projeví kvadraticky
+
+### Šikmost/Špičatost a jejich reakce
+- nemění se v žádném případě
+- tyto statistiky vyjadřují tvar rozdělení, který zůstává stejný
 
 ## Normování proměnné a význam
 
