@@ -453,7 +453,65 @@ Více informací [zde](https://github.com/ondrejsvorc/UJEP/blob/main/PAS/summary
 ## Interpretační problémy a aspekty intervalového odhadu a p-hodnoty
 ## Kovariance a korelace
 ## Jádrový odhad hustoty a modus
+
 ## Populace, náhodný a nenáhodný výběr, populační a výběrové charakteristiky
+
+### Populace (základní soubor)
+- **Soubor všech prvků**, které zkoumáme.
+- Může být konečná nebo nekonečná.  
+- Zahrnuje všechny jednotky, o kterých chceme získat informace.  
+- Např. všichni obyvatelé ČR, všechny výrobky z výrobní linky.
+
+### Náhodný výběr
+- Výběr, kde každý prvek populace má **stejnou pravděpodobnost** být vybrán (např. losování).
+- Minimalizuje zkreslení. 
+
+# Nenáhodný výběr
+- Výběr, který není náhodný a může být **zkreslený**.
+
+# Populační charakteristiky a výběrové charakteristiky
+
+## Populační charakteristiky
+- Populační charakteristiky (parametry) popisují celou populaci:  
+  - **Populační průměr (μ):** Průměrná hodnota celé populace.  
+  - **Populační rozptyl (σ²):** Variabilita dat v populaci.  
+  - **Populační proporce (P):** Podíl určité vlastnosti v populaci.
+
+## Výběrové charakteristiky
+- Výběrové charakteristiky (statistiky) popisují výběr z populace:  
+  - **Výběrový průměr:** Průměrná hodnota ve vzorku.  
+  - **Výběrový rozptyl (s²):** Variabilita ve vzorku.  
+  - **Výběrová proporce (p):** Podíl určité vlastnosti ve vzorku.
+- Výběrové charakteristiky slouží jako odhady populačních parametrů.
+- Čím větší výběr, tím přesnější odhad populačních parametrů.
+- Náhodný výběr minimalizuje zkreslení a zajišťuje reprezentativnost.
+- Hypotézy testujeme proto, abychom odlišili náhodu od skutečného efektu.
+
+```r
+set.seed(123)
+populace <- rnorm(1000, mean = 50, sd = 10)
+
+nahodny_vyber <- sample(populace, 50)
+nenahodny_vyber <- populace[1:50]
+
+populacni_prumer <- mean(populace)
+populacni_rozptyl <- var(populace)
+
+vyberovy_prumer_nahodny <- mean(nahodny_vyber)
+vyberovy_rozptyl_nahodny <- var(nahodny_vyber)
+
+vyberovy_prumer_nenahodny <- mean(nenahodny_vyber)
+vyberovy_rozptyl_nenahodny <- var(nenahodny_vyber)
+
+cat("Populační průměr:", populacni_prumer, "\n")
+cat("Populační rozptyl:", populacni_rozptyl, "\n\n")
+
+cat("Výběrový průměr (náhodný výběr):", vyberovy_prumer_nahodny, "\n")
+cat("Výběrový rozptyl (náhodný výběr):", vyberovy_rozptyl_nahodny, "\n\n")
+
+cat("Výběrový průměr (nenáhodný výběr):", vyberovy_prumer_nenahodny, "\n")
+cat("Výběrový rozptyl (nenáhodný výběr):", vyberovy_rozptyl_nenahodny, "\n")
+```
 
 ## Frekvenční rozdělení a frekvenční křivka
 
