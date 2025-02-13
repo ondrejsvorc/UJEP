@@ -1,0 +1,1 @@
+https://kma.ujep.cz/administrace/uploads/530b005.pdf
