@@ -1,1 +1,2 @@
-https://kma.ujep.cz/administrace/uploads/530b005.pdf
+Pokročilé statistické metody
+https://kma.ujep.cz/profil/alena-cernikova
