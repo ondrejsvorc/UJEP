@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<students>
+  <student id="1">
+    <name>Jan</name>
+    <surname>Kopecký</surname>
+  </student>
+  <student id="2">
+    <name>Jiří</name>
+    <surname>Navrátil</surname>
+  </student>
+  <student id="3">
+    <name>Petr</name>
+    <surname>Lukáš</surname>
+  </student>
+</students>
