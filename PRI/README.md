@@ -55,3 +55,10 @@ Ekvivalentní zápisy
 <?php echo($x) ?>
 <?= echo($x) ?>
 ```
+
+Detaily HTTP Response
+```
+docker ps
+docker exec -ti project-web bash
+curl -v localhost
+```
