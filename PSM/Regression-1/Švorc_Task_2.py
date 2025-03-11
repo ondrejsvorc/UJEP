@@ -112,6 +112,6 @@ for col in X.columns:
 
 best_models = {}
 for col, errors in results.items():
-    best_degree = sorted(errors, key=lambda x: x[1])[0][0]  # Nejlepší podle MSE
+    best_degree = sorted(errors, key=lambda x: x[1])[0][0]  # Best according to MSE
     best_models[col] = best_degree
     print(f"Best degree for '{col}': {best_degree}")
