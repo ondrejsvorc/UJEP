@@ -10,8 +10,7 @@ from sklearn.metrics import mean_squared_error, r2_score
 from statsmodels.stats.outliers_influence import variance_inflation_factor
 
 def load_house_data():
-    path = "datasets/house_data.csv" if "google.colab" not in sys.modules else "/content/drive/MyDrive/2024_2025/PSM_2024_2025/Regression_2/Datasets/house_data.csv"
-    return pd.read_csv(path, delimiter=",")
+    return pd.read_csv("house_data.csv", delimiter=",")
 
 def clean_data(df):
     df = df.dropna()

@@ -10,8 +10,7 @@ from sklearn.linear_model import LinearRegression
 import sys
 
 def load_manufacturing():
-    path = "datasets/manufacturing.csv" if "google.colab" not in sys.modules else "/content/drive/MyDrive/2024_2025/PSM_2024_2025/Regression_1/Datasets/manufacturing.csv"
-    return pd.read_csv(path, delimiter=",")
+    return pd.read_csv("manufacturing.csv", delimiter=",")
 
 def apply_loess(x_train, y_train, x_test, frac=0.3):
     x_train, y_train, x_test = np.array(x_train), np.array(y_train), np.array(x_test)
