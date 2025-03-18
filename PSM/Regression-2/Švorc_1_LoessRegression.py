@@ -7,7 +7,6 @@ from sklearn.metrics import mean_squared_error, r2_score
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import PolynomialFeatures
 from sklearn.linear_model import LinearRegression
-import sys
 
 def load_manufacturing():
     return pd.read_csv("manufacturing.csv", delimiter=",")
