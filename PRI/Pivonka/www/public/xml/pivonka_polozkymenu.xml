@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<records>
+  <record>
+    <id_polozkamenu>1</id_polozkamenu>
+    <nazev>Smažený sýr</nazev>
+    <cena>150.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>2</id_polozkamenu>
+    <nazev>Telecí řízek</nazev>
+    <cena>220.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>3</id_polozkamenu>
+    <nazev>Grilované kuřecí prsa</nazev>
+    <cena>190.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>4</id_polozkamenu>
+    <nazev>Tatarský biftek</nazev>
+    <cena>280.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>5</id_polozkamenu>
+    <nazev>Losos na grilu</nazev>
+    <cena>270.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>6</id_polozkamenu>
+    <nazev>Hovězí guláš</nazev>
+    <cena>180.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>7</id_polozkamenu>
+    <nazev>Kuřecí polévka s nudlemi</nazev>
+    <cena>120.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>8</id_polozkamenu>
+    <nazev>Česneková</nazev>
+    <cena>100.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>9</id_polozkamenu>
+    <nazev>Tatarský</nazev>
+    <cena>210.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>10</id_polozkamenu>
+    <nazev>Pizza Margherita</nazev>
+    <cena>200.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>11</id_polozkamenu>
+    <nazev>Lasagne</nazev>
+    <cena>230.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>12</id_polozkamenu>
+    <nazev>Ravioli s ricottou a špenátem</nazev>
+    <cena>240.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>13</id_polozkamenu>
+    <nazev>Tiramisu</nazev>
+    <cena>160.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>14</id_polozkamenu>
+    <nazev>Cheesecake</nazev>
+    <cena>180.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>15</id_polozkamenu>
+    <nazev>Jablečný závin</nazev>
+    <cena>130.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>16</id_polozkamenu>
+    <nazev>Těstoviny Carbonara</nazev>
+    <cena>190.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>17</id_polozkamenu>
+    <nazev>Paella</nazev>
+    <cena>250.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>18</id_polozkamenu>
+    <nazev>Sushi mix</nazev>
+    <cena>300.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>19</id_polozkamenu>
+    <nazev>Kuřecí salát</nazev>
+    <cena>150.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>20</id_polozkamenu>
+    <nazev>Tzatziki</nazev>
+    <cena>100.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>21</id_polozkamenu>
+    <nazev>Sýrová pomazánka</nazev>
+    <cena>140.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>22</id_polozkamenu>
+    <nazev>Kořeněná zeleninová polévka</nazev>
+    <cena>130.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>23</id_polozkamenu>
+    <nazev>Hovězí steak</nazev>
+    <cena>280.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>24</id_polozkamenu>
+    <nazev>Krevety na grilu</nazev>
+    <cena>320.00</cena>
+  </record>
+  <record>
+    <id_polozkamenu>25</id_polozkamenu>
+    <nazev>Grilovaný halibut</nazev>
+    <cena>290.00</cena>
+  </record>
+</records>
