@@ -9,6 +9,7 @@ body {
   margin: 20px;
   background-color: #f8f9fa;
   color: #333;
+  scroll-behavior: smooth;
 }
 
 h1 {
@@ -20,7 +21,6 @@ ul {
   list-style-type: none;
   padding: 0;
 }
-
 li {
   margin-bottom: 10px;
 }
@@ -30,7 +30,35 @@ a {
   color: #007BFF;
   font-weight: bold;
 }
-
 a:hover {
   text-decoration: underline;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 20px;
+  background: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 5px;
+  overflow: hidden;
+}
+th, td {
+  padding: 10px;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+th {
+  background-color: #007BFF;
+  color: white;
+  font-weight: bold;
+}
+td {
+  background-color: #fff;
+}
+tr:nth-child(even) {
+  background-color: #f2f2f2;
+}
+tr:hover {
+  background-color: #e9ecef;
 }
