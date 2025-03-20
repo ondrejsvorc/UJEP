@@ -1,5 +1,5 @@
-# základní docker obraz
-FROM mysql
+# Use the official PostgreSQL image
+FROM postgres:latest
 
-# inicializace databáze
-ADD ./Dockerfiles/univerzita.sql /docker-entrypoint-initdb.d
+# Copy the initialization script
+COPY ./Dockerfiles/init.sql /docker-entrypoint-initdb.d/

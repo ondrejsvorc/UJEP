@@ -13,6 +13,11 @@ RUN docker-php-ext-install xsl
 # instalace rozšíření mysqli pro komunikaci s mysql databází
 RUN docker-php-ext-install mysqli && docker-php-ext-enable mysqli
 
+# instalace rozšíření PostgreSQL PDO
+RUN apt install -y libpq-dev \
+    && docker-php-ext-install pdo pdo_pgsql \
+    && docker-php-ext-enable pdo_pgsql
+
 # PHP debugger
 RUN pecl install xdebug && docker-php-ext-enable xdebug
 
