@@ -12,12 +12,6 @@ if (!in_array($table, $allowedTables, true)) {
     exit;
 }
 
-/**
- * Generates an XML string containing all records from the specified table.
- *
- * @param string $table The table name (already validated).
- * @return string The XML string.
- */
 function generateTableXml(string $table): string {
     $pdo = Database::getConnection();
     $sql = "SELECT * FROM $table";

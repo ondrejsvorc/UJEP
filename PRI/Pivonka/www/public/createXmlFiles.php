@@ -6,19 +6,12 @@ require_once __DIR__ . '/allowedTables.php';
 
 header('Content-Type: text/plain; charset=UTF-8');
 
-/**
- * Saves the XML file for a given table.
- *
- * @param string $tableName The allowed table name (e.g., "pivonka.pozice").
- */
 function saveTableXml(string $tableName): void {
-    // Ensure the "xml" folder exists.
     $xmlFolder = __DIR__ . '/xml';
     if (!is_dir($xmlFolder)) {
         mkdir($xmlFolder, 0777, true);
     }
 
-    // Use a safe filename (replace dots with underscores).
     $filename = $xmlFolder . '/' . str_replace('.', '_', $tableName) . '.xml';
 
     $pdo = Database::getConnection();
@@ -30,12 +23,10 @@ function saveTableXml(string $tableName): void {
     foreach ($rows as $row) {
         $record = $xml->addChild("record");
         foreach ($row as $key => $value) {
-            // Cast the value to string and escape special characters.
             $record->addChild($key, htmlspecialchars((string)($value ?? "N/A")));
         }
     }
 
-    // Format the XML for readability using DOMDocument.
     $dom = new DOMDocument('1.0', 'UTF-8');
     $dom->preserveWhiteSpace = false;
     $dom->formatOutput = true;
@@ -44,11 +35,6 @@ function saveTableXml(string $tableName): void {
     file_put_contents($filename, $dom->saveXML());
 }
 
-/**
- * Loops over all allowed tables and saves an XML file for each.
- *
- * @param array $allowedTables The list of allowed table names.
- */
 function saveAllTablesXml(array $allowedTables): void {
     foreach ($allowedTables as $tableName) {
         saveTableXml($tableName);
