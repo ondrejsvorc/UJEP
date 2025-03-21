@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="styles.css"?>
+<records>
+  <record>
+    <id_pozice>1</id_pozice>
+    <id_pozicenadrizeny>N/A</id_pozicenadrizeny>
+    <nazev>Majitel</nazev>
+    <plat>60000</plat>
+  </record>
+  <record>
+    <id_pozice>2</id_pozice>
+    <id_pozicenadrizeny>1</id_pozicenadrizeny>
+    <nazev>Šéfkuchař</nazev>
+    <plat>50000</plat>
+  </record>
+  <record>
+    <id_pozice>3</id_pozice>
+    <id_pozicenadrizeny>1</id_pozicenadrizeny>
+    <nazev>Vrchní číšník</nazev>
+    <plat>45000</plat>
+  </record>
+  <record>
+    <id_pozice>4</id_pozice>
+    <id_pozicenadrizeny>2</id_pozicenadrizeny>
+    <nazev>Kuchař</nazev>
+    <plat>35000</plat>
+  </record>
+  <record>
+    <id_pozice>5</id_pozice>
+    <id_pozicenadrizeny>3</id_pozicenadrizeny>
+    <nazev>Číšník</nazev>
+    <plat>22000</plat>
+  </record>
+</records>

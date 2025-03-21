@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema">
+  <xs:element name="records">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="record" maxOccurs="unbounded" minOccurs="0">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="id_pozice" type="xs:int"/>
+              <xs:element name="id_pozicenadrizeny" type="xs:int"/>
+              <xs:element name="nazev" type="xs:string"/>
+              <xs:element name="plat" type="xs:int"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>

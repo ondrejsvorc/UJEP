@@ -1,0 +1,23 @@
+records {
+  display: table;
+  width: 100%;
+  border-collapse: collapse;
+  font-family: Arial, sans-serif;
+  margin: 20px;
+}
+
+record {
+  display: table-row;
+}
+
+record > * {
+  display: table-cell;
+  border: 1px solid #ccc;
+  padding: 8px;
+  font-size: 14px;
+}
+
+nazev {
+  font-weight: bold;
+  color: #333;
+}
