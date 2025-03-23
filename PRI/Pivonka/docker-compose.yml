@@ -3,7 +3,7 @@ services:
   php-apache:
     container_name: project-vps
     build:
-      dockerfile: Dockerfiles/PhpApache
+      dockerfile: PhpApache
     depends_on:
       - database
     volumes:
@@ -21,7 +21,7 @@ services:
       POSTGRES_USER: admin
       POSTGRES_PASSWORD: heslo
     volumes:
-      - ./Dockerfiles/init.sql:/docker-entrypoint-initdb.d/init.sql
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
     ports:
       - 5432:5432 # PostgreSQL default port
 
