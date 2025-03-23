@@ -1,9 +1,6 @@
 <?php
 declare(strict_types=1);
-
-require_once __DIR__ . '/../app/Database.php';
 require_once __DIR__ . '/allowedTables.php';
-
 header('Content-Type: application/xml; charset=UTF-8');
 
 $table = strtolower($_GET['table'] ?? '');
