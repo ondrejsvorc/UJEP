@@ -1,0 +1,10 @@
+<readingList>
+  <book>
+    <id>1</id>
+    <status>read</status>
+  </book>
+  <book>
+    <id>3</id>
+    <status>want to read</status>
+  </book>
+</readingList>
