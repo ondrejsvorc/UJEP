@@ -15,7 +15,7 @@ services:
       dockerfile: Dockerfiles/Database
     environment:
       MYSQL_ROOT_PASSWORD: root
-      MYSQL_DATABASE: univerzita
+      MYSQL_DATABASE: BookTracker
       MYSQL_USER: admin
       MYSQL_PASSWORD: pwd
     ports:
