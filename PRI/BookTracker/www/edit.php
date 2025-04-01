@@ -46,9 +46,9 @@ $book = $result->fetch_assoc();
   <label>Status:
     <select name="status">
       <option value="">—</option>
-      <option value="read" <?= $current['status'] === 'read' ? 'selected' : '' ?>>Read</option>
-      <option value="currently reading" <?= $current['status'] === 'currently reading' ? 'selected' : '' ?>>Currently Reading</option>
-      <option value="want to read" <?= $current['status'] === 'want to read' ? 'selected' : '' ?>>Want to Read</option>
+      <option value="read" <?= $current['status'] === 'read' ? 'selected' : '' ?>>read</option>
+      <option value="currently reading" <?= $current['status'] === 'currently reading' ? 'selected' : '' ?>>currently Reading</option>
+      <option value="want to read" <?= $current['status'] === 'want to read' ? 'selected' : '' ?>>want to read</option>
     </select>
   </label>
   <label><strong>Rating:</strong></label>

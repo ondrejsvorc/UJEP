@@ -2,8 +2,14 @@
 <readingList>
   <book>
     <id>1</id>
-    <status/>
+    <status>read</status>
     <rating>3.5</rating>
     <note>test</note>
+  </book>
+  <book>
+    <id>2534</id>
+    <status/>
+    <rating>0</rating>
+    <note/>
   </book>
 </readingList>
