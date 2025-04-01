@@ -7,9 +7,9 @@
     <note>test</note>
   </book>
   <book>
-    <id>2534</id>
-    <status/>
-    <rating>0</rating>
-    <note/>
+    <id>1267</id>
+    <status>currently reading</status>
+    <rating>3</rating>
+    <note>test</note>
   </book>
 </readingList>

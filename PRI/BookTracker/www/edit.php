@@ -7,7 +7,7 @@ include 'includes/constants.php';
 $id = isset($_GET['id']) ? (int) $_GET['id'] : 0;
 if ($id <= 0) {
   echo start_page();
-  echo "<p>❌ Invalid book ID.</p><p><a href='#' onclick='history.back(); return false;'>← Back</a></p>";
+  echo "<p>❌ Invalid book ID.</p><p><a href='detail.php?id=<?= $id ?>'>← Back to book</a></p>";
   echo end_page();
   exit;
 }
@@ -32,7 +32,7 @@ $stmt->execute();
 $result = $stmt->get_result();
 if ($result->num_rows === 0) {
   echo start_page();
-  echo "<p>❌ Book not found.</p><p><a href='#' onclick='history.back(); return false;'>← Back</a></p>";
+  echo "<p>❌ Book not found.</p><p><a href='detail.php?id=<?= $id ?>'>← Back to book</a></p>";
   echo end_page();
   exit;
 }
@@ -58,7 +58,7 @@ $book = $result->fetch_assoc();
   <textarea name="note" id="note" rows="4"><?= htmlspecialchars($current['note']) ?></textarea>
   <button type="submit">💾 Save</button>
 </form>
-<p><a href="#" onclick="history.back(); return false;">← Back</a></p>
+<p><a href="detail.php?id=<?= $id ?>">← Back to book</a></p>
 <?= end_page() ?>
 
 <script>

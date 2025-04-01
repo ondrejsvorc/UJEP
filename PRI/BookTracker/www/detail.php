@@ -53,5 +53,5 @@ $note = $readingList[$id]['note'] ?? '';
   <li><strong>Rating:</strong> <?= htmlspecialchars($rating) ?>/5</li>
   <li><strong>Note:</strong> <?= nl2br(htmlspecialchars($note)) ?></li>
 </ul>
-<p><a href="#" onclick="history.back(); return false;">← Back</a></p>
+<a href="list.php">← Back to books</a>
 <?= end_page() ?>

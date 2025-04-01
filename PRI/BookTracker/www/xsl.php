@@ -13,5 +13,5 @@ if (str_starts_with(trim($lines[0]), '<?xml')) {
   array_shift($lines);
 }
 
-$stylesheet = '<?xml-stylesheet type="text/xsl" href="' . XML_STYLES_PATH . '"?>';
+$stylesheet = '<?xml-stylesheet type="text/xsl" href="' . XML_STYLES_PATH . '?v=' . time() . '"?>'; # No caching
 echo '<?xml version="1.0" encoding="UTF-8"?>' . "\n" . $stylesheet . "\n" . implode("\n", $lines);

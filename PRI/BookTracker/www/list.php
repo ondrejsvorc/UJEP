@@ -57,13 +57,14 @@ $result = $db->query($query);
 <?php endif; ?>
 
 <?= start_page() ?>
-<h2>Books</h2>
+<h2 onclick="window.location.href = 'index.php'" style="cursor: pointer;">Books</h2>
 
 <form action="import.php" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: row; gap: 10px; margin-bottom: 1em;">
   <button type="button" onclick="document.getElementById('xmlFile').click()">📂 Import...</button>
   <input type="file" name="xml" id="xmlFile" accept=".xml" style="display: none;" onchange="this.form.submit()">
   <a href="export.php"><button type="button">📤 Export</button></a>
 </form>
+
 
 <form method="GET" style="display: flex; flex-direction: row; gap: 10px; align-items: center; margin-bottom: 1em; justify-content: space-between">
   <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Search books...">
@@ -86,22 +87,30 @@ $result = $db->query($query);
   </thead>
   <tbody>
     <?php while ($row = $result->fetch_assoc()):
-      $combined = strtolower($row['title'] . $row['author'] . $row['genre'] . $row['year']);
+      $bookId = $row['id'];
+      $entry = $readingList[$bookId] ?? ['status' => '—', 'rating' => '—'];
+      $combined = strtolower(
+        $row['title'] .
+        $row['author'] .
+        $row['genre'] .
+        $row['year'] .
+        $entry['status'] .
+        $entry['rating']
+      );
       if ($search && !str_contains($combined, strtolower($search))) {
         continue;
       }
-      $status = $readingList[$row['id']]['status'] ?? null;
-      if ($filterStatuses && (!$status || !isset($filterStatuses[$status]))) {
+      if ($filterStatuses && (!$entry['status'] || !isset($filterStatuses[$entry['status']]))) {
         continue;
       }
     ?>
-    <tr onclick="window.location.href = 'detail.php?id=<?= $row['id'] ?>'">
+    <tr onclick="window.location.href = 'detail.php?id=<?= $bookId ?>'">
       <td><?= highlight($row['title'], $search) ?></td>
       <td><?= highlight($row['author'], $search) ?></td>
       <td><?= highlight($row['genre'], $search) ?></td>
       <td><?= highlight($row['year'], $search) ?></td>
-      <td><?= htmlspecialchars($readingList[$row['id']]['status'] ?? '—') ?></td>
-      <td><?= htmlspecialchars($readingList[$row['id']]['rating'] ?? '—') ?></td>
+      <td><?= highlight($entry['status'] ?: '—', $search) ?></td>
+      <td><?= highlight($entry['rating'] ?? '—', $search) ?></td>
     </tr>
     <?php endwhile; ?>
   </tbody>
