@@ -81,6 +81,7 @@ $result = $db->query($query);
       <th>Genre</th>
       <th>Year</th>
       <th>Status</th>
+      <th>Rating</th>
     </tr>
   </thead>
   <tbody>
@@ -89,7 +90,7 @@ $result = $db->query($query);
       if ($search && !str_contains($combined, strtolower($search))) {
         continue;
       }
-      $status = $readingList[$row['id']] ?? null;
+      $status = $readingList[$row['id']]['status'] ?? null;
       if ($filterStatuses && (!$status || !isset($filterStatuses[$status]))) {
         continue;
       }
@@ -99,7 +100,8 @@ $result = $db->query($query);
       <td><?= highlight($row['author'], $search) ?></td>
       <td><?= highlight($row['genre'], $search) ?></td>
       <td><?= highlight($row['year'], $search) ?></td>
-      <td><?= htmlspecialchars($status ?? '—') ?></td>
+      <td><?= htmlspecialchars($readingList[$row['id']]['status'] ?? '—') ?></td>
+      <td><?= htmlspecialchars($readingList[$row['id']]['rating'] ?? '—') ?></td>
     </tr>
     <?php endwhile; ?>
   </tbody>

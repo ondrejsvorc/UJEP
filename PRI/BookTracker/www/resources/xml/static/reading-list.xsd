@@ -6,16 +6,34 @@
         <xs:element name="book" maxOccurs="unbounded">
           <xs:complexType>
             <xs:sequence>
-              <xs:element name="id" type="xs:unsignedInt"/>
+              <xs:element name="id" type="xs:integer"/>
               <xs:element name="status">
                 <xs:simpleType>
                   <xs:restriction base="xs:string">
-                    <xs:enumeration value="want to read"/>
-                    <xs:enumeration value="currently reading"/>
                     <xs:enumeration value="read"/>
+                    <xs:enumeration value="currently reading"/>
+                    <xs:enumeration value="want to read"/>
                   </xs:restriction>
                 </xs:simpleType>
               </xs:element>
+              <xs:element name="rating" minOccurs="1">
+                <xs:simpleType>
+                  <xs:restriction base="xs:decimal">
+                    <xs:enumeration value="0"/>
+                    <xs:enumeration value="0.5"/>
+                    <xs:enumeration value="1"/>
+                    <xs:enumeration value="1.5"/>
+                    <xs:enumeration value="2"/>
+                    <xs:enumeration value="2.5"/>
+                    <xs:enumeration value="3"/>
+                    <xs:enumeration value="3.5"/>
+                    <xs:enumeration value="4"/>
+                    <xs:enumeration value="4.5"/>
+                    <xs:enumeration value="5"/>
+                  </xs:restriction>
+                </xs:simpleType>
+              </xs:element>
+              <xs:element name="note" type="xs:string" minOccurs="0"/>
             </xs:sequence>
           </xs:complexType>
         </xs:element>

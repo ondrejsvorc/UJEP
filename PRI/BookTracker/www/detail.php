@@ -35,7 +35,9 @@ if ($result->num_rows === 0) {
 }
 
 $book = $result->fetch_assoc();
-$status = $readingList[$id] ?? '—';
+$status = $readingList[$id]['status'] ?? '—';
+$rating = $readingList[$id]['rating'] ?? '—';
+$note = $readingList[$id]['note'] ?? '—';
 ?>
 
 <?= start_page() ?>
@@ -48,6 +50,8 @@ $status = $readingList[$id] ?? '—';
   <li><strong>Genre:</strong> <?= htmlspecialchars($book['genre'] ?? '—') ?></li>
   <li><strong>Year:</strong> <?= htmlspecialchars($book['year']) ?></li>
   <li><strong>Status:</strong> <?= htmlspecialchars($status) ?></li>
+  <li><strong>Rating:</strong> <?= htmlspecialchars($rating) ?>/5</li>
+  <li><strong>Note:</strong> <?= nl2br(htmlspecialchars($note)) ?></li>
 </ul>
-<p><a href="list.php">← Back to book list</a></p>
+<p><a href="#" onclick="history.back(); return false;">← Back</a></p>
 <?= end_page() ?>

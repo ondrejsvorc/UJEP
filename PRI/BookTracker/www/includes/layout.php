@@ -49,6 +49,17 @@ function start_page() {
     a:hover {
       text-decoration: underline;
     }
+    .stars {
+      display: inline-flex;
+      font-size: 2em;
+      cursor: pointer;
+      user-select: none;
+    }
+    .star {
+      position: relative;
+      width: 1em;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
