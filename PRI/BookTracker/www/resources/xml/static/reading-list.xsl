@@ -30,6 +30,8 @@
             <tr>
               <th>ID</th>
               <th>Status</th>
+              <th>Rating</th>
+              <th>Note</th>
             </tr>
           </thead>
           <tbody>
@@ -37,11 +39,35 @@
               <tr>
                 <td><xsl:value-of select="id" /></td>
                 <td><xsl:value-of select="status" /></td>
+                <td>
+                  <xsl:call-template name="render-stars">
+                    <xsl:with-param name="value" select="rating" />
+                  </xsl:call-template>
+                </td>
+                <td><xsl:value-of select="note" /></td>
               </tr>
             </xsl:for-each>
           </tbody>
         </table>
       </body>
     </html>
+  </xsl:template>
+  <xsl:template name="render-stars">
+    <xsl:param name="value" />
+    <xsl:variable name="filled" select="floor($value)" />
+    <xsl:variable name="half" select="(number($value) - floor($value)) &gt;= 0.5" />
+    <xsl:variable name="max" select="5" />
+    <!-- Full stars -->
+    <xsl:for-each select="document('')/*[1]/*[position() &lt;= $filled]">
+      <xsl:text>★</xsl:text>
+    </xsl:for-each>
+    <!-- Half star -->
+    <xsl:if test="$half">
+      <xsl:text>⯪</xsl:text>
+    </xsl:if>
+    <!-- Empty stars -->
+    <xsl:for-each select="document('')/*[1]/*[position() &lt;= ($max - $filled - $half)]">
+      <xsl:text>☆</xsl:text>
+    </xsl:for-each>
   </xsl:template>
 </xsl:stylesheet>
