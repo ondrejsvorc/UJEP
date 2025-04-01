@@ -2,20 +2,8 @@
 <readingList>
   <book>
     <id>1</id>
-    <status>read</status>
+    <status/>
     <rating>3.5</rating>
-    <note>Loved the atmosphere and pacing.</note>
-  </book>
-  <book>
-    <id>2</id>
-    <status>want to read</status>
-    <rating>0.5</rating>
-    <note>Kinda hated it.</note>
-  </book>
-  <book>
-    <id>1267</id>
-    <status>currently reading</status>
-    <rating>3.5</rating>
-    <note>extremely horrible movie man............................. never gonna read this again</note>
+    <note>test</note>
   </book>
 </readingList>

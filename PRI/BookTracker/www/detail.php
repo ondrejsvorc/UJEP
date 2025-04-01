@@ -35,9 +35,9 @@ if ($result->num_rows === 0) {
 }
 
 $book = $result->fetch_assoc();
-$status = $readingList[$id]['status'] ?? '—';
-$rating = $readingList[$id]['rating'] ?? '—';
-$note = $readingList[$id]['note'] ?? '—';
+$status = $readingList[$id]['status'] ?? '';
+$rating = $readingList[$id]['rating'] ?? 0;
+$note = $readingList[$id]['note'] ?? '';
 ?>
 
 <?= start_page() ?>

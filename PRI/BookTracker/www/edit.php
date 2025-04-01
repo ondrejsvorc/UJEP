@@ -36,14 +36,12 @@ if ($result->num_rows === 0) {
   echo end_page();
   exit;
 }
-
 $book = $result->fetch_assoc();
 ?>
 
 <?= start_page() ?>
 <h2>Edit Book</h2>
 <p><strong><?= htmlspecialchars($book['title']) ?></strong></p>
-
 <form method="POST" style="display: flex; flex-direction: column; gap: 10px; max-width: 300px;">
   <label>Status:
     <select name="status">
@@ -53,60 +51,49 @@ $book = $result->fetch_assoc();
       <option value="want to read" <?= $current['status'] === 'want to read' ? 'selected' : '' ?>>Want to Read</option>
     </select>
   </label>
-
   <label><strong>Rating:</strong></label>
   <div class="stars" id="stars"></div>
   <input type="hidden" name="rating" id="rating" value="<?= htmlspecialchars($current['rating']) ?>">
-
   <label for="note"><strong>Note:</strong></label>
   <textarea name="note" id="note" rows="4"><?= htmlspecialchars($current['note']) ?></textarea>
-
   <button type="submit">💾 Save</button>
 </form>
-
 <p><a href="#" onclick="history.back(); return false;">← Back</a></p>
 <?= end_page() ?>
 
 <script>
-  const starsEl = document.getElementById('stars');
-  const ratingInput = document.getElementById('rating');
-  let isMouseDown = false;
+  const stars = document.getElementById('stars');
+  const input = document.getElementById('rating');
+  let isDragging = false;
 
-  const renderStars = (value) => {
-    starsEl.innerHTML = '';
+  const getRating = (e, full, half) => e.offsetX < e.target.offsetWidth / 2 ? half : full;
+  const updateRating = (value) => {
+    input.value = value;
+    render(parseFloat(value));
+  };
+
+  const render = (value) => {
+    stars.innerHTML = '';
     for (let i = 0; i < 5; i++) {
       const full = i + 1;
       const half = i + 0.5;
-      let char = '☆';
-      if (value >= full) char = '★';
-      else if (value >= half) char = '⯪';
+      const char = value >= full ? '★' : value >= half ? '⯪' : '☆';
 
-      const span = document.createElement('span');
-      span.className = 'star';
-      span.textContent = char;
+      const star = document.createElement('span');
+      star.className = 'star';
+      star.textContent = char;
 
-      span.addEventListener('mousemove', (e) => {
-        if (isMouseDown) {
-          const isHalf = e.offsetX < e.target.offsetWidth / 2;
-          const val = isHalf ? half : full;
-          ratingInput.value = val;
-          renderStars(val);
-        }
-      });
-
-      span.addEventListener('click', (e) => {
-        const isHalf = e.offsetX < e.target.offsetWidth / 2;
-        const val = isHalf ? half : full;
-        ratingInput.value = (parseFloat(ratingInput.value) === val) ? 0 : val;
-        renderStars(parseFloat(ratingInput.value));
-      });
-
-      starsEl.appendChild(span);
+      star.onclick = (e) => {
+        const rating = getRating(e, full, half);
+        updateRating(input.value == rating ? 0 : rating);
+      };
+      star.onmousemove = (e) => isDragging && updateRating(getRating(e, full, half));
+      stars.appendChild(star);
     }
   };
 
-  starsEl.addEventListener('mousedown', () => isMouseDown = true);
-  document.addEventListener('mouseup', () => isMouseDown = false);
+  stars.onmousedown = () => isDragging = true;
+  document.onmouseup = () => isDragging = false;
 
-  renderStars(parseFloat(ratingInput.value) || 0);
+  render(parseFloat(input.value) || 0);
 </script>

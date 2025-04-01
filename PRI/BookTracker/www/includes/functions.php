@@ -37,7 +37,7 @@ function saveReadingList(array $data, string $path = XML_IMPORT_PATH): bool {
   foreach ($data as $id => $entry) {
     $book = $dom->createElement('book');
     $book->appendChild($dom->createElement('id', $id));
-    $book->appendChild($dom->createElement('status', $entry['status']));
+    $book->appendChild($dom->createElement('status', $entry['status'] ?? ""));
     $book->appendChild($dom->createElement('rating', $entry['rating'] ?? 0));
     $book->appendChild($dom->createElement('note', $entry['note'] ?? ""));
     $root->appendChild($book);
