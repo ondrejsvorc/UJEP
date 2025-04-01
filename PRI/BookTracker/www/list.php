@@ -65,7 +65,6 @@ $result = $db->query($query);
   <a href="export.php"><button type="button">📤 Export</button></a>
 </form>
 
-
 <form method="GET" style="display: flex; flex-direction: row; gap: 10px; align-items: center; margin-bottom: 1em; justify-content: space-between">
   <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Search books...">
   <label><input type="checkbox" name="read" <?= isset($_GET['read']) ? 'checked' : '' ?>> Read</label>
