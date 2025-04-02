@@ -42,6 +42,14 @@ function start_page() {
       padding: 2px;
       background-color: #FCD53F;
     }
+    textarea {
+      padding: 6px;
+      margin-bottom: 20px;
+      width: 100%;
+      resize: vertical;
+      font-family: sans-serif;
+      font-size: 1em;
+    }
     a {
       color: #0066cc;
       text-decoration: none;
