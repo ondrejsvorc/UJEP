@@ -1,0 +1,112 @@
+1. ÚKOL
+************************************************************
+
+Pozorování: Kontakt pohledem
+------------------------------------------------------------
+Součinové členy (P(H)*P(E|H)): [0.01, 0.03, 0.2, 0.04, 0.005]
+Normační člen (součet): 0.285
+Posteriorní pravděpodobnosti (P(H|E)):
+Zcela se nelíbí: 0.035
+Nelíbí se: 0.105
+Neutrální: 0.702
+Líbí se: 0.14
+Zamilovanost: 0.018
+
+Pozorování: Úsměv
+------------------------------------------------------------
+Součinové členy (P(H)*P(E|H)): [0.01, 0.015, 0.1, 0.08, 0.01]
+Normační člen (součet): 0.215
+Posteriorní pravděpodobnosti (P(H|E)):
+Zcela se nelíbí: 0.047
+Nelíbí se: 0.07
+Neutrální: 0.465
+Líbí se: 0.372
+Zamilovanost: 0.047
+
+Pozorování: Požádala o pití
+------------------------------------------------------------
+Součinové členy (P(H)*P(E|H)): [0.052, 0.0675, 0.0145, 0.00018, 5e-06]
+Normační člen (součet): 0.134
+Posteriorní pravděpodobnosti (P(H|E)):
+Zcela se nelíbí: 0.388
+Nelíbí se: 0.504
+Neutrální: 0.108
+Líbí se: 0.001
+Zamilovanost: 0.0
+
+Pozorování: Dívá se na jiné muže
+------------------------------------------------------------
+Součinové členy (P(H)*P(E|H)): [0.03, 0.06, 0.1, 0.016, 0.001]
+Normační člen (součet): 0.207
+Posteriorní pravděpodobnosti (P(H|E)):
+Zcela se nelíbí: 0.145
+Nelíbí se: 0.29
+Neutrální: 0.483
+Líbí se: 0.077
+Zamilovanost: 0.005
+
+Pozorování: Krátké fráze
+------------------------------------------------------------
+Součinové členy (P(H)*P(E|H)): [0.01, 0.06, 0.15, 0.02, 0.005]
+Normační člen (součet): 0.245
+Posteriorní pravděpodobnosti (P(H|E)):
+Zcela se nelíbí: 0.041
+Nelíbí se: 0.245
+Neutrální: 0.612
+Líbí se: 0.082
+Zamilovanost: 0.02
+
+Pozorování: Toaleta + make-up
+------------------------------------------------------------
+Součinové členy (P(H)*P(E|H)): [0.005, 0.0075, 0.05, 0.04, 0.03]
+Normační člen (součet): 0.132
+Posteriorní pravděpodobnosti (P(H|E)):
+Zcela se nelíbí: 0.038
+Nelíbí se: 0.057
+Neutrální: 0.379
+Líbí se: 0.303
+Zamilovanost: 0.227
+
+                            Zcela se nelíbí         Nelíbí se         Neutrální           Líbí se      Zamilovanost
+-------------------------------------------------------------------------------------------------------------------
+Kontakt pohledem                      0.035             0.105             0.702             0.140             0.018
+Úsměv                                 0.047             0.070             0.465             0.372             0.047
+Požádala o pití                       0.388             0.504             0.108             0.001             0.000
+Dívá se na jiné muže                  0.145             0.290             0.483             0.077             0.005
+Krátké fráze                          0.041             0.245             0.612             0.082             0.020
+Toaleta + make-up                     0.038             0.057             0.379             0.303             0.227
+
+Pozorování                    Nejpravděpodobnější stav      Posteriorní pravděpodobnost
+---------------------------------------------------------------------------------------
+Kontakt pohledem              Neutrální                     70.2 %
+Úsměv                         Neutrální                     46.5 %
+Požádala o pití               Nelíbí se                     50.4 %
+Dívá se na jiné muže          Neutrální                     48.3 %
+Krátké fráze                  Neutrální                     61.2 %
+Toaleta + make-up             Neutrální                     37.9 %
+
+2. ÚKOL
+************************************************************
+Posterior Probabilities:
+Guest  Host  Prize  Posterior
+  0     1      0      0.333
+  0     1      2      0.667
+  0     2      0      0.333
+  0     2      1      0.667
+  1     0      1      0.333
+  1     0      2      0.667
+  1     2      0      0.667
+  1     2      1      0.333
+  2     0      1      0.667
+  2     0      2      0.333
+  2     1      0      0.667
+  2     1      2      0.333
+
+Bayesian Inference:
+Guest  Host  P(Win|Keep)  P(Win|Switch)  Switch Recommended
+  0     1        0.333          0.667                True
+  0     2        0.333          0.667                True
+  1     0        0.333          0.667                True
+  1     2        0.333          0.667                True
+  2     0        0.333          0.667                True
+  2     1        0.333          0.667                True
