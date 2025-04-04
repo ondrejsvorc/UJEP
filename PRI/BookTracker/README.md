@@ -1,6 +1,6 @@
 ## 📚 BookTracker
 
-Web application for **tracking and rating books**. Users can **browse** a list of books from the database, **search and filter** them, **import/export** their personal reading list in XML, and assign each book a **reading status**, **rating** (0–5 ★), and a **note**.
+Web application for **tracking and rating books**. Users can **browse** a list of books from database, **search and filter** them, **import/export** their **personal reading list** in **XML**, and assign each book a **reading status**, **rating** (0–5 ★), and a **note**.
 
 ### ERD Diagram
 ![ERD Diagram](sql/db_diagram.png)
