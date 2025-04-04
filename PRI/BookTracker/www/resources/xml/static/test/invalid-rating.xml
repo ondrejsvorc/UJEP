@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<readingList>
+  <book>
+    <id>4</id>
+    <status>read</status>
+    <rating>6</rating>
+    <note>Rating too high</note>
+  </book>
+</readingList>

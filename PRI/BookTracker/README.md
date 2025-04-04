@@ -38,12 +38,12 @@ Web application for **tracking and rating books**. Users can **browse** a list o
  ┃ ┃ ┃ ┃ ┗ 📜reading-list.xml
  ┃ ┃ ┃ ┗ 📂static
  ┃ ┃ ┃ ┃ ┣ 📂test
- ┃ ┃ ┃ ┃ ┃ ┣ 📜reading-corrupt.xml
- ┃ ┃ ┃ ┃ ┃ ┣ 📜reading-invalid-rating.xml
- ┃ ┃ ┃ ┃ ┃ ┣ 📜reading-list-large.xml
- ┃ ┃ ┃ ┃ ┃ ┣ 📜reading-missing-status.xml
- ┃ ┃ ┃ ┃ ┃ ┣ 📜reading-valid.xml
- ┃ ┃ ┃ ┃ ┃ ┗ 📜reading-wrong-root.xml
+ ┃ ┃ ┃ ┃ ┃ ┣ 📜invalid-missing-endtag.xml
+ ┃ ┃ ┃ ┃ ┃ ┣ 📜invalid-missing-status.xml
+ ┃ ┃ ┃ ┃ ┃ ┣ 📜invalid-rating.xml
+ ┃ ┃ ┃ ┃ ┃ ┣ 📜invalid-root.xml
+ ┃ ┃ ┃ ┃ ┃ ┣ 📜valid-large.xml
+ ┃ ┃ ┃ ┃ ┃ ┗ 📜valid-small.xml
  ┃ ┃ ┃ ┃ ┣ 📜reading-list.xsd
  ┃ ┃ ┃ ┃ ┗ 📜reading-list.xsl
  ┃ ┃ ┗ 📜book.svg

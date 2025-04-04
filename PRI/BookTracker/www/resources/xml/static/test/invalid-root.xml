@@ -1,0 +1,9 @@
+<?xml version='1.0' encoding='utf-8'?>
+<students>
+  <book>
+  <id>5</id>
+  <status>read</status>
+  <rating>4</rating>
+  <note>Wrong root element</note>
+  </book>
+</students>

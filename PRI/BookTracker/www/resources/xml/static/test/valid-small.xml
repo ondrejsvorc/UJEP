@@ -1,0 +1,14 @@
+<?xml version='1.0' encoding='utf-8'?>
+<readingList>
+  <book>
+    <id>1</id>
+    <status>read</status>
+    <rating>4.5</rating>
+    <note>Great book!</note>
+  </book>
+  <book>
+    <id>2</id>
+    <status>want to read</status>
+    <rating>0</rating>
+  </book>
+</readingList>
