@@ -1,0 +1,33 @@
+Table DimCustomers {
+  CustomerID string [pk]
+  CustomerName string
+  Region string
+  SignupDate date
+}
+
+Table DimProducts {
+  ProductID string [pk]
+  ProductName string
+  Category string
+  Price decimal
+}
+
+Table DimDate {
+  DateKey date [pk]
+  Year int
+  Quarter int
+  Month int
+  Day int
+  WeekDay int
+  IsWeekend bool
+}
+
+Table FactTransactions {
+  TransactionID string [pk]
+  CustomerID string [ref: > DimCustomers.CustomerID]
+  ProductID string [ref: > DimProducts.ProductID]
+  DateKey date [ref: > DimDate.DateKey]
+  Quantity int
+  TotalValue decimal
+  Price decimal
+}

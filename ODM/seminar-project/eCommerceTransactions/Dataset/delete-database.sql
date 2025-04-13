@@ -1,1 +1,0 @@
-IF EXISTS (SELECT name FROM sys.databases WHERE name = 'EverMart') DROP DATABASE EverMart;

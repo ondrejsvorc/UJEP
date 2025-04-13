@@ -1,0 +1,15 @@
+-- Table Creation
+CREATE TABLE "default"."Customers" (
+    "CustomerID" String,
+    "CustomerName" String,
+    "Region" String,
+    "SignupDate" Date
+) 
+ENGINE MergeTree()
+ORDER BY tuple()
+SETTINGS index_granularity = 8192 SETTINGS flatten_nested=0;
+
+-- Data Insertion
+INSERT INTO "default"."Customers"
+SELECT "CustomerID","CustomerName","Region","SignupDate" FROM url('https://s3.eu-west-1.amazonaws.com/prod-cp-upload-eu-eu-west-1/file-import/f5421558-1082-4e90-b9ac-fe08bd6a3fae/87593aa0-1d28-43e3-acfd-1e6c077fe89f/d39943f6-e28a-4e51-8703-e1650403a9a3.csv?X-Amz-Algorithm=AWS4-HMAC-SHA256&X-Amz-Content-Sha256=UNSIGNED-PAYLOAD&X-Amz-Credential=ASIAVKSHF6YX2IPFH5RF%2F20250413%2Feu-west-1%2Fs3%2Faws4_request&X-Amz-Date=20250413T120952Z&X-Amz-Expires=3600&X-Amz-Security-Token=IQoJb3JpZ2luX2VjEHMaCXVzLWVhc3QtMiJHMEUCIHaYgOtpZtehfZE9gm6Rv0pIsUS3wzr%2B8JXna9e2E%2BjUAiEAqAKbDK%2Bbn0RewiurUpOpqgfOgXauCIC0qzdmDdtZa20qoAMI7P%2F%2F%2F%2F%2F%2F%2F%2F%2F%2FARACGgwzNjYyOTUyNTA0NzkiDM%2B8j1k%2BTbklHs3T2yr0Apf5N4peYiXLLmHU%2BZFSZqHFC3unovfjTPCdntKDVRelEx8JJ8juKf4HI%2Fo8aOqtKEEr%2BUc6RZWffhSMu4%2Bf33cEEvJs%2F9yWerm%2FGhDXNleIr997t6D6xrRxEnYZHav9rfS%2FIR%2FAtGyVDv9mAnYG1UqQ2vNVeOF0WaHbn7icbs6Vg2o0mRj56q8lLi5sot59vsqlfmzCra32TGAXSQeQLefnHOzGvVdeuDqFUuiEcigPYGCcRKXuFXOivQ7hMzAaz5evEVgAmqOcClNoWcSzX4RK2b%2B5tVx6xVQQ3MdJBJvDiB9zIW%2FNjsBkUkEz%2BPwEjFO0SoqB5ZkKWCXUSnhq3A6Nbaqg%2FdKMSSHS6IltKs32p78VeLUk9CSbk4NfvQuR9eMQhqVKb%2B807rNmYQxGJzjVSAID%2FOnMvO8DAUV31bFfA0W7RJWtWFIpY1qisXa20tIOxhZuyxzOZ%2FVet4yvwTFJ%2FALFQStkD%2FRa792FbRN1cCRjRDDlvO6%2FBjqdAWl38wzW7RmX2%2Fu12vl7hxzD%2BWhOYZnFAs6%2FXlOdDI2RzT6Ost2FEXzR27MkHbVPTHkpJoaclCNpDr9jTdEALmACXkGhZ4bt5PkrEA70KBrH4MMPbV37jw6N4n5ph4cmz3pM6JJLoNN1X6Tjy51ML1e%2BW0XUqqOi21HYLq%2BUOaPkYTmpaHvhn%2Bz%2FunAMBFM9lHLJttQywf%2FHkx0Vqwc%3D&X-Amz-Signature=9354a5cd3ee34ca7ea713c269d05fcab4412e173eed8072a4542f9374ad94e41&X-Amz-SignedHeaders=host&x-id=GetObject', CSV)
+SETTINGS date_time_input_format='best_effort',flatten_nested=0,input_format_allow_errors_num=10,input_format_allow_errors_ratio=0.99,format_csv_delimiter=',';

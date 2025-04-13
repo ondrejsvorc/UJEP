@@ -1,0 +1,23 @@
+Table Customers {
+  CustomerID string [pk]
+  CustomerName string
+  Region string
+  SignupDate date
+}
+
+Table Products {
+  ProductID string [pk]
+  ProductName string
+  Category string
+  Price decimal
+}
+
+Table Transactions {
+  TransactionID string [pk]
+  CustomerID string [ref: > Customers.CustomerID]
+  ProductID string [ref: > Products.ProductID]
+  TransactionDate datetime
+  Quantity int
+  TotalValue decimal
+  Price decimal
+}

@@ -1,0 +1,30 @@
+DROP TABLE IF EXISTS Customers;
+DROP TABLE IF EXISTS Products;
+DROP TABLE IF EXISTS Transactions;
+
+CREATE TABLE Customers (
+    CustomerID String,
+    CustomerName String,
+    Region String,
+    SignupDate Date
+) ENGINE = MergeTree()
+ORDER BY CustomerID;
+
+CREATE TABLE Products (
+    ProductID String,
+    ProductName String,
+    Category String,
+    Price Decimal(10, 2)
+) ENGINE = MergeTree()
+ORDER BY ProductID;
+
+CREATE TABLE Transactions (
+    TransactionID String,
+    CustomerID String,
+    ProductID String,
+    TransactionDate DateTime,
+    Quantity Int32,
+    TotalValue Decimal(10, 2),
+    Price Decimal(10, 2)
+) ENGINE = MergeTree()
+ORDER BY TransactionID;
