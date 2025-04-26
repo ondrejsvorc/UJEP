@@ -23,11 +23,11 @@ CREATE TABLE `Book` (
   `id` int unsigned NOT NULL AUTO_INCREMENT,
   `title` varchar(255) NOT NULL,
   `author_id` int unsigned NOT NULL,
-  `genre_id` int unsigned,
-  `year` year,
+  `genre_id` int unsigned NOT NULL,
+  `year` year NOT NULL,
   PRIMARY KEY (`id`),
-  FOREIGN KEY (`author_id`) REFERENCES `Author` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (`genre_id`) REFERENCES `Genre` (`id`) ON DELETE SET NULL
+  FOREIGN KEY (`author_id`) REFERENCES `Author` (`id`),
+  FOREIGN KEY (`genre_id`) REFERENCES `Genre` (`id`)
 );
 
 INSERT INTO `Author` (`id`, `name`) VALUES
@@ -133,14 +133,15 @@ INSERT INTO `Author` (`id`, `name`) VALUES
 (100, 'Julie Powell');
 
 INSERT INTO `Genre` (`id`, `name`) VALUES
-(1, 'Dystopian'),
-(2, 'Science Fiction'),
-(3, 'Fantasy'),
-(4, 'Horror'),
-(5, 'Satire'),
-(6, 'Adventure'),
-(7, 'Post-apocalyptic'),
-(8, 'Young Adult');
+(1, 'Unspecified'),
+(2, 'Dystopian'),
+(3, 'Science Fiction'),
+(4, 'Fantasy'),
+(5, 'Horror'),
+(6, 'Satire'),
+(7, 'Adventure'),
+(8, 'Post-apocalyptic'),
+(9, 'Young Adult');
 
 INSERT INTO `Book` (`id`, `title`, `author_id`, `genre_id`, `year`) VALUES
 (1, 'Serious billion loss impact information property', 68, 6, 1877),
