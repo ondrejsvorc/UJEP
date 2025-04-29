@@ -162,6 +162,7 @@ plot(sc[,1], sc[,2], pch = 19, col = "blue", xlab = "Faktor 1 (Velikost)", ylab 
 text(sc[,1], sc[,2], labels = rownames(sc), pos = 4, cex = 0.7)
 
 ## Hledejte hlavni komponenty / faktory pro soubor UScrime.
+## (prý ale vyšlo 5 faktorů, ne 2)
 data("UScrime")
 m1 <- as.matrix(UScrime[, c("M", "Ed", "Po1", "LF", "Pop", "GDP", "Ineq")])
 cor(m1)
