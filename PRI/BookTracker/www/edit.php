@@ -42,12 +42,12 @@ $book = $result->fetch_assoc();
 <?= start_page() ?>
 <h2>Edit Book</h2>
 <p><strong><?= htmlspecialchars($book['title']) ?></strong></p>
-<form method="POST" style="display: flex; flex-direction: column; gap: 10px; max-width: 300px;">
+<form method="POST" class="edit-form">
   <label>Status:
     <select name="status">
       <option value="">—</option>
       <option value="read" <?= $current['status'] === 'read' ? 'selected' : '' ?>>read</option>
-      <option value="currently reading" <?= $current['status'] === 'currently reading' ? 'selected' : '' ?>>currently Reading</option>
+      <option value="currently reading" <?= $current['status'] === 'currently reading' ? 'selected' : '' ?>>currently reading</option>
       <option value="want to read" <?= $current['status'] === 'want to read' ? 'selected' : '' ?>>want to read</option>
     </select>
   </label>

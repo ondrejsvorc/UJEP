@@ -59,13 +59,13 @@ $result = $db->query($query);
 <?= start_page() ?>
 <h2 onclick="window.location.href = 'index.php'" style="cursor: pointer;">Books</h2>
 
-<form action="import.php" method="POST" enctype="multipart/form-data" style="display: flex; flex-direction: row; gap: 10px; margin-bottom: 1em;">
+<form action="import.php" method="POST" enctype="multipart/form-data" class="import-form">
   <button type="button" onclick="document.getElementById('xmlFile').click()">📂 Import...</button>
   <input type="file" name="xml" id="xmlFile" accept=".xml" style="display: none;" onchange="this.form.submit()">
   <a href="export.php"><button type="button">📤 Export</button></a>
 </form>
 
-<form method="GET" style="display: flex; flex-direction: row; gap: 10px; align-items: center; margin-bottom: 1em; justify-content: space-between">
+<form method="GET" class="filter-form">
   <input type="text" name="search" value="<?= htmlspecialchars($search) ?>" placeholder="Search books...">
   <label><input type="checkbox" name="read" <?= isset($_GET['read']) ? 'checked' : '' ?>> Read</label>
   <label><input type="checkbox" name="currently_reading" <?= isset($_GET['currently_reading']) ? 'checked' : '' ?>> Currently Reading</label>

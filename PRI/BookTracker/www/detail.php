@@ -43,7 +43,7 @@ $note = $readingList[$id]['note'] ?? '';
 <?= start_page() ?>
 <h2>
   <?= htmlspecialchars($book['title']) ?>
-  <a href="edit.php?id=<?= $id ?>" style="font-size: 0.7em; margin-left: 10px;">✏️ Edit</a>
+  <a href="edit.php?id=<?= $id ?>" class="edit-book-redirect">✏️ Edit</a>
 </h2>
 <ul>
   <li><strong>Author:</strong> <?= htmlspecialchars($book['author']) ?></li>
