@@ -64,9 +64,14 @@ $book = $result->fetch_assoc();
 <script>
   const stars = document.getElementById('stars');
   const input = document.getElementById('rating');
-  let isDragging = false;
+  let isRating = false;
 
-  const getRating = (e, full, half) => e.offsetX < e.target.offsetWidth / 2 ? half : full;
+  const getRating = (e, full, half) => {
+    const mousePositionX = e.offsetX;
+    const starWidth = e.target.offsetWidth;
+    const isLeftHalf = mousePositionX < starWidth / 2;
+    return isLeftHalf ? half : full;
+  };
   const updateRating = (value) => {
     input.value = value;
     render(parseFloat(value));
@@ -78,22 +83,20 @@ $book = $result->fetch_assoc();
       const full = i + 1;
       const half = i + 0.5;
       const char = value >= full ? '★' : value >= half ? '⯪' : '☆';
-
       const star = document.createElement('span');
       star.className = 'star';
       star.textContent = char;
-
       star.onclick = (e) => {
         const rating = getRating(e, full, half);
-        updateRating(input.value == rating ? 0 : rating);
+        updateRating(input.value == getRating(e, full, half) ? 0 : rating);
       };
-      star.onmousemove = (e) => isDragging && updateRating(getRating(e, full, half));
+      star.onmousemove = (e) => isRating && updateRating(getRating(e, full, half));
       stars.appendChild(star);
     }
   };
 
-  stars.onmousedown = () => isDragging = true;
-  document.onmouseup = () => isDragging = false;
+  stars.onmousedown = () => isRating = true;
+  document.onmouseup = () => isRating = false;
 
   render(parseFloat(input.value) || 0);
 </script>
