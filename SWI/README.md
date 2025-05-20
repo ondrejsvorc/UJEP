@@ -1,1 +1,1 @@
-https://github.com/pavelberanek91/UJEP/tree/main/SWI
+[SWI](https://github.com/ondrejsvorc/SWI)
