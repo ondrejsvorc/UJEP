@@ -26,11 +26,29 @@ dotnet run
 
 ## Návrhové vzory
 ### Creational patterns (Vzory týkající se tvorby objektů)
-- Singleton
-- Builder
-- Prototype
 - Factory Method
 - Abstract Factory
+- Builder
+- Prototype
+- Singleton
 
 ### Structural Patterns (Vzory týkající se struktury programu)
+- Adapter
+- Bridge
+- Composite
+- Decorator
+- Facade
+- Flyweight
+- Proxy
+
 ### Behavioral Patterns (Vzory týkající se chování)
+- Chain of Responsibility
+- Command
+- Iterator
+- Mediator
+- Memento
+- Observer
+- State
+- Strategy
+- Template Method
+- Visitor
