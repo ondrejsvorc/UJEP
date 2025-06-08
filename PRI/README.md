@@ -28,3 +28,104 @@
 Umět uvést jednoduché příklady. Budou nám k okruhu zadávány jednoduché úkoly.
 1. příklad: Máme textový řetězec "abc abb abc" a chceme spočítat, kolikrát se v něm nachází každé z písmenek.
 2. příklad: Náhodný výběr určitých prvků z pole (funkce rand).
+
+## 1.
+
+### XML
+- XML = e**X**tensible **M**arkup **L**anguage (rozšiřitelný značkovací jazyk)
+
+### XML dokument
+- jakýkoliv text zapsaný podle pravidel XML
+- nejčastěji obsah `.xml` souboru
+- nemusí být vždy v souboru – může být v paměti, ve stringu, odpovědí z API, ...
+- musímít kořenový element
+
+### Značkovací jazyk
+- používá značky (tags), kterými popisuje strukturu a význam dat
+
+### Značka
+- dělí se na:
+  - počáteční (`<jmeno>`)
+  - koncová (`</jmeno>`)
+- case sensitive (`<jmeno>` != `<Jmeno>`)
+
+### Element
+- skládá se z:
+  - počáteční značky
+  - obsahu
+    - jednoduchý = obsahuje pouze text
+    - elementy = obsahuje vnořené elementy
+    - směsný = obsahuje text i vnořené elementy
+    - prázdný = neobsahuje nic (ani text, ani elementy)
+  - koncové značky
+- kořenový = musí existovat právě jeden v celém XML dokumentu, všechny další elementy jsou do něj vnořeny
+- vnořený = element vnořený v jiném elementu (tedy všechny elementy krom kořenového)
+- rodičovský = obsahuje jeden nebo více vnořených elementů (tedy kořenový element je zároveň rodičovský, obsahuje-li další elementy)
+- sourozenecký = elementy se stejným rodičem, se stejnou úrovní vnoření
+- dítě = element přímo vnořený v rodiči (dítě rodiče)
+- vnuk =  element vnořený ve vnořeném elementu (dítě dítěte)
+
+```xml
+<kniha>
+  <autor>
+    <jmeno>Jan</jmeno>
+  </autor>
+</kniha>
+```
+Element `kniha` je kořenovým elementem a zároveň rodičem elementu `autor`. Element `autor` je rodičem elementu `jmeno`, který je jeho dítětem a zároveň vnukem elementu `zprava`.
+
+### Značka vs Element
+- značka je součástí syntaxe (syntaktický prvek)
+- element tvoří strukturu dokumentu
+
+### XML Prolog
+- volitelný první řádek XML elementu
+- pseudoelement (připomíná element, ale není elementem)
+- pořadí atributů musí být dodrženo, u klasických elementů ne
+- atribut `version`: označuje verzi XML, ve které je dokument napsán
+- atribut `encoding`: uvádí kódování znaků, které je použito v dokumentu
+- atribut `standalone`: určuje, zda je dokument samostatný, tj. zda nevyžaduje externí zdroj (DTD, XML schéma) pro validaci
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+```
+
+### Atribut
+- dělí se na:
+  - povinný = musí mít explicitně definovanou hodnotu
+  - nepovinný = má implicitní hodnotu
+- hodnota atributu musí být vždy v uvozovkách (lze použít buď jednoduché nebo dvojité)
+- slouží jako metadata (data o datech) - aby přidaly další informace o daném elementu
+- může být přepsán na vnořený element daného elementu
+
+### Entita
+- dělí se na:
+  - interní = náhrada textem v dokumentu
+  - externí = načítání obsahu z externího zdroje
+- speciální sekvence znaků, které reprezentují znaky, jež nelze (nebo se nehodí) psát přímo do textu
+- příklady:
+  - `&lt;` = <
+  - `&gt;` = >
+  - `&apos;` = '
+  - `&quot;` = "
+```xml
+<vyraz>5 &lt; 10</vyraz>
+```
+
+### Jmenný prostor
+- anglicky namespace
+- atribut `xmlns` (ns = namespace)
+- deklarace atributu `xmlns:prefix="URI"` nebo `xmlns="URI"`
+- jednoznačně rozlišuje elementy/atributy podle původu a zabraňuje kolizím
+- pomocí prefixu u prvku říkáme, že on a všechny jeho potomci patří do určitého jmenného prostoru
+- standardně má být URI nějaká URL adresa, která vysvětluje strukturu daného XML dokumentu, ale ve skutečnosti místo URI můžeme napsat cokoliv - je to jen unikátní identifikátor daného jméného prostoru
+
+### Well-formed vs Validní XML dokument
+- well-formed = dodržuje základní syntaktická pravidla XML a může být zpracován XML parserem
+- validní = je well-formed + struktura je validní dle DTD/XSD
+
+### Komentář
+- `<!-- Toto je komentář -->`
+- nemůže být vnořený do jiného komentáře
+- atributy elementů nemohou být zakomentovány
+- nemůže se nacházet nad XML prologem
+- je ignorován parsery
