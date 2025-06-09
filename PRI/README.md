@@ -709,3 +709,62 @@ form.addEventListener("submit", (e) => {
   console.log("Formulář byl zachycen.");
 });
 ```
+
+## 8.
+
+### XML DOM
+- XML načtené jako strom (DOM)
+- umožňuje přístup ke všem uzlům (element, atribut, text, ...)
+
+```javascript
+const xhr = new XMLHttpRequest();
+xhr.open("GET", "knihy.xml", true);
+xhr.onload = () => {
+  const xml = xhr.responseXML;
+  const knihy = xml.getElementsByTagName("kniha");
+  console.log(knihy.length);
+};
+xhr.send();
+```
+
+```javascript
+node.parentNode         // rodič
+node.firstChild         // první potomek
+node.lastChild          // poslední potomek
+node.childNodes         // všechny děti
+```
+
+```javascript
+node.nodeName           // název elementu
+node.nodeValue          // hodnota (pro text, atribut)
+node.nodeType           // typ uzlu
+```
+
+```javascript
+let xmlDoc;
+const xhr = new XMLHttpRequest();
+xhr.open("GET", "knihy.xml", true);
+xhr.onload = () => {
+  if (xhr.status === 200) {
+    xmlDoc = xhr.responseXML;
+  }
+};
+xhr.send();
+```
+
+```javascript
+const xmlString = `
+<sbirka>
+  <kniha>
+    <autor>Franz Kafka</autor>
+    <nazev>Proměna</nazev>
+  </kniha>
+</sbirka>`;
+
+const parser = new DOMParser();
+const xmlDoc = parser.parseFromString(xmlString, "text/xml");
+
+const kniha = xmlDoc.getElementsByTagName("kniha")[0];
+const autor = kniha.getElementsByTagName("autor")[0].textContent;
+console.log(autor); // Franz Kafka
+```
