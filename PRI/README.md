@@ -896,3 +896,116 @@ $jmeno = $data["jmeno"] ?? "neznámý";
 echo json_encode(["vzkaz" => "Ahoj, $jmeno"]);
 ?>
 ```
+
+## 12.
+
+### DOM XML v PHP
+- PHP má vestavěnou třídu `DOMDocument`
+- umožňuje načítání, čtení, úpravy a zápis XML
+
+#### knihy.xml
+```xml
+<sbirka>
+  <kniha>
+    <autor>Franz Kafka</autor>
+    <nazev>Proměna</nazev>
+  </kniha>
+  <kniha>
+    <autor>George Orwell</autor>
+    <nazev>1984</nazev>
+  </kniha>
+</sbirka>
+```
+
+#### Čtení
+```php
+<?php
+$xml = new DOMDocument();
+$xml->load("knihy.xml");
+
+$knihy = $xml->getElementsByTagName("kniha");
+
+foreach ($knihy as $kniha) {
+  $autor = $kniha->getElementsByTagName("autor")[0]->nodeValue;
+  $nazev = $kniha->getElementsByTagName("nazev")[0]->nodeValue;
+  echo "$autor – $nazev<br>";
+}
+?>
+```
+
+#### Úprava
+```php
+<?php
+$xml = new DOMDocument();
+$xml->load("knihy.xml");
+
+$root = $xml->documentElement;
+$nova_kniha = $xml->createElement("kniha");
+
+$autor = $xml->createElement("autor", "Lev Tolstoj");
+$nova_kniha->appendChild($autor);
+
+$nazev = $xml->createElement("nazev", "Válka a mír");
+$nova_kniha->appendChild($nazev);
+
+$root->appendChild($nova_kniha);
+$xml->save("knihy.xml");
+?>
+```
+
+#### Tvorba
+```php
+<?php
+$doc = new DOMDocument("1.0", "UTF-8");
+$doc->formatOutput = true;
+
+// kořen
+$root = $doc->createElement("sbirka");
+$doc->appendChild($root);
+
+// 1. kniha
+$kniha1 = $doc->createElement("kniha");
+$kniha1->setAttribute("id", "1");
+
+$autor1 = $doc->createElement("autor", "Franz Kafka");
+$nazev1 = $doc->createElement("nazev", "Proměna");
+
+$kniha1->appendChild($autor1);
+$kniha1->appendChild($nazev1);
+$root->appendChild($kniha1);
+
+// 2. kniha
+$kniha2 = $doc->createElement("kniha");
+$kniha2->setAttribute("id", "2");
+
+$autor2 = $doc->createElement("autor");
+$autor2->appendChild($doc->createTextNode("George Orwell"));
+
+$nazev2 = $doc->createElement("nazev");
+$nazev2->appendChild($doc->createTextNode("1984"));
+
+$kniha2->appendChild($autor2);
+$kniha2->appendChild($nazev2);
+$root->appendChild($kniha2);
+
+// přístup a změna
+$knihy = $doc->getElementsByTagName("kniha");
+$knihy[0]->getElementsByTagName("nazev")[0]->nodeValue = "Zámek";
+
+// uložení
+$doc->save("vystup.xml");
+```
+Výstup tvorby
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<sbirka>
+  <kniha id="1">
+    <autor>Franz Kafka</autor>
+    <nazev>Zámek</nazev>
+  </kniha>
+  <kniha id="2">
+    <autor>George Orwell</autor>
+    <nazev>1984</nazev>
+  </kniha>
+</sbirka>
+```
