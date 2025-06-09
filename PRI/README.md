@@ -855,3 +855,44 @@ try {
   echo "Hotovo";
 }
 ```
+
+## 11.
+
+### Odeslání JSON z klienta na server
+- `json_encode`
+- `json_decode`
+
+#### example.html
+```html
+<!DOCTYPE html>
+<html>
+  <body>
+    <button id="btn">Odeslat</button>
+    <script>
+      document.getElementById("btn").addEventListener("click", () => {
+        const data = { jmeno: "Anna" };
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "server.php", true);
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            const odpoved = JSON.parse(xhr.responseText);
+            console.log(odpoved.vzkaz); // Ahoj, Anna
+          }
+        };
+        xhr.send(JSON.stringify(data));
+      });
+    </script>
+  </body>
+</html>
+```
+
+#### server.php
+```php
+<?php
+header("Content-Type: application/json");
+$data = json_decode(file_get_contents("php://input"), true);
+$jmeno = $data["jmeno"] ?? "neznámý";
+echo json_encode(["vzkaz" => "Ahoj, $jmeno"]);
+?>
+```
