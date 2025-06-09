@@ -1009,3 +1009,62 @@ Výstup tvorby
   </kniha>
 </sbirka>
 ```
+
+## 13.
+
+### SimpleXML
+- jednodušší než DOMDocument
+- vhodné pro čtení XML (ne moc pro úpravy)
+- XML převede přímo na objekt (typu SimpleXMLElement)
+  - objektový přístup: $xml->kniha[0]->autor
+  - přístup k atributům: $kniha["id"]
+  - přetypování je doporučeno: (string), (int), …
+  - iteruje se pomocí foreach – jako u pole
+
+#### Načtení XML
+```php
+<?php
+$xml = simplexml_load_file("knihy.xml");
+
+echo "<h3>Výpis knih:</h3>";
+
+foreach ($xml->kniha as $kniha) {
+  $id = (string) $kniha["id"];
+  $autor = (string) $kniha->autor;
+  $nazev = (string) $kniha->nazev;
+
+  echo "<p>[$id] $autor – $nazev</p>";
+}
+?>
+```
+
+#### XSLT
+```php
+$xml = new DOMDocument();
+$xml->load("knihy.xml");
+
+$xsl = new DOMDocument();
+$xsl->load("sablona.xsl");
+
+$proc = new XSLTProcessor();
+$proc->importStylesheet($xsl);
+
+echo $proc->transformToXML($xml);
+```
+
+#### sablona.xsl
+```xsl
+<?xml version="1.0"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <xsl:template match="/sbirka">
+    <html><body>
+      <xsl:for-each select="kniha">
+        <p>
+          <xsl:value-of select="autor" /> –
+          <xsl:value-of select="nazev" />
+        </p>
+      </xsl:for-each>
+    </body></html>
+  </xsl:template>
+</xsl:stylesheet>
+```
