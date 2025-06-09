@@ -493,3 +493,54 @@ name, width, height {
   </xsl:template>
 </xsl:stylesheet>
 ```
+
+## 5.
+
+### XPath
+- XPath = XML Path Language
+- indexace je od 1, ne od 0
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<sbirka>
+  <kniha id="b1" jazyk="cs">
+    <autor>Franz Kafka</autor>
+    <nazev>Proměna</nazev>
+    <rok_vydani>1915</rok_vydani>
+    <naklad>30000</naklad>
+  </kniha>
+  <kniha id="b2" jazyk="en">
+    <autor>George Orwell</autor>
+    <nazev>1984</nazev>
+    <rok_vydani>1949</rok_vydani>
+    <naklad>500000</naklad>
+  </kniha>
+  <kniha id="b3" jazyk="ru">
+    <autor>Lev Tolstoj</autor>
+    <nazev>Válka a mír</nazev>
+    <rok_vydani>1869</rok_vydani>
+    <naklad>100000</naklad>
+  </kniha>
+</sbirka>
+```
+
+```
+/sbirka/kniha/nazev                         <--- všechny názvy knih (absolutní cesta)
+/sbirka/kniha[1]/nazev                      <--- název první knihy
+/sbirka/kniha[last()]/autor                 <--- autor poslední knihy
+//autor                                     <--- všichni autoři (kdekoli v dokumentu)
+//kniha[@jazyk='cs']                        <--- knihy psané česky
+//kniha[@id='b2']/nazev                     <--- název knihy s id="b2"
+//kniha/naklad[text() > 100000]             <--- náklady větší než 100 000
+//kniha[naklad > 100000]/nazev              <--- názvy knih s nákladem > 100 000
+//kniha[autor='Franz Kafka']/rok_vydani     <--- rok vydání Kafkovy knihy
+//kniha[2]/@jazyk                           <--- jazyk druhé knihy
+//kniha/@id                                 <--- všechny hodnoty atributu id
+//kniha[1]/../kniha[2]/nazev                <--- název druhé knihy (přes relativní cestu)
+//kniha[1]/nazev/text()                     <--- text názvu první knihy
+//kniha[@jazyk='ru'][position()=1]/autor    <--- autor první ruské knihy
+//kniha[rok_vydani < 1900]/nazev            <--- knihy vydané před rokem 1900
+//kniha[position() mod 2 = 1]/nazev         <--- názvy knih na lichých pozicích
+//*                                         <--- všechny elementy v dokumentu
+//@*                                        <--- všechny atributy v dokumentu
+```
