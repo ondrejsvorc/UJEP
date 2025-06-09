@@ -20,7 +20,7 @@
 7. JavaScript a DOM HTML (události, event listener, ...)
 8. JavaScript a DOM XML (získání a procházení DOM, XMLHttpRequest, ...)
 9. PHP (syntaxe, struktura, formuláře, práce se soubory)
-10. PHP (pole, objekty, výjimky, )
+10. PHP (pole, objekty, výjimky)
 11. PHP a JSON (jak odeslat konkrétní parametr na PHP, jak ho PHP zpracuje a jak klientovi vrátí JSON - resp. odesílání JSON z klienta na server a ze serveru zpátky na klienta)
 12. PHP a DOM XML
 13. SimpleXML, PHP a XSLT
@@ -227,4 +227,269 @@ Element `kniha` je kořenovým elementem a zároveň rodičem elementu `autor`. 
 ```
 ```xml
 <student id="s001" obor="ekonomie" aktivni="ano"/>
+```
+
+## 3.
+
+### XML Schema
+- novější alternativa k DTD
+- narozdíl od DTD:
+  - podporuje datové typy
+  - podporuje jmenné prostory
+  - píše se v XML
+- způsob, kterým se píše XML Schema se řídí dle XML Schema Definition (XSD)
+- `<xs:schema>` = kořenový element
+  - atributy:
+    - `xmlns:xs`
+    - `targetNamespace`
+    - `xmlns`
+    - `elementFormDefault`
+- `<xs:element>` = deklarace elementu
+  - atributy:
+    - `name` = název elementu
+    - `type` = datový typ elementu
+    - `default` = implicitní hodnota elementu
+    - `fixed` = fixní/konstantní hodnota elementu
+- `<xs:attribute>` = deklarace atributu
+  - atributy:
+    - `name` = název atributu
+    - `type` = datový typ atributu
+    - `default` = implicitní hodnota atributu
+    - `fixed` = fixní/konstantní hodnota atributu
+    - `use="required"` = označení atributu jako povinného
+- datové typy:
+  - `xs:string` = textový řetězec
+  - `xs:decimal` = desetinné číslo
+  - `xs:integer` = celé číslo
+  - `xs:boolean` = pravdivostní hodnota
+  - `xs:date` = datum
+  - `xs:time` = čas
+
+
+#### class.xml
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<class
+  xmlns="http://www.mojeschema.cz"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://www.mojeschema.cz class.xsd">
+  <student>
+    <firstname>Graham</firstname>
+    <lastname>Bell</lastname>
+    <age>20</age>
+  </student>
+</class>
+```
+
+#### class.xsd
+```xml
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema"
+           targetNamespace="http://www.mojeschema.cz"
+           xmlns="http://www.mojeschema.cz"
+           elementFormDefault="qualified">
+  <xs:element name="class">
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="student">
+          <xs:complexType>
+            <xs:sequence>
+              <xs:element name="firstname" type="xs:string"/>
+              <xs:element name="lastname" type="xs:string"/>
+              <xs:element name="age" type="xs:int"/>
+            </xs:sequence>
+          </xs:complexType>
+        </xs:element>
+      </xs:sequence>
+    </xs:complexType>
+  </xs:element>
+</xs:schema>
+```
+
+### XSD omezení
+- synonymum fazety
+- používají se pro definici přípustných hodnot elementů a atributů
+
+```xml
+<xs:element name="cena">
+  <xs:simpleType>
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="10"/>
+      <xs:maxInclusive value="100"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:element>
+```
+
+```xml
+<xs:element name="ovoce">
+  <xs:simpleType>
+    <xs:restriction base="xs:string">
+      <xs:enumeration value="jablko"/>
+      <xs:enumeration value="pomeranč"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:element>
+```
+
+```xml
+<xs:element name="jmeno">
+  <xs:simpleType>
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[A-Z][a-z]{2}"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:element>
+```
+
+```xml
+<xs:element name="heslo">
+  <xs:simpleType>
+    <xs:restriction base="xs:string">
+      <xs:minLength value="5"/>
+      <xs:maxLength value="12"/>
+    </xs:restriction>
+  </xs:simpleType>
+</xs:element>
+```
+
+```xml
+<xs:whiteSpace value="preserve"/> <!-- zachová vše tak, jak je: mezery, taby, nové řádky -->
+<xs:whiteSpace value="replace"/>  <!-- tabulátory a nové řádky se nahradí mezerami -->
+<xs:whiteSpace value="collapse"/> <!-- všechny mezery se zredukují na jednu -->
+```
+
+### XSD indikátory
+- dělí se na indikátory:
+  - pořadí:
+    - `<xs:all></xs:all>` = všechny podřízené elementy se musí vyskytovat, ale na pořadí nezáleží
+    - `<xs:choice></xs:choice>` = musí se vyskytovat pouze jeden z podřízených elementů
+    - `<xs:sequence></xs:sequence>` = všechny podřízené elementy se musí vyskytovat v daném pořadí
+  - výskytu:
+    - atribut `minOccurs` = minimální počet výskytů (implicitně 1)
+    - atribut `maxOccurs` = maximální počet výskytů (implicitně 1)
+  - skupiny:
+    - `<xs:group name=""></xs:group>` = skupina elementů, kterou lze znovu použít
+    - `<xs:attributeGroup name=""></xs:attributeGroup>` = skupina atributů, kterou lze znovu použít
+
+```xml
+<xs:all>
+  <xs:element name="firstName" type="xs:string"/>
+  <xs:element name="lastName" type="xs:string"/>
+</xs:all>
+```
+
+```xml
+<xs:choice>
+  <xs:element name="email" type="xs:string"/>
+  <xs:element name="phone" type="xs:string"/>
+</xs:choice>
+```
+
+```xml
+<xs:sequence>
+  <xs:element name="firstName" type="xs:string"/>
+  <xs:element name="lastName" type="xs:string"/>
+</xs:sequence>
+```
+
+```xml
+<xs:element name="middleName" type="xs:string" minOccurs="0"/>
+```
+
+```xml
+<xs:group name="addressGroup">
+  <xs:sequence>
+    <xs:element name="street" type="xs:string"/>
+    <xs:element name="city" type="xs:string"/>
+  </xs:sequence>
+</xs:group>
+```
+```xml
+<xs:group ref="addressGroup"/>
+```
+
+```xml
+<xs:attributeGroup name="commonAttrs">
+  <xs:attribute name="id" type="xs:ID"/>
+  <xs:attribute name="lang" type="xs:string"/>
+</xs:attributeGroup>
+```
+```xml
+<xs:complexType>
+  <xs:attributeGroup ref="commonAttrs"/>
+</xs:complexType>
+```
+
+## 4.
+
+### XML a CSS
+- CSS = **C**ascading **S**tyle **S**heets (kaskádové styly)
+- soubor .xml se po otevření v prohlížeči zobrazuje jako text
+- CSS umožňuje obsah .xml souboru zobrazit v hezké grafické podobě
+
+table.xml
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/css" href="table.css"?>
+<table>
+  <name>Stůl</name>
+  <width>100</width>
+  <height>50</height>
+</table>
+```
+table.css
+```css
+table {
+  border: 1px solid black;
+}
+
+name, width, height {
+  display: block;
+  margin: 5px;
+}
+```
+
+### XML a XSL
+- XSL = E**x**tensible **S**tylesheet **L**anguage
+- umožňuje transformaci XML do jiného formátu (např. HTML)
+- dále umožňuje filtrování, řazení, podmínky a smyčky
+- skládá se z:
+  - XSL se skládá z:
+    - XSLT – jazyk pro transformaci
+    - XPath – navigace a výběr dat
+
+```xml
+<?xml version="1.0" encoding="UTF-8"?>
+<?xml-stylesheet type="text/xsl" href="sbirka.xsl"?>
+<sbírka>
+  <kniha>
+    <autor>Tolstoj</autor>
+    <název>Válka a mír</název>
+  </kniha>
+</sbírka>
+```
+
+```xsl
+<?xml version="1.0" encoding="UTF-8"?>
+<xsl:stylesheet version="1.0" xmlns:xsl="http://www.w3.org/1999/XSL/Transform">
+  <xsl:template match="/">
+    <html>
+      <body>
+        <h1>Sbírka knih</h1>
+        <table border="2">
+          <tr bgcolor="yellow">
+            <th>Autor</th>
+            <th>Název</th>
+          </tr>
+          <xsl:for-each select="sbírka/kniha">
+            <tr>
+              <td><xsl:value-of select="autor"/></td>
+              <td><xsl:value-of select="název"/></td>
+            </tr>
+          </xsl:for-each>
+        </table>
+      </body>
+    </html>
+  </xsl:template>
+</xsl:stylesheet>
 ```
