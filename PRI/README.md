@@ -618,3 +618,94 @@ xhr.onload = () => {
 };
 xhr.send();
 ```
+
+## 7.
+
+### DOM
+- DOM = Document Object Model
+- objektová reprezentace HTML/XML dokumentu jako stromu uzlů
+- každý HTML element je objekt
+- přístup ke každému uzlu: čtení, úprava, mazání, přidávání
+
+### Základní JavaScript metody pro manipulaci s DOM
+- `document.getElementById`
+- `document.querySelector`
+- `document.querySelectorAll`
+- `document.getElementsByClassName`
+- `document.getElementsByTagName`
+
+```html
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+  <meta charset="UTF-8" />
+  <title>DOM demo</title>
+</head>
+<body>
+  <h1 id="nadpis">Nadpis</h1>
+  <p class="paragraf">První odstavec</p>
+  <p class="paragraf">Druhý odstavec</p>
+  <div id="box">
+    <span class="info">Info 1</span>
+    <span class="info">Info 2</span>
+  </div>
+  <button id="tlacitko">Klikni</button>
+</body>
+</html>
+```
+
+```javascript
+document.getElementById("nadpis");                  // <h1 id="nadpis">Nadpis</h1>
+document.getElementsByClassName("paragraf");        // HTMLCollection(2) [<p>, <p>]
+document.getElementsByTagName("span");              // HTMLCollection(2) [<span>, <span>]
+document.querySelector("div#box span.info");        // <span class="info">Info 1</span>
+document.querySelectorAll("p.paragraf");            // NodeList(2) [<p>, <p>]
+```
+
+```javascript
+const nadpis = document.getElementById("nadpis");
+nadpis.textContent = "Nový nadpis";
+```
+
+```javascript
+const p = document.querySelector(".paragraf");
+p.innerHTML = "<strong>Tučný text</strong>";
+```
+
+### Event
+- česky událost
+- akce, která se stane v dokumentu (např. kliknutí, pohyb myši, stisk klávesy)
+- typy událostí:
+  - onclick = kliknutí
+  - oninput = změna hodnoty ve vstupním elementu
+  - onsubmit = odeslání formuláře
+  - onblur = element ztratí focus
+  - ...
+- s prefixem `on` se píšou do HTML, bez prefixu se pak píšou do `.addEventListener` (např. onclick v HTML, ale click v .addEventListener)
+
+### Event Listener
+- naslouchá události a reaguje na ni funkcí
+
+```javascript
+const btn = document.getElementById("tlacitko");
+btn.addEventListener("click", () => {
+  alert("Klik!");
+});
+```
+```javascript
+btn.removeEventListener("click", funkce);
+```
+```html
+<form id="formular">
+  <input type="text" placeholder="Zadej něco..." />
+  <button type="submit">Odeslat</button>
+</form>
+```
+
+```javascript
+const form = document.getElementById("formular");
+form.addEventListener("submit", (e) => {
+  e.preventDefault(); // zabrání odeslání formuláře
+  console.log("Formulář byl zachycen.");
+});
+```
