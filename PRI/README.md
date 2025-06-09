@@ -97,6 +97,12 @@ Element `kniha` je kořenovým elementem a zároveň rodičem elementu `autor`. 
 - slouží jako metadata (data o datech) - aby přidaly další informace o daném elementu
 - může být přepsán na vnořený element daného elementu
 
+### Globální built-in atributy
+- `<student xml:space="" xml:lang=""></student>`
+- `xml:space="default"` = zbaví se nadbytečných mezer
+- `xml:space="preserve"` = ponechá mezery
+- `xml:lang="cs"` = říká, že obsah daného elementu je v češtině
+
 ### Entita
 - dělí se na:
   - interní = náhrada textem v dokumentu
@@ -120,8 +126,8 @@ Element `kniha` je kořenovým elementem a zároveň rodičem elementu `autor`. 
 - standardně má být URI nějaká URL adresa, která vysvětluje strukturu daného XML dokumentu, ale ve skutečnosti místo URI můžeme napsat cokoliv - je to jen unikátní identifikátor daného jméného prostoru
 
 ### Well-formed vs Validní XML dokument
-- well-formed = dodržuje základní syntaktická pravidla XML a může být zpracován XML parserem
-- validní = je well-formed + struktura je validní dle DTD/XSD
+- well-formed = dodržuje syntaktická pravidla XML a může být zpracován XML parserem
+- validní = je well-formed + struktura vyhovuje DTD/XSD
 
 ### Komentář
 - `<!-- Toto je komentář -->`
@@ -129,3 +135,96 @@ Element `kniha` je kořenovým elementem a zároveň rodičem elementu `autor`. 
 - atributy elementů nemohou být zakomentovány
 - nemůže se nacházet nad XML prologem
 - je ignorován parsery
+
+## 2.
+
+### DTD
+- DTD = **D**ocument **T**ype **D**efinition
+- dělí se na:
+  - interní = definovaný uvnitř XML dokumentu zaobalený v `<!DOCTYPE>`
+  - externí = definovaný mimo XML dokument
+  - případně lze tyto dva přístupy kombinovat, interní má větší prioritu
+- definuje strukturu a legální elementy a atributy XML dokumentu
+- externí DTD náchylné na XXE útok
+- `#PCDATA` = Parsed Character Data
+
+#### Interní DTD
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE note [
+  <!ELEMENT note (to,from,heading,body)>
+  <!ELEMENT to (#PCDATA)>
+  <!ELEMENT from (#PCDATA)>
+  <!ELEMENT heading (#PCDATA)>
+  <!ELEMENT body (#PCDATA)>
+]>
+<note>
+  <to>Tove</to>
+  <from>Jani</from>
+  <heading>Reminder</heading>
+  <body>Don't forget me this weekend!</body>
+</note>
+```
+
+#### Externí DTD
+```xml
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<!DOCTYPE note SYSTEM "note.dtd">
+<note>
+  <to>Tove</to>
+  <from>Jani</from>
+  <heading>Reminder</heading>
+  <body>Don't forget me this weekend!</body>
+</note>
+```
+#### note.dtd
+```xml
+<!ELEMENT note (to,from,heading,body)>
+<!ELEMENT to (#PCDATA)>
+<!ELEMENT from (#PCDATA)>
+<!ELEMENT heading (#PCDATA)>
+<!ELEMENT body (#PCDATA)>
+```
+
+### DTD značky
+- `<!DOCTYPE>` = deklarace typu dokumentu
+- `<!ELEMENT>` = deklarace dokumentu
+- `<!ATTLIST>` = deklarace atributů
+- `<!ENTITY>` = deklarace entity
+
+### ELEMENT
+```xml
+<!ELEMENT jmeno (#PCDATA)>        <!-- text -->
+<!ELEMENT prazdny EMPTY>          <!-- prázdný obsah -->
+<!ELEMENT vsechno ANY>            <!-- libovolný obsah -->
+<!ELEMENT osoba (jmeno, vek?)>    <!-- , = sekvence, ? = nula nebo jeden -->
+<!ELEMENT rodina (osoba+)>        <!-- + = jeden a více -->
+<!ELEMENT multi (a | b)>          <!-- | = buď a, nebo b -->
+```
+
+### DTD entity
+```xml
+<!ENTITY autor "Jan Novak">
+<autor>&autor;</autor>
+```
+
+### CDATA
+- CDATA = Character Data
+- narozdíl od PCDATA není parsovaný XML parserem
+- ekvivalentní zápisy:
+  - `<msg><![CDATA[2 < 5]]></msg>` = zde je obsahem dá se říct literál `2 < 5`
+  - `<msg>2 &lt; 5</msg>` = zde je obsahem PCDATA a entita `&lt;` je parsována
+
+### ATTLIST
+- `<!ATTLIST název_elementu název_atributu typ implicitní_hodnota>`
+```xml
+<!ATTLIST student
+  id ID #REQUIRED                             <!-- unikátní identifikátor, povinný -->
+  obor (informatika|ekonomie) "informatika"   <!-- výčet, výchozí hodnota je "informatika" -->
+  aktivni CDATA #IMPLIED                      <!-- volitelný textový atribut -->
+  jazyk CDATA #FIXED "cz"                     <!-- neměnný textový atribut, vždy "cz" -->
+>
+```
+```xml
+<student id="s001" obor="ekonomie" aktivni="ano"/>
+```
