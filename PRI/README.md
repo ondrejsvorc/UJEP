@@ -544,3 +544,77 @@ name, width, height {
 //*                                         <--- všechny elementy v dokumentu
 //@*                                        <--- všechny atributy v dokumentu
 ```
+
+## 6.
+
+### JavaScript
+- skriptovací, interpretovaný jazyk s dynamickým typovým systémem
+- proměňuje statickou stránku na dynamickou
+- využití:
+  - interakce s uživatelem
+  - manipulace s HTML elementy
+  - dynamické vykreslování obsahu
+
+### JSON
+- JSON = **J**ava**S**cript **O**bject **N**otation
+- klíče i hodnoty jsou v uvozovkách (kromě čísel, boolean, null)
+- struktura: objekty `{}`, pole `[]`, primitivní typy
+- serializace = převod objektu na JSON (`JSON.parse`)
+- deserializace = převod JSON na objekt (`JSON.stringify`)
+
+#### person.json
+```json
+{
+  "jmeno": "Jan",
+  "vek": 25,
+  "student": true,
+  "znamky": [1, 2, 3],
+  "kontakt": {
+    "email": "jan@example.com"
+  }
+}
+```
+
+### Serializace
+```javascript
+const json = `{
+  "jmeno": "Jan",
+  "vek": 25,
+  "student": true,
+  "znamky": [1, 2, 3],
+  "kontakt": {
+    "email": "jan@example.com"
+  }
+}`;
+
+const person = JSON.parse(json);
+```
+
+### Deserializace
+```javascript
+const person = {
+  jmeno: "Jan",
+  vek: 25,
+  student: true,
+  znamky: [1, 2, 3],
+  kontakt: {
+    email: "jan@example.com"
+  }
+};
+
+const json = JSON.stringify(person);
+```
+
+```javascript
+const xhr = new XMLHttpRequest();
+xhr.open("GET", "person.json", true);
+xhr.onload = () => {
+  if (xhr.status !== 200) {
+    console.error("Chyba při načítání JSON:", xhr.status);
+    return;
+  }
+  const person = JSON.parse(xhr.responseText);
+  console.log(person.jmeno); // "Jan"
+};
+xhr.send();
+```
