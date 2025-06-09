@@ -776,25 +776,15 @@ console.log(autor); // Franz Kafka
 - kód uvnitř `<?php ?>`
 - proměnné začínají `$`
 
-```php
-<?php
-
-echo "Ahoj";
-$x = 5;
-$y = "text";
-
-?>
-```
-
-```php
-$pole = array(1, 2, 3);        // indexované
-$osoba = [                     // asociativní
-  "jmeno" => "Anna",
-  "vek" => 22
-];
-
-echo $osoba["jmeno"];          // Anna
-```
+### HTML formulář
+- párový tag, který umožňuje uživatelům zadávat a odesílat data
+- má 2 hlavní atributy = action a method
+- action = cesta ke skriptu, kterému se posílají data formuláře
+- method = HTTP metoda, která se použije k odeslání dat (GET, POST)
+  - GET = přenáší data formuláře v URL adrese jako součást adresy (využití: menší data, filtrování)
+  - POST = přenáší data formuláře v těle požadavku (využití: větší nebo citlivá data)
+- přístup v superglobálních proměnných $_POST a $_GET (asociativní pole)
+- klíčem je hodnota atributu `name` konkrétního formulářového prvku
 
 ```html
 <form method="post" action="zpracuj.php">
@@ -814,4 +804,54 @@ $obsah = file_get_contents("data.txt");         // čtení
 $f = fopen("data.txt", "w");
 fwrite($f, "text");
 fclose($f);
+```
+
+## 10.
+
+### Pole
+```php
+$pole = array(1, 2, 3);        // indexované
+$osoba = [                     // asociativní
+  "jmeno" => "Anna",
+  "vek" => 22
+];
+
+echo $osoba["jmeno"];          // Anna
+echo $pole[0]                  // 1
+
+foreach ($pole as $hodnota) {
+  echo $hodnota;
+}
+foreach ($osoba as $klic => $hodnota) {
+  echo "$klic: $hodnota";
+}
+```
+
+### Třída
+```php
+class Osoba {
+  public $jmeno;
+
+  function __construct($jmeno) {
+    $this->jmeno = $jmeno;
+  }
+
+  function pozdrav() {
+    return "Ahoj, jsem $this->jmeno";
+  }
+}
+
+$o = new Osoba("Jan");
+echo $o->pozdrav();             // Ahoj, jsem Jan
+```
+
+### Výjimka
+```php
+try {
+  throw new Exception("Chyba!");
+} catch (Exception $e) {
+  echo $e->getMessage();        // Chyba!
+} finally {
+  echo "Hotovo";
+}
 ```
