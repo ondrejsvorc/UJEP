@@ -768,3 +768,50 @@ const kniha = xmlDoc.getElementsByTagName("kniha")[0];
 const autor = kniha.getElementsByTagName("autor")[0].textContent;
 console.log(autor); // Franz Kafka
 ```
+
+## 9.
+
+### PHP
+- skriptovací jazyk na straně serveru
+- kód uvnitř `<?php ?>`
+- proměnné začínají `$`
+
+```php
+<?php
+
+echo "Ahoj";
+$x = 5;
+$y = "text";
+
+?>
+```
+
+```php
+$pole = array(1, 2, 3);        // indexované
+$osoba = [                     // asociativní
+  "jmeno" => "Anna",
+  "vek" => 22
+];
+
+echo $osoba["jmeno"];          // Anna
+```
+
+```html
+<form method="post" action="zpracuj.php">
+  <input name="jmeno">
+  <button type="submit">Odeslat</button>
+</form>
+```
+```php
+$jmeno = $_POST["jmeno"];     // obsah input elementu
+```
+
+```php
+file_put_contents("data.txt", "text");          // zápis
+$obsah = file_get_contents("data.txt");         // čtení
+```
+```php
+$f = fopen("data.txt", "w");
+fwrite($f, "text");
+fclose($f);
+```
