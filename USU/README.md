@@ -34,6 +34,11 @@
 - lze využít jak pro regresi, tak i pro klasifikaci
 - předpovídá třídu nebo hodnotu nového datového bodu na základě jeho nejbližších sousedů
 - pracuje s principem - body, které jsou si blízko si jsou podobné
+- to, jak jsou od sebe daleko dělá podle euklidovské vzdálenosti
+  - př: máme dva body ve dvourozměrném prostoru, A[x1, y1] a B[x2, y2]
+  - euklidovská vzdálenost mezi těmito dvěma body je dána vzorcem: `d = sqrt((x2 – x1)^2 + (y2 – y1)^2)`
+  - vzorec vypočítá druhou odmocninu ze součtu čtverců rozdílů mezi souřadnicemi dvou bodů
+  - představuje délku úsečky spojující dva body
 
 ### OvR
 - One-vs-rest (jeden vs zbytek)
@@ -62,7 +67,7 @@ model.fit(X_train, y_train)
 ```
 
 #### Regrese
-- cílem regrese je předpovědět spojitou (číslenou) hodnotu
+- cílem regrese je předpovědět spojitou (číselnou) hodnotu
 - např. odhad ceny bytu, předpověď teploty, hmotnost člověka podle výšky
 - hledá přímku, která co nejlépe prochází daty
 - snaží se minimalizovat chybu mezi predikcí a realitou
@@ -70,7 +75,7 @@ model.fit(X_train, y_train)
 
 #### Metriky regrese
 - MAE (Mean absolute error)
-- MSE (Mean squared error)
+- MSE (Mean squared error) = měří průměrnou hodnotu druhých mocnin rozdílů mezi predikovanými a skutečnými hodnotami
 - R^2 score (koeficient determinace)
 
 #### LASSO regrese (L1 regularizace)
@@ -92,7 +97,7 @@ model.fit(X_train, y_train)
 #### Logistická regrese
 - učení s učitelem
 - model tedy ví, co má predikovat a každému vstupu (x) je znám výstup (label, y)
-- lineární model, který predikuje pravděpodobnost patření do třídy
+- model, který predikuje pravděpodobnost patření do třídy
 - využívá sigmoidu
 
 #### Princip logistické regrese
@@ -123,7 +128,7 @@ kde b je tzv. bias - volitelný posun výsledku.
 #### K-means algoritmus
 - iterativní shlukovací algoritmus
 - shluk se nazývá také cluster a shlukování také jako clusterování
-- třídí data do `k` shluků na základě jejich vlastností
+- třídí data do `k` shluků na základě jejich euklidovské vzdálenosti od centroidů
 - parametr `k` se uvádí při volání algoritmu
 - shluky jsou definovány svými centroidy, což jsou body ve stejném prostoru jako shlukované objekty
 - objekty se zařazují do toho shluku, jehož centroidu jsou nejblíže
@@ -173,18 +178,24 @@ kde b je tzv. bias - volitelný posun výsledku.
 #### Accuracy
 - `TP + TN / (TP + TN + FP + FN)` = počet správných klasifikací (ať už pozitivních nebo negativních) děleno počet všech klasifikací
 - kolik toho klasifikujeme správně
+- př.: když máme hodně málo SPAMů, model může dělat 99 % správně jen tím, že řekne „není spam“ pokaždé, takže je to zavádějící
 
 #### Precision
 - prediktivní hodnota pozitivního testu (Positive Predictive Value)
 - `TP / (TP + FP)` = počet správných klasifikací (pouze pozitivních) děleno počet všech klasifikací (pouze pozitivních)
 - jak moc se dá věřit našemu ANO
+- př.: když model řekne "je to spam", jak moc mu můžu věřit?
 
 #### Recall
 - `TP / (TP + FN)` = počet správných klasifikací (pouze pozitivních) děleno počet všech správných pozitivních klasifikací a špatných negativních klasifikací
 - jaký podíl všech ANO odhalíme
+- př.: ze všech skutečných spamů - kolik jich model odhalil?
+- vysoký recall = najdeme skoro všechny spamy, i kdybychom občas označili něco navíc omylem
 
 #### F1 skóre
 - `2 * precision * recall / (precision + recall)`
+- když chceš, aby model byl přesný (precision) a zároveň zachytil dost věcí (recall)
+- je to harmonický průměr, takže trestá extrémy (když jedno je hodně nízko, F1 jde dolů)
 
 #### Matice záměn
 - tabulka, která ukazuje, kolik vstupů bylo správně a kolik špatně klasifikováno
@@ -199,6 +210,18 @@ kde b je tzv. bias - volitelný posun výsledku.
   - TN = správně označený normální e-mail
   - FP = normální e-mail chybně označený jako spam
   - FN = spam chybně označený jako normální
+
+### Škálování
+- většina algoritmů počítá vzdálenosti (a věk a příjem mají hodně jiné měřítka - příjem by se ve výpočtech jevil hned jako důležitější)
+- všechny features jsou po škálování "porovnatelně velké"
+- každý má stejnou důležitost na začátku učení
+- škálování data jen natáhne nebo smrskne do zvoleného rozsahu
+
+### Standardizace
+- převede každou feature tak, aby měla
+  - střední hodnota = 0
+  - směrodatnou odchylka = 1
+- standardizace zachovává tvar rozdělení dat, ale posouvá a rozšiřuje/zužuje ho
 
 ### Redukce dimenzionality
 - cílem je zmenšit počet vstupních proměnných (features), aniž bychom ztratili zásadní informaci
@@ -289,10 +312,12 @@ kde b je tzv. bias - volitelný posun výsledku.
 #### Aktivační funkce
 - sigmoida
 - hyperbolický tangens (tanh) = rozšíření oboru hodnot sigmoidy na interval od -1 do +1
-- relu
-- lulu (leaky relu)
+- relu = max(0, x)
+- lulu (leaky relu) = max(0.1x, x)
 - lineární
 - softmax
+
+![Activation Functions](https://machine-learning.paperspace.com/~gitbook/image?url=https%3A%2F%2F2327526407-files.gitbook.io%2F%7E%2Ffiles%2Fv0%2Fb%2Fgitbook-legacy-files%2Fo%2Fassets%252F-LvBP1svpACTB1R1x_U4%252F-LvNWUoWieQqaGmU_gl9%252F-LvO3qs2RImYjpBE8vln%252Factivation-functions3.jpg%3Falt%3Dmedia%26token%3Df96a3007-5888-43c3-a256-2dafadd5df7c&width=768&dpr=4&quality=100&sign=27b81237&sv=2)
 
 #### Regularizace
 - ochrana proti přeučení (overfitting)
