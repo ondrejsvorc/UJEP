@@ -1,32 +1,50 @@
-# Ředitel banky si u Vás objednal analýzu výsledků dotazníkového šetření realizovaného na skupině zákazníků banky.
-# Jeho dotaz zní: jak bych měl navýšit zisk banky?
-# Vaším úkolem je vymyslet svou vlastní optimální strategii působení na zákazníky tak,
-# aby se vylepšil jejich vztah k bance.
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+load("SatData.RData");
 
-# Mezi marketéry velkých firem se klade zásadní důraz na následující
-# tři proměnné: celková spokojenost, ochota firmu doporučit, víra že u firmy vydržím.
-# Můžete se zaměřit na některou z těchto proměnných, nebo na jejich kombinaci (např. pomocí váženého průměru)
-# a hledat regresní optimální model, na čem tato proměnná závisí.
-# Následně pak vyhodnotíte, na které faktory by se banka měla zaměřit především.
+# Počet respondentů
+nrow(satisfaction)
 
-satisfaction <- get(load("SatData.RData"))
-View(satisfaction)
+# Škála proměnných
+summary(satisfaction)
 
-# Výběr relevantních proměnných (vstupy + výstup)
-model_data <- satisfaction[, c(
-  "reputation", "trustworthiness", "seriousness", "solidness", "care",
-  "exp_products", "exp_services", "service", "solutions",
-  "qual_products", "qual_services", "range_products", "qual_personal", "qual_overall",
-  "benefits", "investments", "quality", "price",
-  "satisfaction"
-)]
+blocks <- list(
+  IMAG = c("reputation","trustworthiness","seriousness","solidness","care"),
+  EXPE = c("exp_products","exp_services","service","solutions","quality"),
+  QUAL = c("qual_products","qual_services","range_products","qual_personal","qual_overall"),
+  VAL  = c("benefits","investments","quality","price"),
+  SAT  = c("satisfaction","expectations","comparison","performance"),
+  LOYX = c("return","recommendation","loyalty")
+)
 
-# Regresní model
-model <- lm(satisfaction ~ ., data = model_data)
+# Extrahuje první hlavní komponenty (PC1 - PCA first component)
+pc1 <- function(df, v) prcomp(df[, v], scale.=TRUE)$x[,1]
 
-# Shrnutí výsledků
+# Vytvoření kompozitních proměnných
+IMAG <- pc1(satisfaction, blocks$IMAG)
+EXPE <- pc1(satisfaction, blocks$EXPE)
+QUAL <- pc1(satisfaction, blocks$QUAL)
+VAL  <- pc1(satisfaction, blocks$VAL)
+SAT  <- pc1(satisfaction, blocks$SAT)
+LOYX <- pc1(satisfaction, blocks$LOYX)
+
+dat <- data.frame(IMAG,EXPE,QUAL,VAL,SAT,LOYX,
+                  switch = satisfaction$switch,
+                  switch_bin = as.integer(satisfaction$switch >= 5))
+
+# Rozdělení podle prahu switch >= 5
+table(dat$switch_bin)
+prop.table(table(dat$switch_bin)) * 100
+
+# Logistická regrese pro odchod klienta
+model <- glm(switch_bin ~ IMAG + EXPE + QUAL + VAL + SAT + LOYX, data=dat, family=binomial)
 summary(model)
 
-# Seřazení prediktorů podle významnosti
-coeffs <- summary(model)$coefficients
-coeffs[order(coeffs[,4]), ]
+# Výpočet odds ratio a intervalů spolehlivosti
+or <- exp(coef(model))
+ci <- exp(confint(model))
+round(cbind(or, ci), 3)
+
+# Vizualizace rozdílů v loajalitě podle odchodu
+boxplot(LOYX ~ switch_bin, data=dat, 
+        names=c("Nechce odejít","Chce odejít"),
+        main="Rozdíl v loajalitě podle rozhodnutí o odchodu")
