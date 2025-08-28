@@ -1,0 +1,2388 @@
+﻿### Start of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM_mnohorozmerne.R
+#######################################
+#### Mnohorozmerna statistika
+
+library(DescTools)
+library(MASS)
+library(RcmdrMisc)
+# nacteni knihoven
+
+#######################################
+### Zobecneni jednorozmernych metod
+
+## Mnohorozmerny dvouvyberovy T-test (Hotellingovo T2)
+# Porovnavame 2 vyucujici na zaklade hodnoceni jejich studentu. 
+#   Je mezi vyucujicimi vyznamny rozdil?
+matematici <- data.frame(ucitel = factor(rep(1:2, c(5, 7))), 
+                         spokojenost = c(1, 3, 2, 4, 3, 2, 6, 4, 5, 5, 3, 4), 
+                         znalost = c(4, 7, 2, 6, 3, 6, 6, 8, 7, 10, 9, 6))
+  # vytvoreni dat
+matematici
+  # ukazka dat
+tapply(matematici$spokojenost, matematici$ucitel, mean)
+tapply(matematici$znalost, matematici$ucitel, mean)
+  # prumerna spokojenost a znalost u jednotlivych ucitelu
+
+# jednorozmerne porovnani
+boxplot(matematici$spokojenost ~ matematici$ucitel)
+boxplot(matematici$znalost ~ matematici$ucitel)
+t.test(matematici$spokojenost ~ matematici$ucitel)
+t.test(matematici$znalost ~ matematici$ucitel)
+  # u znalosti vychazi vyznamny rozdil, u spokojenosti ne
+(m1 <- HotellingsT2Test(cbind(matematici$spokojenost, matematici$znalost) ~ matematici$ucitel))
+  # porovnani obou hodnoceni u ucitelu
+
+## MANOVA - jak se vytvari plasticky film
+# vytvoreni dat
+trhliny <- c(6.5, 6.2, 5.8, 6.5, 6.5, 6.9, 7.2, 6.9, 6.1, 6.3, 6.7, 6.6, 7.2, 7.1, 6.8, 7.1, 7.0, 7.2, 7.5, 7.6)
+lesk <- c(9.5, 9.9, 9.6, 9.6, 9.2, 9.1, 10.0, 9.9, 9.5, 9.4, 9.1, 9.3, 8.3, 8.4, 8.5, 9.2, 8.8, 9.7, 10.1, 9.2)
+sytost <- c(4.4, 6.4, 3.0, 4.1, 0.8, 5.7, 2.0, 3.9, 1.9, 5.7, 2.8, 4.1, 3.8, 1.6, 3.4, 8.4, 5.2, 6.9, 2.7, 1.9)
+Y <- cbind(trhliny, lesk, sytost)
+  # zavisle promenna se sklada ze tri dilcich promennych
+pomer <- factor(gl(2,10), labels = c("Nizky", "Vysoky"))
+prisady <- factor(gl(2, 5, length = 20), labels = c("Nizky", "Vysoky"))
+  # dva nezavisle faktory ... tri zavisle promenne se budou porovnavat v techto skupinach
+
+(fit <- manova(Y ~ pomer * prisady))
+  # vlastni model - na vystupu jsou soucty ctvercu pro kazdou promennou
+summary.aov(fit)
+
+  # H0: Vliv interakcĂ­ nevĂ˝znamnĂ˝
+  # H1: vliv interakcĂ­ vĂ˝znamnĂ˝
+  # p > 0.05 = nezĂˇmĂ­tĂˇm H0
+
+  # tabulky jednorozmernych analyz rozptylu pro kazdou promennou zvlast
+  # na nezavisle promennych zavisi jen trhliny a lesk
+summary(fit, test="Wilks")
+  # existuje nekolik testovych statistik na nichz je zalozena mnohorozmerna analyza rozptylu
+  # R-ko nabizi statistiky: "Pillai", "Wilks", "Hotelling-Lawley", "Roy"
+  # Wilkovo lambda je zobecnenim klasicke F-statistiky z jednorozmerne ANOVy
+summary(fit)
+  summary(fit, test="Hotelling-Lawley")
+  # pouziti jine testove statistiky
+  # interakce nejsou vyznamne
+  
+(fit2 <- manova(Y ~ pomer + prisady))
+summary(fit2)
+  # mira vlivu samostatnych promennych
+
+plotMeans(Y[, 1], pomer, prisady)
+plotMeans(Y[, 2], pomer, prisady)
+plotMeans(Y[, 3], pomer, prisady)
+  # grafy prumeru pro jednotlive faktory
+  # na zavislosti mezi faktory a zavislymi promennymi
+
+#################################
+### Samostatne
+data(mtcars)
+
+## Lisi se ciselne charakteristiky podle poctu valcu?
+Y <- mtcars[, c("mpg", "disp", "hp", "drat", "wt", "qsec", "gear", "carb")]
+fit <- manova(as.matrix(Y) ~ mtcars$cyl)
+summary(fit, test="Wilks")
+summary.aov(fit)
+    # VĹˇechny promÄ›nnĂ© (mpg, disp, hp, drat, wt, qsec, gear, carb) jsou vĂ˝znamnÄ› odliĹˇnĂ© podle poÄŤtu vĂˇlcĹŻ (vĹˇechny p < 0.005).
+
+## Lisi se ciselne charakteristiky podle typu motoru?
+Y <- mtcars[, c("mpg", "disp", "hp", "drat", "wt", "qsec", "gear", "carb")]
+fit <- manova(as.matrix(Y) ~ mtcars$vs)
+summary(fit, test="Wilks")
+summary.aov(fit)
+    # VĂ˝znamnÄ› se liĹˇĂ­: mpg, disp, hp, drat, wt, qsec, carb (p < 0.05).
+    # NevĂ˝znamnĂ˝ rozdĂ­l: gear (p = 0.2579).
+
+## â€žLiĹˇĂ­ se ÄŤĂ­selnĂ© charakteristikyâ€ś znamenĂˇ, Ĺľe auta s rĹŻznĂ˝m poÄŤtem vĂˇlcĹŻ nebo typem motoru majĂ­ v prĹŻmÄ›ru jinĂ© hodnoty (spotĹ™eby, vĂ˝konu, vĂˇhy, atd.) â€” a tento rozdĂ­l nenĂ­ nĂˇhodnĂ˝, ale statisticky vĂ˝znamnĂ˝.
+
+#################################
+# Metoda hlavnich komponent
+
+# VytvĂˇĹ™Ă­ novĂ©, nezĂˇvislĂ© promÄ›nnĂ© (hlavnĂ­ komponenty), kterĂ© zachycujĂ­ co nejvĂ­c pĹŻvodnĂ­ variability dat
+# v co nejmenĹˇĂ­m poÄŤtu dimenzĂ­.
+
+v1 <- c(1,1,1,1,1,1,1,1,1,1,3,3,3,3,3,4,5,6)
+v2 <- c(1,2,1,1,1,1,2,1,2,1,3,4,3,3,3,4,6,5)
+v3 <- c(3,3,3,3,3,1,1,1,1,1,1,1,1,1,1,5,4,6)
+v4 <- c(3,3,4,3,3,1,1,2,1,1,1,1,2,1,1,5,6,4)
+v5 <- c(1,1,1,1,1,3,3,3,3,3,1,1,1,1,1,6,4,5)
+v6 <- c(1,1,1,2,1,3,3,3,4,3,1,1,1,2,1,6,5,4)
+vmat <- data.frame(v1,v2,v3,v4,v5,v6)
+m1 <- cbind(v1,v2,v3,v4,v5,v6)
+  # vytvoreni dat
+
+# Zakladem analyzy hlavnich komponent je korelacni matice
+cor(m1)
+  # korelacni matice
+eigen(cor(m1))
+  # vlastni cisla a vlastni vektory korelacni matice
+
+# Pocet potrebnych hlavnich komponent ma byt pocet vlastnich cisel vetsich nez 1
+screeplot(princomp(m1, cor = T), type="l")
+abline(h=1, col="green")
+  # dostatecne velke procento vyuzite variability (80%)
+  cumsum(eigen(cor(m1))$values / sum(eigen(cor(m1))$values))
+    # prvni 3 komponenty vysvetli pres 90% variability
+
+# Vytvoreni hlavnich komponent  
+prcomp(m1)
+(PC <- prcomp(vmat, scale = T))
+  # hlavni komponenty
+  # vrati variabilitu hlavnich komponent spolu s koeficienty jednotlivych komponent
+plot(PC$x[,1], PC$x[,2], pch = 19, main = "Prvni 2 hlavni komponenty")
+  # vykresleni prvnich dvou hlavnich komponent, ukazuji v datech skupiny
+# maji hlavni komponenty prirozenou interpretaci?
+#   mnohdy ne, pak je potreba pouzit faktorovou analyzu
+
+## Faktorova analyza
+factanal(m1, factors = 3)
+  # faktorova analyza jen prerotuje hlavni komponenty
+  #	metoda rotace 'varimax' je brana jako zakladni (defaultni) 
+  # vypis loadingu a procent vysvetlene variability
+(sc <- factanal(~v1+v2+v3+v4+v5+v6, factors = 3, scores = "Bartlett")$scores)
+  # faktorove skory pro jednotliva pozorovani
+plot(sc[,1], sc[,2], pch = 19, main = "Prvni 2 faktory")
+  # vykresleni prvnich dvou faktoru
+
+################################
+### Samostatne
+
+## Kolik hlavnich komponent/ faktoru je potreba pro reprezentaci ciselnych promennych?
+#   Jak byste pojmenovali faktory? Nakreslete vhodny graf/ grafy.
+data("mtcars")
+m1 <- as.matrix(mtcars[, c("mpg", "disp", "hp", "drat", "wt", "qsec", "gear", "carb")])
+cor(m1)
+eigen(cor(m1))
+screeplot(princomp(m1, cor = TRUE), type = "lines", main = "Screeplot - mtcars")
+abline(h = 1, col = "green")
+cumsum(eigen(cor(m1))$values / sum(eigen(cor(m1))$values))
+pc <- prcomp(m1, scale = TRUE)
+summary(pc)
+print(pc)
+(sc <- factanal(m1, factors = 3, scores = "Bartlett")$scores)
+plot(sc[,1], sc[,2], pch = 19, main = "PrvnĂ­ 2 faktory - mtcars", xlab = "Faktor 1", ylab = "Faktor 2")
+plot(sc[,1], sc[,2], pch = 19, col = "blue", xlab = "Faktor 1 (Velikost)", ylab = "Faktor 2 (VĂ˝kon)", main = "FaktorovĂˇ analĂ˝za - mtcars")
+text(sc[,1], sc[,2], labels = rownames(sc), pos = 4, cex = 0.7)
+
+## Hledejte hlavni komponenty / faktory pro soubor UScrime.
+## (prĂ˝ ale vyĹˇlo 5 faktorĹŻ, ne 2)
+data("UScrime")
+m1 <- as.matrix(UScrime[, c("M", "Ed", "Po1", "LF", "Pop", "GDP", "Ineq")])
+cor(m1)
+eigen(cor(m1))
+screeplot(princomp(m1, cor = TRUE), type = "lines", main = "Screeplot - mtcars")
+abline(h = 1, col = "green")
+cumsum(eigen(cor(m1))$values / sum(eigen(cor(m1))$values))
+pc <- prcomp(m1, scale = TRUE)
+summary(pc)
+print(pc)
+(sc <- factanal(m1, factors = 2, scores = "Bartlett")$scores)
+plot(sc[,1], sc[,2], pch = 19, main = "PrvnĂ­ 2 faktory - UScrime", xlab = "Faktor 1", ylab = "Faktor 2")
+### End of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM_mnohorozmerne.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM_mnohorozmerne2.R
+###########################
+library(MASS)
+  # knihovna s nastroji mnohorozmerne statistiky
+
+## Diskriminacni analyza
+Iris <- data.frame(rbind(iris3[,,1], iris3[,,2], iris3[,,3]), Sp = rep(c("s","c","v"), rep(50,3)))
+  # databaze o trech druzich kosatcu: Setosa (s), Versicolour (c), Virginica (v)
+  # mereny jsou 4 ukazatele: sepal length & width, petal length & width
+  #	kalisni a okvetni listek, vzdy delka a sirka
+train <- sample(1:150, 75)
+  # nahodny vyber 75 rostlin z cele databaze
+table(Iris$Sp[train])
+  # vstupni data do diskriminacni analyzy ... rostliny, u nichz presne zname druh
+(z <- lda(Sp ~ ., Iris, prior = c(1,1,1)/3, subset = train))
+  # linearni diskriminacni analyza
+  # vystup: vstupni (apriori) pravdepodobnosti ... jake je ocekavane zastoupeni skupin v populaci 
+  #	prumery promennych ve skupinach a koeficienty linearnich diskriminacnich funkci
+predict(z, Iris[-train, ])$x
+  # vysledne hodnoty diskriminacnich funkci
+predict(z, Iris[-train, ])$posterior
+  # pravdepodobnosti zarazeni do jednotlivych populaci
+predict(z, Iris[-train, ])$class
+  # na zaklade vytvorene klasifikacni funkce priradi nova mereni do skupin
+  #	vybere idealni skupinu + vypocte pravdepodobnosti s nimiz do jednotlivych skupin patri
+table(Iris[-train,"Sp"], predict(z, Iris[-train, ])$class)
+  # klasifikacni tabulka, jak dobre se trefim: v radcich skutecne hodnoty, ve sloupcich predikce
+
+#########################
+### Samostatne
+
+# vyzkousejte si na datech z biopsie
+data("biopsy")
+  # jak vypada diskriminacni funkce rozlisujici zhoubny a nezhoubny nador?
+
+#########################
+## Shlukova analyza
+
+# budem delit americke staty do skupin na zaklade 4 ukazatelu: vrazdy, napadeni, populace, znasilneni
+hc <- hclust(dist(USArrests), "ave")
+  # hierarchicke clusterovani metodou average linkage
+  # vstupem je matice vzdalenosti jednotlivych bodu
+plot(hc, hang = -1)
+  # nakresleni dendrogramu - postup, jak shlukuje
+  #	nejprve ma kazde pozorovani svou vlastni skupinu, a ty se pak spojuji do vetsich celku
+  #	mozny je i obraceny postup, tj. od jedne velke skupiny k mnoha malym
+  # na graf se podivam a urcuji pocet skupin, ktere v nem vidim
+seg <- cutree(hc, k = 4)
+  # rozdeli data do 4 skupin
+rect.hclust(hc, k=4, border="red")
+  # mohu si nechat zobrazit skupiny do dendrogramu
+
+# Jak vypadaji segmenty v datech?
+  # v datech mam jen 4 promenne, mohu si nechat vykreslit
+plot(USArrests$Murder, USArrests$Assault, col = seg, pch = 19)
+plot(USArrests$UrbanPop, USArrests$Assault, col = seg, pch = 19)
+plot(USArrests$Rape, USArrests$Assault, col = seg, pch = 19)
+  # pro segmentaci je klicova promenna Assault - proc?
+
+USArrests.sc <- scale(USArrests)
+  # spocitame standardizovane promenne
+hc.sc <- hclust(dist(USArrests.sc), "ave")
+plot(hc.sc, hang = -1)
+  # zde jsou videt 2 velke skupiny nebo 5 mensich (s jednim outlierem)
+seg.sc <- cutree(hc.sc, k = 5)
+  # rozdeli data do 5 skupin
+table(seg, seg.sc)
+  # dame-li vsem promennym stejnou vahu, rozdeli se mi staty jinak
+
+plot(USArrests$Murder, USArrests$Assault, col = seg.sc, pch = 19)
+plot(USArrests$UrbanPop, USArrests$Rape, col = seg.sc, pch = 19)
+  # zde je videt odlehla Aljaska
+
+# vykresleni skupin v prvnich dvou hlavnich komponentach
+pc <- prcomp(USArrests, scale = T)$x
+plot(pc[,1], pc[,2], col = seg.sc, pch = 19)
+  # rozdeleni do skupin je dobre videt
+
+# V praxi se casteji pouziva metoda complete linkage
+hc.sc2 <- hclust(dist(USArrests.sc))
+plot(hc.sc2, hang = -1)
+    # zde mi dendogram jasne deli data na 4 skupiny
+
+# nebo Wardova metoda, ktera dava vetsinou "nejhezci" dendrogram
+hc.sc3 <- hclust(dist(USArrests.sc), method = "ward.D2")
+plot(hc.sc3, hang = -1)
+  # opet jsou krasne videt 4 skupiny, i kdyz trochu jine nez ty ziskane pomoci complete linkage
+
+seg.sc2 <- cutree(hc.sc2, k = 4)
+  # rozdeli data do 4 skupin - complete linkage
+seg.sc3 <- cutree(hc.sc3, k = 4)
+  # rozdeli data do 4 skupin - Wardova metoda
+
+table(seg, seg.sc2)
+table(seg.sc, seg.sc2)
+table(seg.sc2, seg.sc3)
+  # kontrola, jak vznikle skupiny souhlasi s predchozimi delenimi
+
+# Zakresleni aktualniho deleni do skupin
+plot(USArrests$Murder, USArrests$Assault, col = seg.sc2, pch = 19)
+plot(USArrests$UrbanPop, USArrests$Rape, col = seg.sc2, pch = 19)
+plot(pc[,1], pc[,2], col = seg.sc2, pch = 19)
+  # nahlavnich komponentachvychazi pekne
+
+# je mozne vysledne segmenty popsat pomoci puvodnich promennych
+tapply(USArrests$Murder, as.factor(seg.sc2), mean)
+tapply(USArrests$Assault, as.factor(seg.sc2), mean)
+tapply(USArrests$UrbanPop, as.factor(seg.sc2), mean)
+tapply(USArrests$Rape, as.factor(seg.sc2), mean)
+  # pro vybranou promennou spocita prumery za jednotlive shluky
+
+# K-means clustering
+require(graphics)
+
+seg.km <- kmeans(USArrests.sc, 4)
+  # pocet skupin beru na zaklade predesleho hierarchickeho shlukovani
+table(seg.sc2, seg.km$cluster)
+  # jak vychazi metoda K-means v porovnani s hierarchickym shlukovanim
+plot(USArrests$Murder, USArrests$Assault, col = seg.km$cluster, pch = 19)
+plot(USArrests$UrbanPop, USArrests$Rape, col = seg.km$cluster, pch = 19)
+plot(pc[,1], pc[,2], col = seg.km$cluster, pch = 19)
+  # rozlozeni do skupin je velmi podobne
+seg.km$centers
+  # vidime stredy shluku u standardizovanych promennych
+
+#########################
+### Samostatne
+
+# vyzkousejte si na datech o krabech
+data("crabs")
+  # segmentujte na zaklade ciselnych promennych (4.-8. sloupec)
+  # nebyla by lepsi segmentace na zaklade hlavnich komponent/ faktoru?
+
+# pouzijte data fgl - chemicke slozeni ulomku skel
+data("fgl")
+  # vyzkousejte na nich diskriminacni analyzu i shlukovou analyzu
+
+#########################
+
+## Kanonicka korelace
+#	korelace mezi dvema skupinami promennych
+# pracujme s charakteristikami statu: osobni uspory, podil populace do 15 let,
+#	podil populace nad 75 let, prijem na obyvatele, narust prijmu na obyvatele
+# rozdelime promenne do skupin: populacni podily, ekonomicke charakteristiky
+pop <- LifeCycleSavings[, 2:3]
+oec <- LifeCycleSavings[, -(2:3)]
+cancor(pop, oec)
+  # vypocet kanonickych korelaci
+  #	na vystupu jsou kanonicke korelace (jejich pocet je stejny jako 
+  #	pocet promennych v mensi skupine), koeficienty kanonickych promennych
+  #	prumery promennych
+
+library(CCP)
+p.asym(cancor(pop, oec)$cor, dim(pop)[1], dim(pop)[2], dim(oec)[2], tstat = "Wilks")
+  # AsymptotickĂ˝ test
+p.perm(pop, oec, nboot = 999, rhostart = 1, type = "Wilks")
+p.perm(pop, oec, nboot = 999, rhostart = 2, type = "Wilks")
+  # PermutaÄŤnĂ­ test vĂ˝znamnosti kĂˇnonickĂ˝ch korelacĂ­
+
+#########################
+### Samostatne
+# - takto se mÄ›Ĺ™Ă­ zĂˇvislost dvou skupin promÄ›nnĂ˝ch
+
+data("UScrime")
+# Souvisi zasah policie s kriminalitou? 
+#   Zasah policie popisuji promenne Po1 a Po2 a kriminalitu promenne Prob, Time a y.
+police <- UScrime[, c("Po1", "Po2")]
+criminality <- UScrime[, c("Prob", "Time", "y")]
+cannonic_correlations <- cancor(police, criminality)$cor
+cat("KĂˇnonickĂ© korelace", cannonic_correlations)
+p.asym(cannonic_correlations, dim(police)[1], dim(police)[2], dim(criminality)[2], tstat = "Wilks")
+
+# Souvisi nezamestnanost s kriminalitou?
+#   Nezamestnanost popisuji promenne U1 a U2.
+unemployment <- UScrime[, c("U1", "U2")]
+criminality <- UScrime[, c("Prob", "Time", "y")]
+cannonic_correlations <- cancor(unemployment, criminality)$cor
+cat("KĂˇnonickĂ© korelace", cannonic_correlations)
+p.asym(cannonic_correlations, dim(unemployment)[1], dim(unemployment)[2], dim(criminality)[2], tstat = "Wilks")
+### End of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM_mnohorozmerne2.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM_preusporadani.R
+######################
+### Odhady zalozene na preusporadani dat
+######################
+library(DescTools)
+
+### Pouzijte data PlantGrowth
+##  porovnava se vaha ziskane plodiny pri dvou osetrenich a jedne kontrolni skupine
+data("PlantGrowth")
+
+## Nejprve checeme odhadnout stredni hodnotu (populacni prumer) a rozptyl prumeru
+wt <- PlantGrowth$weight 
+
+### bezny postup 
+(original_mean <- mean(wt))
+  # prumer
+(original_variance <- (MeanSE(wt))^2)
+  # rozptyl prumeru
+
+### vyuziti metody Jackknife
+n <- length(wt)
+jackknife_means <- numeric(n)
+  
+# vytvoreni n vyberu, kde kazdy ma jednu vynechanou hodnotu
+for (i in 1:n) {
+  jackknife_sample <- wt[-i]
+  jackknife_means[i] <- mean(jackknife_sample)
+}
+  
+# odhad metodou Jackknife
+(jackknife_mean <- mean(jackknife_means))
+# vychyleni (bias) odhadu
+(bias <- (n - 1) * (original_mean - jackknife_mean))
+# rozptyl odhadu
+(jackknife_variance <- (n - 1) * mean((jackknife_means - jackknife_mean) ^ 2))
+  
+# jake je rozdeleni Jackknife odhadu?
+hist(jackknife_means, col = "lightgreen")
+
+### vyuziti Bootstrapu
+# pocet bootstrapovych vyberu
+num_resamples <- 1000
+
+n <- length(wt)
+bootstrap_means <- numeric(num_resamples)
+
+# bootstrapove vybery s vracenim   
+for (i in 1:num_resamples) {
+    # Resample with replacement
+  bootstrap_sample <- sample(wt, size = n, replace = TRUE)
+  bootstrap_means[i] <- mean(bootstrap_sample)
+}
+  
+# odhad metodou Bootstrap
+(bootstrap_mean <- mean(bootstrap_means))
+# vychyleni (bias) odhadu
+(bias <- bootstrap_mean - original_mean)
+# rozptyl odhadu
+(bootstrap_variance <- var(bootstrap_means))
+
+# jake je rozdeleni bootstrapoveho odhadu
+hist(bootstrap_means, col = "lightblue")
+  
+# pro jednoducha data vsechny 3 metody dobre funguji
+
+###################################
+### Samostatne
+
+## Jak odhadnout sikmost vahy?
+## Odhadnete ruznymi zpusoby stredni hodnotu a rozptyl vyse hladiny Huronskeho jezera
+data("LakeHuron")
+
+# -0.1457988 - levostrannĂ© zeĹˇikmÄ›nĂ­
+Skew(wt)
+
+(mean(wt))
+(var(wt))
+(MeanSE(wt))^2
+
+n <- length(wt)
+jackknife_skews<- sapply(1:n, function(i) Skew(wt[-i]))
+(jackknife_skew <- Skew(jackknife_skews))
+(jackknife_bias <- (n - 1) * (Skew(wt) - jackknife_skew))
+(jackknife_variance <- (n - 1) * mean((jackknife_skews - jackknife_skew)^2))
+hist(jackknife_skews, col = "orange")
+
+###################################
+
+### pro odhad intervalu spolehlivosti se pouziva bud klasicky zpusob, nebo metoda bootstrap
+
+## urcete interval spolehlivosti obema zpusoby
+# vyjde Vam rucni vypocet bootstrapoveho intervalu spolehlivosti stejne / obdobne
+#   jako pri pouziti prednastavene funkce?
+
+jackknife_skew - sqrt(jackknife_variance)*qnorm(0.975)
+jackknife_skew + sqrt(jackknife_variance)*qnorm(0.975)
+
+BootCI(wt, FUN = Skew)
+
+###################################
+### Dvouvyberovy test
+
+## porovnejte dva leky na spani
+data("sleep")
+  # promenna extra obsahuje informaci, o kolik se prodlouzil spanek
+
+# Testovane hypotezy
+#   H0: oba leky funguji stejne
+#   H1: mezi leky je rozdil
+
+### Klasicky postup
+par(mfrow = c(1, 2))
+tapply(sleep$extra, sleep$group, PlotQQ)
+par(mfrow = c(1, 1))
+  # graficky test normality, vse se zda OK
+
+var.test(sleep$extra ~ sleep$group)
+  # test shody rozptylu, vse se zda OK
+
+t.test(sleep$extra ~ sleep$group, var.eq = T)
+  # na hladine vyznamnosti 5% se mezi leky neprokazal vyznamny rozdil
+
+### Permutacni test
+set.seed(101) 
+nsim <- 9999
+res <- numeric(nsim) 
+
+# generovani permutaci pro permutacni test
+for (i in 1:nsim) {
+  perm <- sample(nrow(sleep))
+  psleep <- transform(sleep, extra = extra[perm])
+  res[i] <- mean(psleep$extra[psleep$group == 1])-
+    mean(psleep$extra[psleep$group == 2])
+    # ulozim rozdil mezi prumery
+}
+
+obs <- mean(sleep$extra[sleep$group == 1]) - mean(sleep$extra[sleep$group == 2])
+  # pozorovana hodnota rozdilu prumeru, pridam ji k nagenerovanym permutacnim hodnotam
+res <- c(res, obs)
+
+# zobrazeni vysledku spolu s nasi pozorovanou hodnotou
+hist(res, col = "lightblue", las = 1, main = "")
+abline(v = obs, col = "red")
+
+# p-hodnota = procento vysledku v absolutni hodnote vetsi nez ten nas
+mean(abs(res) >= abs(obs))
+  # vysledek odpovida t-testu
+
+###################################
+### Samostatne
+
+## Zkuste si test spocitat metodou bootstrap (tj. pro vyhodnoceni nepouzit permutace, ale bootstrapove vybery)
+
+## Porovnejte prvni osetreni a kontrolu u dat PlantGrowth.
+#   Porovnani provedte jak klasicky, tak permutacnim testem, tak bootstrapem
+
+## Porovnejte vsechny tri osetreni uvedenymi tremi zpusoby
+#   Jako statistiku vyhodnocujici rozdil mezi tremi vybery muzete pouzit napr.
+#   sum(ni * mean(Yi)^2), tj. soucet pres vsechny skupiny pocet hodnot ve skupine krat prumer skupiny na druhou
+
+data("PlantGrowth")
+
+ctrl <- PlantGrowth$weight[PlantGrowth$group == "ctrl"]
+trt1 <- PlantGrowth$weight[PlantGrowth$group == "trt1"]
+
+obs <- mean(ctrl) - mean(trt1) # observation
+
+set.seed(123)
+B <- 10000
+boot_diffs <- replicate(B, mean(sample(ctrl, replace = TRUE)) - mean(sample(trt1, replace = TRUE)))
+
+mean(abs(boot_diffs) >= abs(obs))
+
+hist(boot_diffs, col = "lightblue", main = "Bootstrap rozdĂ­ly")
+abline(v = obs, col = "red", lwd = 2)
+
+t.test(weight ~ group, data = subset(PlantGrowth, group %in% c("ctrl", "trt1")), var.equal = TRUE)
+
+weight <- PlantGrowth$weight
+group <- PlantGrowth$group
+(group_sizes <- table(group))
+(group_means <- tapply(weight, group, mean))
+(obs_stat <- sum(group_sizes * group_means^2))
+
+###################################
+
+library(lmPerm)
+  # knihovna obsahujici permutacni test ve funkci lmp
+
+result <- lmp(formula = sleep$extra ~ sleep$group)
+summary(result)
+### End of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM_preusporadani.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM-cviceni-1\Cviceni1.R
+# Otevrete datovy soubor Kojeni.RData
+#   data pouzita k vypracovani diplomove prace na PRF UK v roce 2000
+
+library(DescTools)
+library(TeachingDemos)
+
+load("Kojeni.RData")
+
+#################################
+## Co je to p-hodnota
+# ukazka na jednovyberovem t-testu
+
+# Rozhodnete, zda stredni hodnota vysky matek muze byt mensi nez 168 cm?
+# Testovane hypotezy:
+#   H0: stredni hodnota vysky matek je rovna 168 cm
+#   H1: stredni hodnota vysky matek je mensi nez 168 cm
+# vyska lidi daneho veku ma normalni rozdeleni
+#   pouzijeme jednovyberovy t-test
+vyska <- Kojeni$vyskaM
+t.test(vyska, mu=168, alternative = "less")
+  # p-hodnota < 0.05 => zamitame H0, plati H1
+  # t = -1.6777 (testovĂˇ statistika)
+  # df = 98 (degrees of freedom)
+  # na hladine vyznamnosti 5% jsme prokazali, ze stredni hodnota vysky matek je mensi nez 168 cm.
+
+## Vykresleni p-hodnoty
+# t-test pracuje s testovou statistikou T: T = sqrt(n)*(mean(X) - mu)/sd(X)
+#	pro tuto statistiku je pak definovana p-hodnota
+
+# p-hodnota je pravdepodobnost, ze za platnosti nulove hypotezy
+# 	nastane vysledek, ktery nastal,
+# 	nebo jakykoliv jiny, ktery jeste vic vyhovuje alternative
+
+# graf - definice p-hodnoty
+# 1. pravdepodobnost, ze za platnosti nulove hypotezy ...
+#   H0 rika, ze testova statistika a ma t-rozdeleni s n-1 stupni volnosti
+plot(x <- seq(-4,4,by=0.1), y=dt(x,length(vyska)-1), type="l",
+     col="blue", main="Hustota t-rozdeleni za H0")
+  # hustota t-rozdeleni
+  # t-rozdÄ›lenĂ­ podobnĂ© normĂˇlnĂ­mu rozdÄ›lenĂ­ ()
+  # https://portal.matematickabiologie.cz/index.php?pg=aplikovana-analyza-klinickych-a-biologickych-dat--analyza-a-management-dat-pro-zdravotnicke-obory--resene-priklady--priklad-1-jednovyberovy-t-test
+  # https://cs.wikipedia.org/wiki/T-test
+
+# 2. nastane vysledek, ktery nastal ...
+(T <- sqrt(length(vyska))*(mean(vyska) - 168)/sd(vyska))
+  # testova statistika 
+lines(c(T,T), c(0,dt(T,length(vyska)-1)), col="red", lwd=2)
+  # zakreslim do grafu
+
+# 3. nebo jakakoliv jina hodnota, ktera jeste vic odpovida alternative
+#   alternativa je mensi nez
+xx <- c(seq(-4, T, by=0.1), T, T, -4)
+yy <- c(dt(c(seq(-4, T, by=0.1), T), length(vyska) - 1), 0, 0)
+polygon(xx, yy, density=40,col="red")
+
+# rucni vypocet p-hodnoty
+# pravdepodobnost hodnot mensich nez testova statistika T
+pt(T, length(vyska) - 1)
+  # p-hodnota je distribucni funkce v hodnote testove statistiky
+
+# v pripade oboustranne alternativy pridam jeste druhou skupinu hodnot 
+#   - symetricky podle testove statistiky T
+#	U otazky typu: Muze byt populacni prumer vysky matek 168 cm?
+#   H0: vyska matek = 168 cm vs. H1: vyska matek != 168 cm
+xx2 <- c(-T, -T, seq(-T, 4, by=0.1), 4, -T)
+yy2 <- c(0, dt(c(-T, seq(-T, 4, by=0.1)), length(vyska) - 1), 0, 0)
+polygon(xx2, yy2, density=40, col="green")
+
+# rucni vypocet p-hodnoty
+pt(T, length(vyska) - 1) + 1 - pt(-T, length(vyska) - 1)
+  2*pt(T, length(vyska) - 1)
+# pst je symetricka kolem nuly
+t.test(vyska, mu = 168)
+  # kontrolni test
+  # p-hodnota 0.09659 > alfa 0.05 -> nezamitame H0
+  #   neprokazalo se, ze by vyska matek nemohla byt rovna 168 cm
+  #   muze byt rovna 168 cm, nebo je priblizne rovna 168 cm.
+
+
+# Za pĹ™edpokladu, Ĺľe H0 je pravdivĂˇ, bychom tak nĂ­zkou vĂ˝Ĺˇku matek namÄ›Ĺ™ili pouze ve 4.8 % pĹ™Ă­padĹŻ.
+# ProtoĹľe je to mĂ©nÄ› neĹľ 5 %, Ĺ™Ă­kĂˇme, Ĺľe to nenĂ­ nĂˇhoda a zamĂ­tĂˇme H0.
+
+
+# Jake rozdeleni ma p-hodnota za platnosti nulove hypotezy? 
+#	Jaka je pst, ze Vam vyjde p < 0.05? A jaka je pst, ze Vam vyjde p < 0.5?
+# Vyzkousime empiricky
+#	Predpokladejme, ze IQ ma normalni rozdeleni se stredni hodnotou 100 a rozptylem 225
+#   provedeme nahodny vyber z tohoto rozdeleni o rozsahu 200
+#	  a otestujeme nulovou hypotezu, ze stredni hodnota = 100
+#   ziskanou p-hodnotu zakreslim do grafu a cely postup opakuji 1000 krat
+#	vysledkem bude graf rozdeleni p-hodnot
+
+N <- 1000			# pocet vyberu
+n <- 200			# pocet pozorovani v jednom vyberu
+p.hodnoty <- rep(0,N)	# prazdny vektor pro prumery
+for (i in 1:N){
+  vyber<-round(rnorm(n,100,sqrt(225)),0)
+  p.hodnoty[i] <- t.test(vyber,mu=100)$p.value
+}
+hist(p.hodnoty)
+  # v idealnim pripade by vysly vsechny sloupce stejne vysoke
+(Y <- sum(p.hodnoty <= 0.05)/N)
+  # v kolika procentech pripadu vysla p-hodnota < 0.05
+(Y <- sum(p.hodnoty <= 0.5)/N)
+  # v kolika procentech pripadu vysla p-hodnota < 0.5
+
+# => p-hodnota ma rovnomerne rozdeleni na intervalu [0,1]
+
+# https://cs.wikipedia.org/wiki/Chyby_typu_I_a_II
+# https://slideplayer.cz/slide/2336628/
+
+## Co je sila testu
+# Pravdepodobnost, ze zamitnu nulovou hypotezu, kdyz plati vybrana alternativa
+# je to chyba druhĂ©ho druhu
+power.examp()
+power.examp(diff = 3)
+power.examp(n = 25)
+power.examp(alpha = 0.1)
+
+###################################
+
+## Zjistete, zda stredni hodnota porodni hmotnosti deti muze byt 3.5 kg.
+#   POZOR: porodni hmotnost se meri v gramech!
+hmot <- Kojeni$por.hmotnost
+
+# predpokladem jednovyberoveho t-testu je normalita dat
+# Nejprve otestujeme normalitu
+#   H0: data maji normalni rozdeleni vs. H1: data nemaji normalni rozdeleni
+PlotQQ(hmot)
+  # body lezi priblizne na primce
+shapiro.test(hmot)
+  # p-hodnota 0.1623 > alfa => nezamitam H0
+  # i Q-Q plot, i test normality ukazuji, ze promenna ma priblizne normalni rozdeleni
+
+# pouzijeme jednovyberovy t-test
+# Testovane hypotezy: H0: porodni hmotnost = 3500 g  vs. H1: porodni hmotnost <> 3500 g
+t.test(hmot, mu = 3500)
+  # p-hodnota = 0.4943 > alfa => nezamitam H0
+  # stredni porodni hmotnost deti muze byt 3.5 kg.
+
+# Muze byt stredni hodnota vysky otcu vetsi nez 177 cm? (promenna vyskaO)
+# Muze byt hmotnost pulrocni deti v prumeru 7.5 kg? (promenna hmotnost)
+
+##################
+## Jednovyberovy Wilcoxonuv test
+
+# Jsou matky v prumeru starsi nez 23 let?
+vek <- Kojeni2$vekM
+
+# Nejprve otestujeme normalitu
+#   H0: data maji normalni rozdeleni
+#   H1: data nemaji normalni rozdeleni
+PlotQQ(vek)
+  # body lezi na oblouku - mam sesikmene rozdeleni
+shapiro.test(vek)
+  # p-hodnota 0.00134 < alfa => zamitam H0
+  # i Q-Q plot, i test normality ukazuji, ze promenna nema normalni rozdeleni
+
+# pouzijeme neparametricky test
+# Testujeme
+#   H0: median vekM = 23 vs. H1: median vekM > 23
+
+# Wilcoxonuv test 
+wilcox.test(vek, mu=23, alternative="greater")
+  # p-hodnota 9.807e-09 < alfa 0.05 -> zamitam H0
+  # Prokazali jsme, ze stredni hodnota veku matek je vetsi nez 23 let.
+
+# Muze byt stredni hodnota delky pulrocnich deti 72 cm? (promenna delka)
+
+##############################
+## Dvouvyberovy t-test
+
+## Lisi se porodni hmotnost mezi pohlavimi (porHmnotnost, Hoch)?
+cislo <- Kojeni$porHmotnost
+kategorie <- Kojeni$Hoch
+
+# Normalita se testuje pro kazdou skupinu zvlast
+#   H0: data maji normalni rozdeleni vs. H1: data nemaji normalni rozdeleni
+par(mfrow=c(1,2))
+tapply(cislo, kategorie, PlotQQ)
+par(mfrow=c(1,1))
+  # body lezi v obou pripadech priblizne na primce
+tapply(cislo, kategorie, shapiro.test)
+  # obe p-hodnoty vetsi nez alfa -> nezamitame H0, 
+  #   data maji normalni rozdeleni -> pouziji t-test
+
+# nejprve graficke zobrazeni
+boxplot(cislo ~ kategorie, main="Porodni hmotnost podle pohlavi", col=c(2,4))
+  # vidime poradi kategorii, muze se hodit
+
+# testujeme hypotezy
+# H0: por.hmotnost divek - por.hmotnost hochu = 0  
+# H1: por.hmotnost divek - por.hmotnost hochu != 0
+
+# Mame na vyber dva dvouvyberove t-testy:
+#   pro shodne rozptyly
+#   pro ruzne rozptyly
+
+# Jsou rozptyly shodne?
+# H0: rozptyly se nelisi;
+# H1: rozptyly se lisi
+var.test(cislo ~ kategorie)
+  # p-hodnota = 0.886 > alfa (0.05) -> nezamitame H0
+  #   rozptyly jsou priblizne shodne, pouzijeme t-test pro shodne rozptyly
+t.test(cislo ~ kategorie, var.eq = T)
+  t.test(cislo ~ kategorie, mu=0, alternative="two.sided", var.eq = T)
+  # p-hodnota = 0.005512 < alfa (0.05) -> zamitame H0, plati H1
+  #   porodni hmotnost se lisi podle pohlavi
+  # A kdo ji ma vyssi?
+
+# Spojitost s intervalem spolehlivosti pro rozdil 
+MeanDiffCI(cislo ~ kategorie)
+  # pocita pro variantu s ruznymi rozptyly
+    
+###############################
+## Dvouvyberovy Wilcoxonuv test
+
+## Lisi se vek maminek v Praze a na venkove (vekM, Porodnice)?
+cislo <- Kojeni$vekM
+kategorie <- Kojeni$Porodnice
+
+# Normalita se testuje pro kazdou skupinu zvlast
+#   H0: data maji normalni rozdeleni
+#   H1: data nemaji normalni rozdeleni
+par(mfrow=c(1,2))
+tapply(cislo,kategorie,PlotQQ)
+par(mfrow=c(1,1))
+  # body lezi na obloucich v obou pripadech
+tapply(cislo, kategorie, shapiro.test)
+  # obe p-hodnoty < alfa -> zamitame H0, data nemaji normalni rozdeleni
+  
+# Wilcoxonuv test
+#   H0: matky z Prahy - matky z venkova = 0
+#   H1: matky z Prahy - matky z venkova != 0
+# Graficky (data jsou pravostrannÄ› zeĹˇikmena)
+boxplot(cislo ~ kategorie, main="Vek matky podle mista porodu")
+  # vidime poradi kategorii, muze se hodit
+
+# I u dvouvyberoveho Wilcoxonova testu je pozadavek na shodu rozptylu
+#   H0: rozptyly se nelisi
+#   H1: rozptyly se lisi
+var.test(cislo ~ kategorie)
+  # p-hodnota = 0.6589 > alfa (0.05) -> nezamitame H0
+  # predpoklad shody rozptylu je splnen
+wilcox.test(cislo ~ kategorie)
+  # p-hodnota = 0.09097 > alfa (0.05) -> nezamitame H0
+  #   neprokazalo se, ze by se vek matek v Praze a na venkove vyznamne lisil.
+  wilcox.test(cislo ~ kategorie, conf.int = T)
+    # vcetne neparametrickeho intervalu spolehlivosti a bodoveho odhadu "pseudomedianu"
+    
+## Jsou matky, ktere daly detem dudlika, v prumeru starsi nez ty, co jim ho nedaly? (promenne vekM, Dudlik)
+# H0: Matky, kterĂ© daly dudlĂ­k, nejsou v prĹŻmÄ›ru starĹˇĂ­ neĹľ matky, kterĂ© ho nedaly.
+# H1: Matky, kterĂ© daly dudlĂ­k, jsou v prĹŻmÄ›ru starĹˇĂ­.
+vekM <- Kojeni$vekM
+dudlik <- Kojeni$Dudlik
+boxplot(vekM ~ dudlik, main="VÄ›k matek podle pouĹľĂ­vĂˇnĂ­ dudlĂ­ku", xlab="PouĹľitĂ­ dudlĂ­ku", ylab="VÄ›k matek", col=c("red", "blue"))
+tapply(vekM, dudlik, shapiro.test)
+wilcox.test(vekM ~ dudlik, alternative="less")
+    
+## Jsou pulrocni kluci v prumeru tezsi nez pulrocni divky? (promenne hmotnost, Hoch)
+# H0: PĹŻlroÄŤnĂ­ kluci nejsou v prĹŻmÄ›ru tÄ›ĹľĹˇĂ­ neĹľ pĹŻlroÄŤnĂ­ dĂ­vky
+# H1: PĹŻlroÄŤnĂ­ kluci jsou v prĹŻmÄ›ru tÄ›ĹľĹˇĂ­ neĹľ pĹŻlroÄŤnĂ­ dĂ­vky
+hmotnost <- Kojeni$hmotnost
+hoch <- Kojeni$Hoch
+boxplot(hmotnost ~ hoch)
+tapply(hmotnost, hoch, shapiro.test)
+t.test(hmotnost ~ hoch, var.equal = FALSE, alternative = "less")
+  
+## Jsou matky v Praze i na venkove stejne vysoke? (promenne vyskaM, Porodnice)
+## Je rozdil ve veku matek, ktere jeste v pul roce kojily a tech co nekojily? (promenne vekM, Koj24)
+
+###############################
+## Chi-kvadrat test
+## Souvisi spolu vzdelani matky a pritomnost otce u porodu?
+## Testuje zĂˇvislost (H0: nezĂˇvislost, H1: zĂˇvislost)
+## Nejprve dÄ›lĂˇme tento test, a pak se teprve testujĂ­ pĹ™edpoklady
+## Kdyby u chisq.test bylo upozornÄ›nĂ­, tak vĂ­me implicitnÄ›, Ĺľe nejsou splnÄ›ny pĹ™edpoklady
+vzdel <- Kojeni$Vzdelani
+otec <- Kojeni$Otec
+
+(tab <- table(vzdel,otec))
+  prop.table(tab, 1)
+  # absolutni a relativni cetnosti
+plot(vzdel ~ otec, col=2:4, main = "Zavislost pritomnost otce u porodu na vzdelani matky")
+  # ani tabulka, ani obrazek nenasvedcuji tomu, ze by mezi promennymi byla zavislost
+  
+# Testovane hypotezy 
+#   H0: vzdelani matky a pritomnost otce u porodu spolu nesouvisi
+#   H1: vzdelani matky a pritomnost otce u porodu spolu souvisi
+chisq.test(vzdel, otec)
+  # p-hodnota 0.8345 > alfa 0.05 => nezamitame H0
+  # Neprokazala se souvislost mezi vzdelanim matky a pritomnosti otce u porodu.
+
+# Test ma sve predpoklady: vsechny ocekavane cetnosti musi byt vetsi nez 5
+# ex = expected
+chisq.test(vzdel, otec)$ex
+  # a jsou :)
+  
+# Kdyby nebyly, pouzili bychom Fisheruv exaktni test
+fisher.test(vzdel, otec)
+  # protoze predpoklady jsou splneny, p-hodnota vychazi podobne
+
+## Souvisi spolu misto porodu a pohlavi
+misto <- Kojeni$Porodnice
+pohlavi <- Kojeni$Hoch
+
+(tab <- table(misto,pohlavi))
+prop.table(tab, 1)
+  # Pravdepodobnost, ze se v Praze narodi holka
+  tab[1,1]/tab[1,2]
+    # sance, ze se v Praze narodi holka
+  
+chisq.test(tab)
+  # p-hodnota blizka 1 > 0.05 => nezamitame H0
+  # Neprokazal se rozdil mezi Prahou a okresem v pohlavi narozenych deti
+
+fisher.test(tab)
+  # na vystupu je videt pomer sanci
+  # sance na to mit holku je v Praze o neco mensi nez v okrese
+
+## Souvisi spolu vzdelani matky a to, zda bylo tehotenstvi planovane (Vzdelani, Plan)?
+# H0: Nesouvisi spolu vzdÄ›lĂˇnĂ­ matky a to, zda blyo tÄ›hotenstvĂ­ plĂˇnovanĂ©
+# H1: Souvisi spolu vzdÄ›lĂˇnĂ­ matky a to, zda blyo tÄ›hotenstvĂ­ plĂˇnovanĂ©
+vzdelani <- Kojeni$Vzdelani
+plan <- Kojeni$Plan
+(tab <- table(vzdelani, plan))
+chisq.test(tab) # p-value = 0.03545 < 0.05 (zamĂ­tĂˇme H0 v prospÄ›ch H1) - souvisĂ­
+fisher.test(tab) # p-value = 0.03804 < 0.05 (zamĂ­tĂˇme H0 v prospÄ›ch H1) - souvisĂ­
+
+
+## Souvisi pritomnost otce u porodu s mistem porodu (Otec, Porodnice)?
+(tab <- table(misto, otec))
+fisher.test(tab) # na okrese je Ĺˇance skoro 6Ă— vÄ›tĹˇĂ­ (5.79Ă— vÄ›tĹˇĂ­)
+
+
+### End of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM-cviceni-1\Cviceni1.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM-cviceni-2\PSM_effectsize.R
+###################
+### Odhad poctu pozorovani
+library(pwr)
+## Kolik pozorovani potrebuji k tomu, abych odhalila rozdil oproti nulove hypoteze
+#   o velikosti 3, pri smerodatne odchylce 5, se silou testu 0.95, na hladine vyznamnosti 0.05.
+#   Vzhodnoceni budu delat pomoci jednovyberoveho t-testu
+pwr.t.test(d=3/5, sig.level=0.05, power=0.95, type="one.sample")
+# Potrebuji 38 pozorovani
+
+# u Wilcoxonova testu potrebuji cca o 15% navic
+(n <- pwr.t.test(d=3/5, sig.level=0.05, power=0.95,type="one.sample")$n)
+n*1.15
+# Wilcoxonuv test by potreboval 44 pozorovani
+
+## A kolik potrebuji pozorovani, kdyz chci odhalit rozdil ve dvou skupinach o velikosti 8,
+#   pri ocekavane sdruzene smerodatne odchylce 20, se silou testu 0.95, na hladine vyznamnosti 0.05.
+pwr.t.test(d=8/20, sig.level=0.05, power=0.95, type="two.sample")
+
+## Chceme-li otestovat pravdepodobnostni rozdeleni kategoricke promenne se ctyrmi kategoriemi,
+#   pouzijeme chi-kvadrat test dobre shody. "Effect size" je soucet (pi - p0i)^2/p0i pres vsechny 
+#   kategorie a odpovida Cramerovu phi. Kolik potrebujeme pozorovani, kdyz chceme tento
+#   effekt o velikosti 0.3, silu testu 0.8 a hlaadinu vyznamnosti 0.05?
+pwr.chisq.test(w=0.3, df=(4-1), power=0.80, sig.level=0.05)
+
+## kolik budeme potrebovat pozorovani, kdyz budeme testovat nezavislost dvou kategorickych
+#   promennych se tremi a ctyrmi kategoriemi. Zajima nas "effect size" o velikosti 0.2, 
+#   sila testu 0.8 a hladina vyznamnosti 0.05.
+pwr.chisq.test(w=0.2, df=(3-1)*(4-1), power=0.80, sig.level=0.05)
+
+## Kolik potrebuji pozorovani, kdyz chci odhalit odchylku od nulove hypotezy o velikosti 1, 
+#   pri smerodatne odchylce 5, se silou testu 0.90, na hladine vyznamnosti 0.05?
+## Kolik potrebuji pozorovani, kdyz chci odhalit rozdil ve dvou skupinach o velikosti 5,
+#   pri ocekavane sdruzene smerodatne odchylce 10, se silou testu 0.9, na hladine vyznamnosti 0.05.
+## kolik budeme potrebovat pozorovani, kdyz budeme testovat nezavislost dvou kategorickych
+#   promennych s peti a ctyrmi kategoriemi. Zajima nas "effect size" o velikosti 0.4, 
+#   sila testu 0.9 a hladina vyznamnosti 0.05.
+
+###################
+### Nacteni dat Stulong.RData
+## data z velke studie, ktera u muzu stredniho veku merila riziko srdecni choroby
+
+names(Stulong)<-c("ID", "vyska", "vaha", "syst1", "syst2", "chlst", "vino", "cukr",
+                  "bmi", "vek", "KOURrisk", "Skupina", "VekK")
+
+###################
+### Vecna vyznamnost
+library(effectsize)
+library(DescTools)
+
+## Je vyznamny rozdil ve vysce mezi starsimi a mladsimi muzi? (promenne vyska, VekK)
+ciselna <- Stulong$vyska
+kategoricka <- Stulong$VekK
+
+# Test normality pro kazdou skupinu zvlast
+par(mfrow = c(1,2))
+tapply(ciselna, kategoricka, PlotQQ)
+par(mfrow = c(1,1))
+
+tapply(ciselna, kategoricka, shapiro.test)
+  # jsou odchylky od normality skutecne vyznamne?
+  # pri velkem poctu pozorovani se divame jen na grafy
+
+# Test shody rozptylu
+var.test(ciselna ~ kategoricka)
+
+# pouzijeme dvouvyberovy t-test
+t.test(ciselna ~ kategoricka)
+  # Je rozdil ve vyskach skutecne vyznamny?
+
+### Statistiky vecne vyznamnosti
+cohens_d(ciselna ~ kategoricka)
+  # Cohenovo d
+  interpret_cohens_d(cohens_d(ciselna ~ kategoricka))
+
+hedges_g(ciselna ~ kategoricka)
+  # Hedgesovo g
+  interpret_hedges_g(hedges_g(ciselna ~ kategoricka))
+
+glass_delta(ciselna ~ kategoricka)
+  # Glassovo delta
+  interpret_glass_delta(glass_delta(ciselna ~ kategoricka))
+
+eta_squared(aov(ciselna ~ kategoricka))
+  # Fisherovo eta
+  (A <- anova(aov(ciselna ~ kategoricka)))
+    A[,2]
+    A[1,2]/(sum(A[,2]))
+  interpret_eta_squared(0.01, rules = "cohen1992")
+
+omega_squared(aov(ciselna ~ kategoricka))
+  # Haysova omega
+  (A[1,2] - A[2,3])/(sum(A[,2]) + A[2,3])
+
+epsilon_squared(aov(ciselna ~ kategoricka))
+  # dalsi charakteristika
+
+###################
+### Analyza rozptylu
+ciselna <- Stulong$vaha
+kategoricka <- Stulong$Skupina
+
+plot(ciselna ~ kategoricka)
+
+# Test normality pro residua modelu
+res <- residuals(lm(ciselna ~ kategoricka))
+PlotQQ(res, pch = 19)
+  # jsou videt odchylky od normality
+
+# Test shody rozptylu
+bartlett.test(ciselna ~ kategoricka)
+
+### Testy analyzy rozptylu
+
+# klasicka ANOVA pro normalne rozdelena data se shodnymi rozptyly ve skupinach
+anova(aov(ciselna ~ kategoricka))
+  # tabulka analyzy rozptylu
+
+# Welchova ANOVA pro normalne rozdelena data s ruznymi rozptyly ve skupinach
+oneway.test(ciselna ~ kategoricka, var.eq = FALSE)
+
+# Kruskal-Wallisova ANOVA pro nenormalne rozdelena data
+kruskal.test(ciselna ~ kategoricka)
+
+# vsechny testy ukazuji vyznamne rozdily
+# ktere konkretni dvojice skupin se od sebe vyznamne lisi
+# parove srovnani pro normalne rozdelena data
+TukeyHSD(aov(ciselna ~ kategoricka))
+  plot(TukeyHSD(aov(ciselna ~ kategoricka)))
+  # nekdy se deli podle shody rozptylu
+  
+# parove srovnani pro nenormalne rozdelena data
+DunnTest(ciselna ~ kategoricka)
+
+## a jsou zjistene rozdily i vecne vyznamne? 
+# Fisherovo eta
+eta_squared(aov(ciselna ~ kategoricka))
+  interpret_eta_squared(0.03, rules = "cohen1992")
+
+# Haysova omega
+omega_squared(aov(ciselna ~ kategoricka))
+  interpret_omega_squared(0.02, rules = "cohen1992")
+
+epsilon_squared(aov(ciselna ~ kategoricka))
+  interpret_epsilon_squared(0.02, rules = "cohen1992")
+
+###################
+## Souvisi spolu diagnosticka Skupina a vek muzu (promenne Skupina, VekK)
+kat1 <- Stulong$Skupina
+kat2 <- Stulong$VekK
+
+(tab <- table(kat1, kat2))
+plot(as.factor(kat1) ~ as.factor(kat2), col=2:5)
+chisq.test(kat1, kat2)
+  # je rozdil ve skupinach skutecne podstatny?
+
+# Cramerovo V
+cramers_v(tab)
+  sqrt(chisq.test(tab)$statistic/(sum(tab)*(ncol(tab)-1)))
+cohens_w(tab)
+  
+## Souvisi spolu konzumace vina a vek muzu (promenne vino, VekK)
+kat1 <- Stulong$vino
+kat2 <- Stulong$VekK
+
+(tab <- table(kat1,kat2))
+plot(as.factor(kat1) ~ as.factor(kat2), col=2:5)
+chisq.test(kat1, kat2)
+  # je rozdil ve skupinach skutecne podstatny?
+
+# Cramerovo phi
+phi(tab)  
+cohens_w(tab)
+
+# Cramerovo phi
+  sqrt(chisq.test(tab)$statistic/sum(tab))
+
+###################
+## Souvisi spolu vaha a hladina cholesterolu?
+cislo1 <- Stulong$vaha
+cislo2 <- Stulong$chlst
+plot(cislo1 ~ cislo2, pch=19, main="Souvislost vahy a hladiny cholesterolu")
+
+cor(cislo1, cislo2)
+cor.test(cislo1, cislo2)
+  # Zavislost je statisticky vyznamna
+  interpret_r(cor(cislo1, cislo2))
+
+summary(lm(cislo1 ~ cislo2))$r.squared  
+  # koeficient determinace
+  # kolik procent variability zavisle promenne se modelem vysvetlilo
+  interpret_r2(summary(lm(cislo1 ~ cislo2))$r.squared)
+
+### End of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM-cviceni-2\PSM_effectsize.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM-cviceni-3\PSM_effectsize.R
+# https://cran.r-project.org/web/packages/pwr/pwr.pdf
+
+###################
+### Odhad poctu pozorovani
+# install.packages("pwr")
+library(pwr)
+## Kolik pozorovani potrebuji k tomu, abych odhalila rozdil oproti nulove hypoteze
+#   o velikosti 3, pri smerodatne odchylce 5, se silou testu 0.95, na hladine vyznamnosti 0.05.
+#   Vyhodnoceni budu delat pomoci jednovyberoveho t-testu
+pwr.t.test(d=3/5, sig.level=0.05, power=0.95, type="one.sample")
+# Potrebuji 38 pozorovani (n)
+# d = rozdĂ­l dÄ›lenĂ˝ smÄ›rodatnou odchylkou
+
+# u Wilcoxonova testu potrebuji cca o 15% navic
+(n <- pwr.t.test(d=3/5, sig.level=0.05, power=0.95,type="one.sample")$n)
+n*1.15
+# Wilcoxonuv test by potreboval 44 pozorovani
+
+## A kolik potrebuji pozorovani, kdyz chci odhalit rozdil ve dvou skupinach o velikosti 8,
+#   pri ocekavane sdruzene smerodatne odchylce 20, se silou testu 0.95, na hladine vyznamnosti 0.05.
+pwr.t.test(d=8/20, sig.level=0.05, power=0.95, type="two.sample")
+# poÄŤet pozorovĂˇnĂ­ v kaĹľdĂ© skupinÄ› by mÄ›l bĂ˝t cca 163
+
+## Chceme-li otestovat pravdepodobnostni rozdeleni kategoricke promenne se ctyrmi kategoriemi,
+#   pouzijeme chi-kvadrat test dobre shody. "Effect size" je soucet (pi - p0i)^2/p0i pres vsechny 
+#   kategorie a odpovida Cramerovu phi. Kolik potrebujeme pozorovani, kdyz chceme tento
+#   effekt o velikosti 0.3, silu testu 0.8 a hlaadinu vyznamnosti 0.05?
+pwr.chisq.test(w=0.3, df=(4-1), power=0.80, sig.level=0.05)
+# pravdÄ›podobnost, kterĂˇ ve skuteÄŤnosti platĂ­, mĂ­nus nulovĂˇ hypotĂ©za = Effect size
+
+## kolik budeme potrebovat pozorovani, kdyz budeme testovat nezavislost dvou kategorickych
+#   promennych se tremi a ctyrmi kategoriemi. Zajima nas "effect size" o velikosti 0.2, 
+#   sila testu 0.8 a hladina vyznamnosti 0.05.
+pwr.chisq.test(w=0.2, df=(3-1)*(4-1), power=0.80, sig.level=0.05)
+
+## Kolik potrebuji pozorovani, kdyz chci odhalit odchylku od nulove hypotezy o velikosti 1, 
+#   pri smerodatne odchylce 5, se silou testu 0.90, na hladine vyznamnosti 0.05?
+pwr.t.test(d=1/5, sig.level=0.05, power=0.90, type="one.sample") # JednovĂ˝bÄ›rovĂ˝ t-test
+# PotĹ™ebuji 264 pozorovĂˇnĂ­
+
+## Kolik potrebuji pozorovani, kdyz chci odhalit rozdil ve dvou skupinach o velikosti 5,
+#   pri ocekavane sdruzene smerodatne odchylce 10, se silou testu 0.9, na hladine vyznamnosti 0.05.
+pwr.t.test(d=5/10, sig.level=0.05, power=0.90, type="two.sample") # DvouvĂ˝bÄ›rovĂ˝ t-test
+# PotĹ™ebuji 85 pozorovĂˇnĂ­ v kaĹľdĂ© skupinÄ› (tedy celkem 170 pozorovĂˇnĂ­)
+
+## Kolik budeme potrebovat pozorovani, kdyz budeme testovat nezavislost dvou kategorickych
+#   promennych s peti a ctyrmi kategoriemi. Zajima nas "effect size" o velikosti 0.4, 
+#   sila testu 0.9 a hladina vyznamnosti 0.05.
+# https://en.wikipedia.org/wiki/Chi-squared_test
+pwr.chisq.test(w=0.4, df=(5-1)*(4-1), power=0.90, sig.level=0.05)
+# PotĹ™ebuji 136 pozorovĂˇnĂ­
+# kategorickĂˇ promÄ›nnĂˇ s pÄ›ti kategoriemi = kontingenÄŤnĂ­ tabulka o jednom sloupci a 4 Ĺ™ĂˇdcĂ­ch
+# kategorickĂˇ promÄ›nnĂˇ se ÄŤtyĹ™mi kategoriemi = kontingenÄŤnĂ­ tabulka o jednom sloupci a 5 Ĺ™ĂˇdcĂ­ch
+
+###################
+### Nacteni dat Stulong.RData
+## data z velke studie, ktera u muzu stredniho veku merila riziko srdecni choroby
+
+load("Stulong.RData")
+View(Stulong)
+names(Stulong)<-c("ID", "vyska", "vaha", "syst1", "syst2", "chlst", "vino", "cukr",
+                  "bmi", "vek", "KOURrisk", "Skupina", "VekK")
+
+###################
+### Vecna vyznamnost
+library(effectsize)
+library(DescTools)
+
+## Je vyznamny rozdil ve vysce mezi starsimi a mladsimi muzi? (promenne vyska, VekK)
+ciselna <- Stulong$vyska
+kategoricka <- Stulong$VekK
+
+# Test normality pro kazdou skupinu zvlast
+par(mfrow = c(1,2))
+tapply(ciselna, kategoricka, PlotQQ)
+par(mfrow = c(1,1))
+
+tapply(ciselna, kategoricka, shapiro.test)
+  # jsou odchylky od normality skutecne vyznamne?
+  # pri velkem poctu pozorovani se divame jen na grafy
+  # ÄŤĂ­selnĂ˝ test normality jako ShapirĹŻv test zde nemĂˇ smysl (QQPlot nebo Histogram je lepĹˇĂ­)
+  # Shapiro test by zamĂ­tl H0 (tedy by tvrdil, Ĺľe data nejsou normĂˇlnÄ› rozdÄ›lena) - ale pĹ™ibliĹľnÄ› jsou
+
+# Test shody rozptylu
+var.test(ciselna ~ kategoricka)
+
+# pouzijeme dvouvyberovy t-test
+# H0: stĹ™ednĂ­ hodnoty jsou stejnĂ©
+# H1: stĹ™ednĂ­ hodnoty se liĹˇĂ­
+t.test(ciselna ~ kategoricka, var.eq = T)
+t.test(ciselna ~ kategoricka)
+  # Je rozdil ve vyskach skutecne vyznamny?
+  # ZamĂ­tĂˇme H0, platĂ­ alternativa - takĹľe rozdĂ­ly stĹ™ednĂ­ch hodnot se liĹˇĂ­
+  # O jak moc se liĹˇĂ­? Ve vĂ˝sledku jsou prĹŻmÄ›ry 176.4812 a 175.1894 a ty odeÄŤteme, takĹľe 1,3 cm rozdĂ­l
+  # V testu vyĹˇlo, Ĺľe rozdĂ­l 1,3 cm je statisticky vĂ˝znamnĂ˝ - ale opravdu?
+  # Ne vĹˇe, co vĂ˝jde jako statisticky vĂ˝znamnĂ˝ nemusĂ­ bĂ˝t vÄ›cnÄ› vĂ˝znamnĂ© - zde 1 cm rozdĂ­l nenĂ­ vÄ›cnÄ› vĂ˝znamnĂ˝
+
+### Statistiky vecne vyznamnosti
+cohens_d(ciselna ~ kategoricka) # Velikost efektu 0.21 a 95% CI je interval spolehlivosti
+  # Cohenovo d (interpretace: malĂ˝ efekt - small)
+  interpret_cohens_d(cohens_d(ciselna ~ kategoricka))
+
+hedges_g(ciselna ~ kategoricka)
+  # Hedgesovo g
+  interpret_hedges_g(hedges_g(ciselna ~ kategoricka))
+
+glass_delta(ciselna ~ kategoricka)
+  # Glassovo delta
+  interpret_glass_delta(glass_delta(ciselna ~ kategoricka))
+
+eta_squared(aov(ciselna ~ kategoricka))
+  # Fisherovo eta
+  # anova vypoÄŤĂ­tĂˇ tabulku analĂ˝zy rozptylu
+  (A <- anova(aov(ciselna ~ kategoricka)))
+    A[,2]
+    A[1,2]/(sum(A[,2]))
+  interpret_eta_squared(0.01, rules = "cohen1992")
+
+omega_squared(aov(ciselna ~ kategoricka))
+  # Haysova omega
+  (A[1,2] - A[2,3])/(sum(A[,2]) + A[2,3])
+
+epsilon_squared(aov(ciselna ~ kategoricka))
+  # dalsi charakteristika
+
+###################
+### Analyza rozptylu
+# testujeme rozdĂ­ly mezi vĂ­ce skupinami
+# pĹ™edpoklady: 
+#   1. normalita
+#      - klasickĂˇ ANOVA - normĂˇlnĂ­, shodnĂ© rozptyly
+#      - Welchova ANOVA - normĂˇlnĂ­, rĹŻznĂ© rozptyly
+#      - Kruskal-Wallis - nenĂ­ normĂˇlnĂ­
+#   2. shoda rozptylĹŻ
+# H0: stĹ™ednĂ­ hodnoty jsou stejnĂ©
+# H1: stĹ™ednĂ­ hodnoty se liĹˇĂ­
+# jednostrannĂˇ alternativa zde ani nejde pouĹľĂ­t
+ciselna <- Stulong$vaha
+kategoricka <- Stulong$Skupina
+
+# MediĂˇny jsou vĂ­cemĂ©nÄ› stejnĂ©
+# ZĂˇsadnĂ­ rozdĂ­l zde nejde vidÄ›t
+# MĂˇme odlehlĂ© hodnoty
+# NS&NSS - mĂˇ odlehlou hodnotu u 100 kg, ale zĂˇroveĹ to nenĂ­ nÄ›jakĂˇ extrĂ©mnĂ­ hodnota, kterĂˇ by nebyla bÄ›ĹľnĂˇ
+plot(ciselna ~ kategoricka)
+
+# Test normality pro residua modelu
+res <- residuals(lm(ciselna ~ kategoricka))
+PlotQQ(res, pch = 19)
+  # jsou videt odchylky od normality
+  # takĹľe nemĂˇme normĂˇlnĂ­ rozdÄ›lenĂ­
+  # TĂ­m pĂˇdem pouĹľijeme Kruskal-WallisĹŻv test
+
+# Test shody rozptylu (BartlettĹŻv test)
+bartlett.test(ciselna ~ kategoricka)
+
+### Testy analyzy rozptylu
+
+# klasicka ANOVA pro normalne rozdelena data se shodnymi rozptyly ve skupinach
+anova(aov(ciselna ~ kategoricka))
+  # tabulka analyzy rozptylu
+
+# Welchova ANOVA pro normalne rozdelena data s ruznymi rozptyly ve skupinach
+oneway.test(ciselna ~ kategoricka, var.eq = FALSE)
+
+# Kruskal-Wallisova ANOVA pro nenormalne rozdelena data
+kruskal.test(ciselna ~ kategoricka)
+
+# vsechny testy ukazuji vyznamne rozdily (ale ne konkrĂ©tnÄ› jakĂ© dvojice skupin - analĂ˝za rozptylu jen Ĺ™ekne, Ĺľe se nÄ›jakĂ© liĹˇĂ­)
+# zde se nehodĂ­ dvouvĂ˝bÄ›rovĂ˝ test (resp. je to ĹˇpatnĂ˝ postup), ale pĂˇrovĂ© srovnĂˇnĂ­
+# ktere konkretni dvojice skupin se od sebe vyznamne lisi
+# parove srovnani pro normalne rozdelena data!
+# spoÄŤĂ­tĂˇ interval spolehlivosti a p-hodnotu
+TukeyHSD(aov(ciselna ~ kategoricka))
+  plot(TukeyHSD(aov(ciselna ~ kategoricka)))
+  # nekdy se deli podle shody rozptylu
+  # interval spolehlivosti pro rozdĂ­l prĹŻmÄ›rĹŻ
+  # pokud obsahuje nulu, tak je to statisticky vĂ˝znamnĂ©??
+  
+# parove srovnani pro nenormalne rozdelena data!
+# pro kaĹľdĂ˝ rozdĂ­l urÄŤĂ­ p-hodnotu
+DunnTest(ciselna ~ kategoricka)
+
+## a jsou zjistene rozdily i vecne vyznamne? 
+# Fisherovo eta
+eta_squared(aov(ciselna ~ kategoricka))
+  interpret_eta_squared(0.03, rules = "cohen1992")
+
+# Haysova omega
+omega_squared(aov(ciselna ~ kategoricka))
+  interpret_omega_squared(0.02, rules = "cohen1992")
+
+epsilon_squared(aov(ciselna ~ kategoricka))
+  interpret_epsilon_squared(0.02, rules = "cohen1992")
+
+###################
+## Souvisi spolu diagnosticka Skupina a vek muzu (promenne Skupina, VekK)
+# 1. ZvolenĂ­ promÄ›nnĂ˝ch
+# 2. Tabulka absolutnĂ­ch ÄŤetnostĂ­
+# 3. Chi kvadrĂˇt test (ĹľĂˇdnĂ© upozornÄ›nĂ­, takĹľe jeho pĹ™edpoklady jsou splnÄ›nĂ©)
+kat1 <- Stulong$Skupina
+kat2 <- Stulong$VekK
+
+(tab <- table(kat1, kat2))
+plot(as.factor(kat1) ~ as.factor(kat2), col=2:5)
+chisq.test(kat1, kat2)
+  # je rozdil ve skupinach skutecne podstatny?
+
+# Cramerovo V (fungujĂ­ jako korelaÄŤnĂ­ koeficient, ale bez zĂˇpornĂ˝ch hodnot - takĹľe 0 a 1)
+cramers_v(tab)
+  sqrt(chisq.test(tab)$statistic/(sum(tab)*(ncol(tab)-1)))
+cohens_w(tab)
+  
+## Souvisi spolu konzumace vina a vek muzu (promenne vino, VekK)
+kat1 <- Stulong$vino
+kat2 <- Stulong$VekK
+
+(tab <- table(kat1,kat2))
+plot(as.factor(kat1) ~ as.factor(kat2), col=2:5)
+chisq.test(kat1, kat2)
+  # je rozdil ve skupinach skutecne podstatny?
+
+# Cramerovo phi
+phi(tab)  
+cohens_w(tab)
+
+# Cramerovo phi
+  sqrt(chisq.test(tab)$statistic/sum(tab))
+
+###################
+## Souvisi spolu vaha a hladina cholesterolu?
+cislo1 <- Stulong$vaha
+cislo2 <- Stulong$chlst
+plot(cislo1 ~ cislo2, pch=19, main="Souvislost vahy a hladiny cholesterolu")
+
+# PearsonĹŻv korelaÄŤnĂ­ koeficient (ukazatel vÄ›cnĂ© vĂ˝znamnosti)
+cor(cislo1, cislo2)
+cor.test(cislo1, cislo2)
+  # Zavislost je statisticky vyznamna
+  interpret_r(cor(cislo1, cislo2))
+
+summary(lm(cislo1 ~ cislo2))$r.squared  
+  # koeficient determinace
+  # kolik procent variability zavisle promenne se modelem vysvetlilo (1 % - coĹľ je nic - takĹľe vÄ›cnÄ› to nic neznamenĂˇ, i kdyĹľ to bylo statisticky vĂ˝znamnĂ©)
+  interpret_r2(summary(lm(cislo1 ~ cislo2))$r.squared)
+
+#######################
+### Samostatne
+
+## Zavisi bmi na koureni? Zjistete statistickou i vecnou vyznamnost.
+bmi <- Stulong$bmi
+koureni <- Stulong$KOURrisk
+boxplot(bmi ~ koureni)
+cohens_d(bmi ~ koureni)
+anova(aov(bmi ~ koureni))
+
+## Zavisi systolicky tlak na vaze?
+## Je rozdil mezi skupinami v hladine cukru v krvi?
+ciselna <- Stulong$cukr
+kategoricka <- Stulong$VekK
+
+## Je rozdil v systolickem tlaku u kuraku a nekuraku?
+ciselna <- Stulong$syst1
+kategoricka <- Stulong$KOURrisk
+
+par(mfrow = c(1,2))
+tapply(ciselna, kategoricka, PlotQQ)
+par(mfrow = c(1,1))
+
+tapply(ciselna, kategoricka, shapiro.test)
+var.test(ciselna ~ kategoricka)
+t.test(ciselna ~ kategoricka)
+
+## Lisi se vyska u tech co piji a nepiji vino?
+# H0: VĂ˝Ĺˇka se u tÄ›ch, co pijĂ­ a nepijĂ­ vĂ­no neliĹˇĂ­
+# H1: VĂ˝Ĺˇka se u tÄ›ch, co pijĂ­ a nepijĂ­ vĂ­no liĹˇĂ­
+# VÄ›cnÄ› se neliĹˇĂ­, ale statisticky ano (zamĂ­tĂˇme H0, platĂ­ H1)
+ciselna <- Stulong$vyska
+kategoricka <- Stulong$vino # 2 skupiny (FALSE/TRUE)
+
+par(mfrow = c(1,2))
+tapply(ciselna, kategoricka, PlotQQ)
+par(mfrow = c(1,1))
+
+tapply(ciselna, kategoricka, shapiro.test)
+var.test(ciselna ~ kategoricka)
+t.test(ciselna ~ kategoricka)
+### End of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM-cviceni-3\PSM_effectsize.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM-Regresni-modely\PSM_regresni_modely.R
+########################
+## Jednoducha linearni regrese
+# nactete data Ichs
+
+# Zavislost hmotnosti na vysce 
+load("Ichs.RData")
+hmot <- Ichs$hmot
+vyska <- Ichs$vyska
+plot(hmot ~ vyska, pch = 19, main = "Zavislost hmotnosti na vysce")
+abline(lm(hmot ~ vyska), col = 2)
+  # regresni primka
+
+# Model jednoduche linearni regrese
+model <- lm(hmot ~ vyska)
+coef(model)
+  # odhady regresnich koeficientu: hmotnost = -66.85 + 0.84*vyska
+  # na 1 cm vysky pripada v prumeru 0.84 kg hmotnosti
+summary(model)
+  # odhad a vyznamnost regresnich koeficientu
+  # Residual standard error - stredni chyba residui
+  # Multiple R-squared - koeficient determinace
+  #   kolik procent variability se zavislosti vysvetli
+AIC(model)
+BIC(model)
+  # Akaikeho a Bayesovske kriterium
+
+confint(model)
+  # intervaly spolehlivosti pro parametry modelu
+
+# Interval spolehlivosti pro odhad
+new <- data.frame(vyska = c(186, 168, 173))
+predict(model, new, interval = "confidence")
+
+# predikcni interval spolehlivosti
+new <- data.frame(vyska = c(186, 168, 173))
+predict(model, new, interval = "prediction")
+
+
+### Testy predpokladu
+# graficka diagnostika
+par(mfrow = c(2, 2))
+plot(model)
+par(mfrow = c(1, 1))
+  # 1. graf: linearita zavislosti
+  #       cervena cara nema mit trend - OK
+  # 2. graf: normalita residui
+  #       body maji byt na primce - OK
+  # 3. graf: stabilita rozptylu (homoskedasticita)
+  #       cervena cara nema mit trend - OK
+  # 4. graf: vlivnost pozorovani (Cook's distance)
+#       zadny bod nevybocuje z mezi - OK
+
+# test normality residui 
+shapiro.test(residuals(model))
+# test stability rozptylu
+library(lmtest)
+bptest(model)
+
+# Cookova vzdalenost
+cooks.distance(model)
+cooks.distance(model)[which.max(cooks.distance(model))]
+  # nejvetsi hodnota Cookovy vzdalenosti
+# merime vlivnost pozorovani
+influence.measures(model)
+summary(influence.measures(model))
+
+# Multikolinearita (ve vicenasobne regresi) - zĂˇvislost jednĂ© ÄŤĂ­selnĂ© promÄ›nnĂ© na vĂ­ce promÄ›nnĂ˝ch
+# Zavislost hmotnosti na systolickem a diastolickem tlaku
+syst <- Ichs$syst
+diast <- Ichs$diast
+plot(hmot ~ syst, pch = 19, main = "Zavislost hmotnosti na systolickem tlaku")
+plot(hmot ~ diast, pch = 19, main = "Zavislost hmotnosti na diastolickem tlaku")
+
+summary(lm(hmot ~ diast + syst))
+  # vidim jen slabou zavislost na systolickem tlaku
+summary(lm(hmot ~ diast))
+summary(lm(hmot ~ syst))
+  # ve skutecnosti je evidentni zavislost na obou tlacich
+plot(syst ~ diast, pch = 19, main = "Vztah mezi systolickym a diastolickym tlakem")
+cor(syst, diast)
+  # vysoka vzajemna korelace
+
+# KorelaÄŤnĂ­ matice se pro multikolinearitu nehodĂ­, protoĹľe ta porovnĂˇvĂˇ dvojice (ale BMI je tĹ™eba zĂˇvislĂ© jak na vĂ˝Ĺˇce, tak na hmotnosti zĂˇroveĹ)
+
+library(car)
+vif(lm(hmot ~ diast + syst))
+  # Variance inflaction factor - lepĹˇĂ­ ukazatel - ma byt maly (idealne pod 1)
+
+######################
+## Kategoricka promenna v linearnim modelu
+Smok <- Ichs$Kour
+plot(hmot ~ Smok)
+lm(hmot ~ Smok)
+summary(lm(hmot ~ Smok))
+  # vidim vyznamnost dummy promennych
+anova(lm(hmot ~ Smok))
+  # vyznamnost cele promenne dohromady 
+
+#####################
+### Interakce v ANOVe - dvojne trideni
+
+# Jak hmotnost zavisi na koureni a cholesterolu?
+library(RcmdrMisc)
+library(car)
+
+hmot <- Ichs$hmot
+vyska <- Ichs$vyska
+Cholest <- Ichs$Cholest
+Smok <- Ichs$Kour
+plotMeans(hmot, Smok, Cholest, error.bars = "se", connect = TRUE, legend.pos = "farright")
+plotMeans(hmot, Smok, Cholest, error.bars = "conf.int", connect = TRUE, legend.pos = "farright")
+Anova(aov(hmot ~ Smok * Cholest))
+
+# ANOVA pres regresni model
+summary(lm(hmot ~ Smok * Cholest))
+Anova(lm(hmot ~ Smok * Cholest))
+  # hmotnost se v zavislosti na jednotlivych promennych nelisi
+Anova(lm(hmot ~ Smok))
+plot(hmot ~ Smok)
+Anova(aov(hmot ~ Cholest))
+plot(hmot ~ Cholest)
+
+# hmot = B0 + Bi * Kour + B2 * Chol + B3 * Kour * Chol + e
+# hmot = 87.4 - 2.08 * nekuĹ™Ăˇk - 7.2 * silnĂ˝ - 5.6 * slabĂ˝ - ...
+
+# SlabĂ˝ kuĹ™Ăˇk se zvĂ˝ĹˇenĂ­m cholesterolem:
+# hmost = 87.4 - 5.6 - 7.7 + 5.8
+
+#######################
+### Multiple linear regression
+
+# Jak systolicky tlak zavisi na hmotnosti, koureni a vysce?
+# takto komplikovanou zavislost nelze zobrazit
+#   pomohou dilci grafy
+
+# Zavislost na hmotnostni a cholesterolu
+syst <- Ichs$syst
+hmot <- Ichs$hmot
+Cholest <- Ichs$Cholest
+plot(syst ~ hmot, pch = 19, col = as.integer(Cholest))
+abline(lm(syst[as.integer(Cholest) == 1] ~ hmot[as.integer(Cholest) == 1]), col = 1)
+abline(lm(syst[as.integer(Cholest) == 2] ~ hmot[as.integer(Cholest) == 2]), col = 2)
+  # Zavislost se podle cholesterolu nelisi
+
+# Zavislost na hmotnosti a koureni
+Kour <- Ichs$Koureni
+plot(syst ~ hmot, pch = 19, col = as.integer(Kour))
+abline(lm(syst[as.integer(Kour) == 1] ~ hmot[as.integer(Kour) == 1]), col = 1)
+abline(lm(syst[as.integer(Kour) == 2] ~ hmot[as.integer(Kour) == 2]), col = 2)
+  # v zavislosti na koureni jsou urcite rozdily videt
+
+model1 <- lm(syst ~ hmot * Kour * vyska)
+summary(model1)
+  # model se vsemi promennymi z nejz budem postupne vynechavat
+
+# Rucne: krokova regrese metoda backward (zpetna) 
+  # nejvetsi inerakce neni vyznamna
+model2 <- lm(syst ~ hmot * Kour + vyska * Kour + vyska * hmot)
+summary(model2)
+  # nejprve se vynechavaji nevyznamne interakce
+
+model3 <- lm(syst ~ hmot * Kour + vyska * Kour)
+summary(model3)
+
+model4 <- lm(syst ~ hmot + vyska * Kour)
+summary(model4)
+
+model5 <- lm(syst ~ hmot + vyska + Kour)
+summary(model5)
+  # az kdyz jsou vynechany nevyznamne interakce, je mozne vynechavat samostatne promenne, 
+  #   ktere nejsou obsazeny v interakcich
+
+model6 <- lm(syst ~ hmot + Kour)
+summary(model6)
+
+# Coefficient of determination
+summary(model1)$r.squared
+summary(model2)$r.squared
+summary(model3)$r.squared
+
+# Krokova regrese
+model.st <- step(lm(syst ~ hmot * Kour * vyska))
+summary(model.st)
+  # automaticka procedura, ktera hleda optimalni model na zaklade Akaikeho kriteria
+AIC(model.st)
+  # u vysledneho modelu je treba zkontrolovat, zda nelze jeste zjednodusit
+
+# Krokova regrese s vyuzitim Bayesovskeho informacniho kriteria
+n <- length(syst)  
+model.st2 <- step(lm(syst ~ hmot * Kour * vyska), k = log(n))
+summary(model.st2)
+  # zde vychazi stejne
+
+# U vysledneho modelu je treba otestovat predpoklady
+par(mfrow = c(2, 2))
+plot(model.st)
+par(mfrow = c(1, 1))
+  # z grafu je videt mensi problem s normalitou dat
+# kontrola dvou stezejnich predpokladu ciselnym testem
+
+## normalita: H0: normalni rozdeleni vs. H1: neni normalni rozdeleni
+shapiro.test(residuals(model.st))
+  # p = 5.453e-05 < alfa = 0.05 => zamitame normalitu, predpoklad neni splnen
+## stabilita rozptylu: H0: rozptyl je stabilni vs. H1. rozptyl neni stabilni
+bptest(model.st)
+  # p = 0.7857 > alfa = 0.05 => nezamitame stabilitu rozptylu, predpoklad je splnen
+vif(model.st)
+  # obe hodnoty nizke, problem s multikolinearitou neni
+
+## Jak resit problem s normalitou?
+# transformace zavisle promenne
+ln.syst <- log(Ichs$syst)
+
+model.ln <- lm(ln.syst ~ hmot * Kour * vyska)
+summary(model.ln)
+  # neni nic videt
+model.lns <- step(model.ln)
+summary(model.lns)
+  # vysly stejne vyznamne promenne
+par(mfrow = c(2, 2))
+plot(model.lns)
+par(mfrow = c(1, 1))
+## normalita: H0: normalni rozdeleni vs. H1: neni normalni rozdeleni
+  shapiro.test(residuals(model.lns))
+  # je zrejme, ze normalita se zlepsila
+
+# Jina moznost je vynechat problematicke pozorovani na osmem radku
+Ichs2 <- Ichs[-8,]
+# optimalni model
+model.st3 <- step(lm(syst ~ hmot * Koureni * vyska, data = Ichs2))
+summary(model.st3)
+# testy predpokladu
+par(mfrow = c(2, 2))
+plot(model.st3)
+par(mfrow = c(1, 1))
+shapiro.test(residuals(model.st3))
+bptest(model.st3)
+  # vsechny predpoklady jsou splneny
+
+### Interpretace regresnich koeficientu
+# koeficient u hmotnosti:
+#   Pri narustku hmotnosti o 1 kg vzroste systolicky tlak v prumeru o 0.45 jednotek
+#     pri stejne kategorii koureni.
+# koeficient u koureni:
+#   Nekuraci maji v prumeru o 8.8 jednotek vyssi systolicky tlak nez kuraci,
+#     pri stejne hmotnosti
+
+##########################
+#### Samostatne
+# Uvazujte data mtcars
+data(mtcars)
+mtcars$cyl <- as.factor(mtcars$cyl)
+mtcars$vs <- as.factor(mtcars$vs)
+mtcars$am <- as.factor(mtcars$am)
+mtcars$gear <- as.factor(mtcars$gear)
+
+model0 <- lm(hp ~ mpg + cyl + disp + drat + wt + qsec + vs + am + gear + carb, data = mtcars)
+summary(model0)
+vif(model0)
+summary(step(model0))
+
+model1 <- lm(hp ~ cyl + vs + am + gear, data = mtcars)
+summary(model1)
+par(mfrow = c(2, 2))
+plot(model1)
+cat("R-squared:", round(summary(model1)$r.squared * 100, 2), "%\n")
+
+# Interakce vs * disp
+model2 <- lm(hp ~ vs * disp, data = mtcars)
+summary(model2)
+par(mfrow = c(2, 2))
+plot(model2)
+cat("R-squared:", round(summary(model2)$r.squared * 100, 2), "%\n")
+
+# Interakce vs * am
+model3 <- lm(hp ~ vs * am, data = mtcars)
+summary(model3)
+par(mfrow = c(2, 2))
+plot(model3)
+cat("R-squared:", round(summary(model3)$r.squared * 100, 2), "%\n")
+
+# Interakce am * disp
+model4 <- lm(hp ~ am * disp, data = mtcars)
+summary(model4)
+par(mfrow = c(2, 2))
+plot(model4)
+cat("R-squared:", round(summary(model4)$r.squared * 100, 2), "%\n")
+
+# Interakce vs * mpg a am * mpg
+model5 <- lm(hp ~ cyl + vs * mpg + am * mpg, data = mtcars)
+summary(model5)
+par(mfrow = c(2, 2))
+plot(model5)
+cat("R-squared:", round(summary(model5)$r.squared * 100, 2), "%\n")
+
+
+# Na cem zavisi sila vozu, promenna hp? Promenne cyl, vs, am a gear uvazujte jako kategoricke.
+# Jaky je rozdil mezi automatickou a manualni prevodovkou (promenna am)?
+# Je dulezita interakce vs a disp? A co interakce vs a am? A interakce am a disp?
+# A co kdyz pridam jeste interakce vs a am s mpg?
+# Kolik procent variability se vyslednym modelem vysvetli? 
+# Jsou splneny predpoklady?
+# Spoctete predpoved ...
+
+##########################
+#### Logisticka regrese
+
+library(datarium)
+library(car)
+  # v knihovne datarium je vhodna databaze z Titaniku
+smpl<-sample(1:2201,150)
+titanic<-titanic.raw[smpl,]
+  # vyber 150 hodnot, abychom mohli pracovat i s p-hodnotama
+dependent<- (titanic$Survived=="Yes")
+  # zavisle promenna
+
+table(titanic$Survived,titanic$Class)
+table(titanic$Survived,titanic$Age)
+table(titanic$Survived,titanic$Sex)
+  # kontrola, jaci pasazeri prezili
+
+mod1<-glm(dependent~titanic$Class+titanic$Sex+titanic$Age,family="binomial")
+  # model logisticke regrese
+summary(mod1)
+  # odhady koefificnetu a jejich vyznamnost
+
+library(fmsb)
+NagelkerkeR2(mod1)
+  # neco jako koeficient determinace (pocitany z deviance)
+
+Anova(mod1,type="II")
+  # vyznamnost promennych
+
+# interpretace regresnich koeficientu
+(b<-coef(mod1))
+  # ulozeni koeficientu do promenne
+1/exp(b[3])
+  # kolikrat se zvysuji sance na preziti u cestujicich v prvni tride oproti cestujicim ve treti tride
+1/exp(b[4])
+  # kolikrat se zvysuji sance na preziti u cestujicich v prvni tride oproti posadce
+exp(b[5])
+  # kolikrat se zvysuji sance na preziti u zen oproti muzum
+
+# Jake sance na preziti ma dospely muz cestujici druhou tridou?
+(odd<-exp(b[1]+b[2]+b[6]))
+# A jakou ma pravdepodobnost, ze prezije
+(prob<-odd/(1+odd))
+
+########################
+### Samostatne
+
+## Zavisi hladina cholesterolu na hmotnosti, koureni a na veku?
+# promenne Rchol, hmot, Kour, vek
+
+########################
+### Poissonova regrese - log-linear model
+# zavisle promennou tvori pocty
+p <- read.csv("https://stats.idre.ucla.edu/stat/data/poisson_sim.csv")
+p <- within(p, {
+  prog <- factor(prog, levels=1:3, labels=c("General", "Academic", 
+                                            "Vocational"))
+  id <- factor(id)
+})
+  # pocty oceneni ziskane studenty v ruznych studijnich programech
+  #   pridana je zavislost na vysledcich testu z matematiky
+(tab<-table(p$prog,p$num_awards))
+barplot(tab,beside=T,col=2:4,main="Numbers of awards for different study programs",legend=T)
+  # graficke znazorneni
+
+# Poissonova regrese
+(mod.p1 <- glm(num_awards ~ prog + math, family="poisson", data=p))
+summary(mod.p1)
+library(car)
+Anova(mod.p1)
+  # obe nezavisle promenne maji vyznamny vliv
+  #   "General" a "Vocational" program se od sebe vyznamne nelisi
+
+confint(mod.p1)
+  # intervaly spolehlivosti pro regresni koeficienty
+NagelkerkeR2(mod.p1)
+  # neco jako koeficient determinace
+
+# Graficky vystup
+pred<-predict(mod.p1, type="response")
+vyst<-data.frame(p$math,p$prog,pred)
+vyst<-vyst[order(vyst[,1]),]
+plot(num_awards~math,col=prog,pch=19,data=p,main="Zavislost poctu oceneni na testu z matematiky")
+lines(vyst[vyst[,2]=="General",1],vyst[vyst[,2]=="General",3],col=1)
+lines(vyst[vyst[,2]=="Academic",1],vyst[vyst[,2]=="Academic",3],col=2)
+lines(vyst[vyst[,2]=="Vocational",1],vyst[vyst[,2]=="Vocational",3],col=3)
+legend(35,5.5,levels(p$prog),lty=1,col=1:3)
+
+
+##################
+### Poradova (ordinalni) regrese
+library(MASS)
+library(foreign)
+dat <- read.dta("https://stats.idre.ucla.edu/stat/data/ologit.dta")
+# example data from internet
+# data: apply - how likely the student will apply for graduation on a school
+#       parent - are the parents graduated?
+#       public - is the undergraduate institution public or private?
+#       GPA - average score on the undergraduate institution
+ftable(xtabs(~ public + apply + pared, data = dat))
+# summary contingency table
+# a question is: on what the probability to apply for graduation depends?
+m <- polr(apply ~ pared + public + gpa, data = dat, Hess=TRUE)
+summary(m)
+# basic outputs for estimates of regression coefficients
+ctable <- coef(summary(m))
+pval <- pt(abs(ctable[, "t value"]), df=length(dat$apply)-1, lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = p))
+# table for coefficients together with the p-values
+# type of the school (public or private) is not important
+#   other variables have significant impact on apply of graduation
+
+## OR and CI
+(ci <- confint(m))
+# confidence intervals for linear coefficients
+exp(cbind(OR = coef(m), ci))
+# how many times the odds of apply of graduation increase, when
+#   the independent variable increases by one, while the other independent variables stay fixed
+### End of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM-Regresni-modely\PSM_regresni_modely.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM-Zobecnene-regresni-modely\PSM_zobecnene_regresni_modely.R
+##########################
+#### Logisticka regrese
+library(datarium)
+library(car)
+library(MASS)
+library(foreign)
+library(fmsb)
+library(AER)
+library(lme4)
+
+# v knihovne datarium je vhodna databaze z Titaniku
+smpl <- sample(1:2201, 150)
+titanic <- titanic.raw[smpl, ]
+  # vyber 150 hodnot, abychom mohli pracovat i s p-hodnotama
+titanic$dependent <- (titanic$Survived == "Yes")
+  # zavisle promenna
+
+table(titanic$Survived, titanic$Class)
+table(titanic$Survived, titanic$Age)
+table(titanic$Survived, titanic$Sex)
+  # kontrola, jaci pasazeri prezili
+
+mod1 <- glm(dependent ~ Class + Sex + Age, family = "binomial", data = titanic)
+  # model logisticke regrese
+summary(mod1)
+  # odhady koefificnetu a jejich vyznamnost
+
+NagelkerkeR2(mod1)
+  # neco jako koeficient determinace (pocitany z deviance)
+
+Anova(mod1, type = "II")
+  # vyznamnost promennych
+
+# interpretace regresnich koeficientu (dulezite k ustni zkousce!!)
+(b <- coef(mod1))
+  # ulozeni koeficientu do promenne
+1/exp(b[3])
+  # kolikrat se zvysuji sance na preziti u cestujicich v prvni tride oproti cestujicim ve treti tride
+1/exp(b[4])
+  # kolikrat se zvysuji sance na preziti u cestujicich v prvni tride oproti posadce
+exp(b[5])
+  # kolikrat se zvysuji sance na preziti u zen oproti muzum
+  # sance, ze zeny preziji oproti muzum je 7krat vetsi (sance neni totez co pravdepodobnost)
+  # sance = pocet tech co prezili ku pocet tech co neprezili
+  # v logisticke regresy se pracuje se sancemi 
+
+# Jake sance na preziti ma dospely muz cestujici druhou tridou?
+(odd <- exp(b[1] + b[2] + b[6]))
+# A jakou ma pravdepodobnost, ze prezije
+(prob <- odd/(1 + odd))
+
+########################
+### Samostatne
+mydata <- read.csv("https://stats.idre.ucla.edu/stat/data/binary.csv")
+  # GRE - Graduate Record Exam scores 
+  # GPA - grade point average 
+  # rank - prestiz stredni skoly, 
+  # admit - byl student prijat ke studiu na VS?
+
+# Na cem zavisi, zda byl student prijat na VS?
+
+##################
+### Poradova (ordinalni) regrese
+
+dat <- read.dta("https://stats.idre.ucla.edu/stat/data/ologit.dta")
+# nacteni dat
+# data: apply - zajem studenta o studium na VS
+#       pared - maji rodice vysokoskolske studium
+#       public - typ stredni skoly: statni(1)  nebo soukroma (0)
+#       GPA - vysledek testu na SS
+ftable(xtabs(~ public + apply + pared, data = dat))
+  # contingencni tabulka kategorickych promennych
+
+# 3 kategorie, takĹľe 2 logistickĂ© regrese
+# Na cem zavisi, zda student chce nastoupit na VS?
+m <- polr(apply ~ pared + public + gpa, data = dat, Hess=TRUE)
+summary(m)
+  # odhady regresnich koeficientu
+ctable <- coef(summary(m))
+pval <- pt(abs(ctable[, "t value"]), df=length(dat$apply)-1, lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = pval))
+  # stejna tabulka doplnena o p-hodnoty
+  # typ stredni skoly nema vyznamny vliv
+  # ostatni promenne vyznamny vliv maji
+
+## pomer sanci (OR) a intervalz spolehlivsoti
+(CI <- confint(m))
+  # intervaly spolehlivosti pro regresni koeficienty
+exp(cbind(OR = coef(m), CI))
+  # interpretace regresnich koeficientu pres pomer sanci + intervaly spolehlivosti
+  #   sance na vyssi ochotu studovat na VS je 2.85 krat vetsi pro studenty 
+  #     s vysokoskolsky vzdelanymi rodici nez u ostatnich, pri stejnem typu SS a stejnym vysledkem GPA 
+  #   kdyz vyroste hodnoceni GPA o 1, prumerna sance na vyssi ochotu studovat na VS vzroste 1.85 krat
+  #     u studentu ze stejneho typu SS se stejne vzdelanymi rodici
+
+# test predpokladu: "parallel lines"
+#   H0: zavislost je ve vsech skupinach zavisle promenne stejna
+#   H1: zavislost se v jednotlivych kategoriich lisi
+poTest(m)
+  # p-hodnoty u vsech koeficientu jsou vetsi nez 0.05 -> nezamitam H0
+  # zavislost je ve vsech skupinach stejna
+
+####################
+## Samostatne
+
+# Na cem zavisi, zda zena pracovala
+data("Womenlf")
+  # data o zamestnanosti zen v roce 1977 v Kanade
+  # partic - zamestnanost zeny (3 kategorie - parttime, fulltime, not.work)
+  # hincome - prijem manzela v tisicich dolarech
+  # children - zda zena ma ci nema deti
+  # region - Kanadska provincie
+
+# priprava dat
+women.work <- Womenlf
+women.work$partic <- factor(women.work$partic, levels=c("not.work", "parttime", "fulltime"))
+  # vytvoreni usporadane kategoricke promenne
+
+m <- polr(partic ~ hincome + children + region, data = women.work, Hess=TRUE)
+summary(m)
+(ctable <- coef(summary(m)))
+pval <- pt(abs(ctable[, "t value"]), df=length(women.work$partic)-1, lower.tail = FALSE) * 2
+(ctable <- cbind(ctable, "p value" = pval))
+
+# Value Std. Error    t value      p value
+# hincome           -0.05691142 0.02017086 -2.8214672 5.146524e-03
+# childrenpresent   -2.00988839 0.29430907 -6.8291758 5.937411e-11
+# regionBC           0.15299289 0.56437987  0.2710814 7.865419e-01
+# regionOntario      0.26866587 0.46220183  0.5812739 5.615556e-01
+# regionPrairie      0.47966358 0.54127130  0.8861796 3.763334e-01
+# regionQuebec      -0.07108525 0.49376999 -0.1439643 8.856393e-01
+# not.work|parttime -1.74922840 0.54363177 -3.2176714 1.454976e-03
+# parttime|fulltime -0.83153049 0.53245224 -1.5616997 1.195658e-01
+
+# To, zda Ĺľena pracovala, zavisĂ­ na pĹ™Ă­jmu manĹľela (hincome) a pĹ™Ă­tomnosti dÄ›tĂ­ (childrenpresent)
+# Na regionu to nezĂˇvisĂ­
+# Ĺ˝eny s dÄ›tmi a Ĺľeny s bohatĂ˝mi manĹľely majĂ­ menĹˇĂ­ Ĺˇanci pracovat. Provincie nehraje roli.
+# children mĂˇ extrĂ©mnÄ› silnĂ˝ efekt â€“ p ~ 0.000000000059
+# Koeficient pro hincome je malĂ˝, ale statisticky vĂ˝znamnĂ˝.
+
+Anova(m)
+poTest(m)
+
+# JakĂˇ je Ĺˇance, Ĺľe Ĺľeny budou pracovat, kdyĹľ nebudou mĂ­t dÄ›ti
+(b <- coef(m))
+1 / exp(b[2])
+
+# OtĂˇzka - logistickĂˇ regrese - kde se dĂˇle vyuĹľĂ­vĂˇ a jak (ordinĂˇlnĂ­ promÄ›nnĂ©?)
+
+########################
+### Poissonova regrese - log-linear model
+# zavisle promennou tvori pocty
+
+# Na cem zavisi pocty oceneni
+p <- read.csv("https://stats.idre.ucla.edu/stat/data/poisson_sim.csv")
+p <- within(p, {
+  prog <- factor(prog, levels=1:3, labels=c("General", "Academic", 
+                                            "Vocational"))
+  id <- factor(id)
+})
+  # pocty oceneni ziskane studenty v ruznych studijnich programech
+  #   pridana je zavislost na vysledcich testu z matematiky
+(tab <- table(p$prog, p$num_awards))
+barplot(tab, beside = T, col = 2:4,
+        main = "Numbers of awards for different study programs", legend = T)
+  # graficke znazorneni
+
+# Poissonova regrese (zobecnÄ›nĂˇ lineĂˇrnĂ­ regrese)
+(mod.p1 <- glm(num_awards ~ prog + math, family = "poisson", data = p))
+summary(mod.p1)
+Anova(mod.p1)
+  # obe nezavisle promenne maji vyznamny vliv
+  #   "General" a "Vocational" program se od sebe vyznamne nelisi
+
+confint(mod.p1)
+  # intervaly spolehlivosti pro regresni koeficienty
+NagelkerkeR2(mod.p1)
+  # neco jako koeficient determinace
+
+# Graficky vystup
+# I kdyĹľ jsou kĹ™ivky pĹ™ekĹ™Ă­ĹľenĂ©, nejednĂˇ se o interakci
+pred <- predict(mod.p1, type = "response")
+vyst <- data.frame(p$math, p$prog, pred)
+vyst <- vyst[order(vyst[,1]),]
+plot(num_awards ~ math, col = prog, pch = 19, data = p,
+     main = "Zavislost poctu oceneni na testu z matematiky")
+lines(vyst[vyst[,2] == "General", 1], vyst[vyst[,2] == "General",3], col = 1)
+lines(vyst[vyst[,2] == "Academic", 1], vyst[vyst[,2] == "Academic",3], col = 2)
+lines(vyst[vyst[,2] == "Vocational", 1], vyst[vyst[,2] == "Vocational",3], col = 3)
+legend(35, 5.5, levels(p$prog), lty = 1, col = 1:3)
+
+# kontrola variability
+# v Poissonove regresi ocekavame, ze rozptyl zavisle promenne be mel byt stejny 
+#   jako jeji stredni hodnota
+mean(p$num_awards)
+var(p$num_awards)
+  # rozdil neni az tak velky, ale uplne stejne tyto hodnoty take nejsou
+
+# Zkusime do modelu pridat koeficient pro upravu rozptylu
+#   tzv. "dispersion parameter"
+(mod.p2 <- glm(num_awards ~ prog + math, family = "quasipoisson", data = p))
+summary(mod.p2)
+  # v nasem pripade je dispersion parameter = 1.08
+  # tedy rozptyl nasi promenne je temer shodny jako jeji stredni hodnota
+  # vyuziti klasicke poissonovy regrese je v eporadku
+Anova(mod.p2)
+  # vysledky se prakticky nelisi
+
+# test (z knihovny AER)
+#   H0: dispersion parameter = 1 vs H1: dispersion parameter > 1
+dispersiontest(mod.p1)
+  # p-hodnota 0.2973 > 0.05 -> nezamitame H0, predpoklad poissonovy regrese je splnen
+
+## kontrola residui
+qqnorm(residuals(mod.p1)); qqline(residuals(mod.p1), col = 2)
+
+# V pripade, ze nejsou splneny podminky poissonovy regrese, je mozne zkusit i 
+#   regresi s negativnim binomickym rozdelenim
+mod.nb <- glm.nb(num_awards ~ prog + math, data=p)
+summary(mod.nb)
+qqnorm(residuals(mod.nb)); qqline(residuals(mod.nb), col = 2)
+
+##################
+## Samostatne
+ 
+# Na cem zavisi pocet skvrn na hlave mladete tetrivka
+data("grouseticks")
+  # index - ID ptacete
+  # ticks - pocet skvrn
+  # brood - cislo vrhu, ze ktereho mlade pochazi
+  # height - nadmorska vyska
+  # year - rok
+  # location - misto
+
+## pocitejte zavislost na nadmorske vysce a roku
+
+# kdybychom nevÄ›dÄ›li typ rozdÄ›lenĂ­, tak cullen and frey graph
+library(fitdistrplus)
+descdist(grouseticks$TICKS, boot = 1000)
+
+View(grouseticks)
+(m <- glm(TICKS ~ HEIGHT + YEAR, family = "poisson", data = grouseticks))
+summary(m)
+Anova(m)
+
+NagelkerkeR2(m)
+dispersiontest(m)
+qqnorm(residuals(m), pch=19)
+
+# Data nesplĹujĂ­ pĹ™edpoklady poissonova rozdÄ›lenĂ­
+mean(grouseticks$TICKS) # 6.369727
+var(grouseticks$TICKS) # 172.6615
+
+(m <- glm(TICKS ~ HEIGHT + YEAR, family = "quasipoisson", data = grouseticks))
+summary(m)
+Anova(m)
+NagelkerkeR2(m)
+qqnorm(residuals(m), pch=19)
+
+(m <- glm(TICKS ~ HEIGHT + YEAR, data = grouseticks))
+summary(m)
+
+### End of C:\Users\ondre\source\repos\git\UJEP\PSM\PSM-Zobecnene-regresni-modely\PSM_zobecnene_regresni_modely.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\PSM\Regression-1\.venv\Lib\site-packages\statsmodels\stats\libqsturng\CH.r
+# Copyright (c) 2011, Roger Lew BSD [see LICENSE.txt]
+# This software is funded in part by NIH Grant P20 RR016454.
+
+
+# This is a collection of scripts used to generate C-H comparisons
+# for qsturng. As you can probably guess, my R's skills are not all that good.
+
+setwd('D:\\USERS\\roger\\programming\\python\\development\\qsturng')
+
+ps = seq(length=100, from=.5, to=.999)
+
+for (r in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,
+            22,23,24,25,26,27,28,29,30,35,40,50,60,70,80,90,100,200)) {
+    for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+                22,24,26,30,35,40,50,60,90,120,240,480,1e38)) {
+        m = qtukey(ps, r, v)
+        fname = sprintf('CH_r=%i,v=%.0f.dat',r,v)
+        print(fname)
+        write(rbind(ps, m),
+              file=fname,
+              ncolumns=2,
+              append=FALSE,
+              sep=',')
+    }
+}
+
+rs = c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,40,60,80,100)
+
+for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+           17,18,19,20,24,30,40,60,120,1e38)) {
+    m = qtukey(0.30, rs, v)
+    fname = sprintf('CH_p30.dat')
+    print(fname)
+    write(rbind(m),
+          file=fname,
+          ncolumns=26,
+          append=TRUE,
+          sep=' ')
+}
+
+for i in
+for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+           17,18,19,20,24,30,40,60,120,1e38)) {
+    m = qtukey(0.675, rs, v)
+    fname = sprintf('CH_p675.dat',r,v)
+    print(fname)
+    write(rbind(m),
+          file=fname,
+          ncolumns=26,
+          append=TRUE,
+          sep=' ')
+}
+
+for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+           17,18,19,20,24,30,40,60,120,1e38)) {
+    m = qtukey(0.75, rs, v)
+    fname = sprintf('CH_p75.dat',r,v)
+    print(fname)
+    write(rbind(m),
+          file=fname,
+          ncolumns=26,
+          append=TRUE,
+          sep=' ')
+}
+
+for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+           17,18,19,20,24,30,40,60,120,1e38)) {
+    m = qtukey(0.975, rs, v)
+    fname = sprintf('CH_p975.dat')
+    print(fname)
+    write(rbind(m),
+          file=fname,
+          ncolumns=26,
+          append=TRUE,
+          sep=' ')
+}
+
+i = 0;
+for (i in 0:9999) {
+    p = runif(1, .5, .95);
+    r = sample(2:100, 1);
+    v = runif(1, 2, 1000);
+    q = qtukey(p,r,v);
+    if (!is.nan(q)) {
+        write(c(p,r,v,q),
+              file='bootleg.dat',
+              ncolumns=4,
+              append=TRUE,
+              sep=',');
+        i = i + 1;
+    }
+}
+### End of C:\Users\ondre\source\repos\git\UJEP\PSM\Regression-1\.venv\Lib\site-packages\statsmodels\stats\libqsturng\CH.r
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\PSM\Regression-2\.venv\Lib\site-packages\statsmodels\stats\libqsturng\CH.r
+# Copyright (c) 2011, Roger Lew BSD [see LICENSE.txt]
+# This software is funded in part by NIH Grant P20 RR016454.
+
+
+# This is a collection of scripts used to generate C-H comparisons
+# for qsturng. As you can probably guess, my R's skills are not all that good.
+
+setwd('D:\\USERS\\roger\\programming\\python\\development\\qsturng')
+
+ps = seq(length=100, from=.5, to=.999)
+
+for (r in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,
+            22,23,24,25,26,27,28,29,30,35,40,50,60,70,80,90,100,200)) {
+    for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+                22,24,26,30,35,40,50,60,90,120,240,480,1e38)) {
+        m = qtukey(ps, r, v)
+        fname = sprintf('CH_r=%i,v=%.0f.dat',r,v)
+        print(fname)
+        write(rbind(ps, m),
+              file=fname,
+              ncolumns=2,
+              append=FALSE,
+              sep=',')
+    }
+}
+
+rs = c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,40,60,80,100)
+
+for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+           17,18,19,20,24,30,40,60,120,1e38)) {
+    m = qtukey(0.30, rs, v)
+    fname = sprintf('CH_p30.dat')
+    print(fname)
+    write(rbind(m),
+          file=fname,
+          ncolumns=26,
+          append=TRUE,
+          sep=' ')
+}
+
+for i in
+for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+           17,18,19,20,24,30,40,60,120,1e38)) {
+    m = qtukey(0.675, rs, v)
+    fname = sprintf('CH_p675.dat',r,v)
+    print(fname)
+    write(rbind(m),
+          file=fname,
+          ncolumns=26,
+          append=TRUE,
+          sep=' ')
+}
+
+for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+           17,18,19,20,24,30,40,60,120,1e38)) {
+    m = qtukey(0.75, rs, v)
+    fname = sprintf('CH_p75.dat',r,v)
+    print(fname)
+    write(rbind(m),
+          file=fname,
+          ncolumns=26,
+          append=TRUE,
+          sep=' ')
+}
+
+for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+           17,18,19,20,24,30,40,60,120,1e38)) {
+    m = qtukey(0.975, rs, v)
+    fname = sprintf('CH_p975.dat')
+    print(fname)
+    write(rbind(m),
+          file=fname,
+          ncolumns=26,
+          append=TRUE,
+          sep=' ')
+}
+
+i = 0;
+for (i in 0:9999) {
+    p = runif(1, .5, .95);
+    r = sample(2:100, 1);
+    v = runif(1, 2, 1000);
+    q = qtukey(p,r,v);
+    if (!is.nan(q)) {
+        write(c(p,r,v,q),
+              file='bootleg.dat',
+              ncolumns=4,
+              append=TRUE,
+              sep=',');
+        i = i + 1;
+    }
+}
+### End of C:\Users\ondre\source\repos\git\UJEP\PSM\Regression-2\.venv\Lib\site-packages\statsmodels\stats\libqsturng\CH.r
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\PSM\Regression-3\.venv\Lib\site-packages\statsmodels\stats\libqsturng\CH.r
+# Copyright (c) 2011, Roger Lew BSD [see LICENSE.txt]
+# This software is funded in part by NIH Grant P20 RR016454.
+
+
+# This is a collection of scripts used to generate C-H comparisons
+# for qsturng. As you can probably guess, my R's skills are not all that good.
+
+setwd('D:\\USERS\\roger\\programming\\python\\development\\qsturng')
+
+ps = seq(length=100, from=.5, to=.999)
+
+for (r in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,
+            22,23,24,25,26,27,28,29,30,35,40,50,60,70,80,90,100,200)) {
+    for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,
+                22,24,26,30,35,40,50,60,90,120,240,480,1e38)) {
+        m = qtukey(ps, r, v)
+        fname = sprintf('CH_r=%i,v=%.0f.dat',r,v)
+        print(fname)
+        write(rbind(ps, m),
+              file=fname,
+              ncolumns=2,
+              append=FALSE,
+              sep=',')
+    }
+}
+
+rs = c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,30,40,60,80,100)
+
+for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+           17,18,19,20,24,30,40,60,120,1e38)) {
+    m = qtukey(0.30, rs, v)
+    fname = sprintf('CH_p30.dat')
+    print(fname)
+    write(rbind(m),
+          file=fname,
+          ncolumns=26,
+          append=TRUE,
+          sep=' ')
+}
+
+for i in
+for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+           17,18,19,20,24,30,40,60,120,1e38)) {
+    m = qtukey(0.675, rs, v)
+    fname = sprintf('CH_p675.dat',r,v)
+    print(fname)
+    write(rbind(m),
+          file=fname,
+          ncolumns=26,
+          append=TRUE,
+          sep=' ')
+}
+
+for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+           17,18,19,20,24,30,40,60,120,1e38)) {
+    m = qtukey(0.75, rs, v)
+    fname = sprintf('CH_p75.dat',r,v)
+    print(fname)
+    write(rbind(m),
+          file=fname,
+          ncolumns=26,
+          append=TRUE,
+          sep=' ')
+}
+
+for (v in c(2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,
+           17,18,19,20,24,30,40,60,120,1e38)) {
+    m = qtukey(0.975, rs, v)
+    fname = sprintf('CH_p975.dat')
+    print(fname)
+    write(rbind(m),
+          file=fname,
+          ncolumns=26,
+          append=TRUE,
+          sep=' ')
+}
+
+i = 0;
+for (i in 0:9999) {
+    p = runif(1, .5, .95);
+    r = sample(2:100, 1);
+    v = runif(1, 2, 1000);
+    q = qtukey(p,r,v);
+    if (!is.nan(q)) {
+        write(c(p,r,v,q),
+              file='bootleg.dat',
+              ncolumns=4,
+              append=TRUE,
+              sep=',');
+        i = i + 1;
+    }
+}
+### End of C:\Users\ondre\source\repos\git\UJEP\PSM\Regression-3\.venv\Lib\site-packages\statsmodels\stats\libqsturng\CH.r
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\PSM\seminar-work\seminar-work.R
+# Ĺeditel banky si u VĂˇs objednal analĂ˝zu vĂ˝sledkĹŻ dotaznĂ­kovĂ©ho ĹˇetĹ™enĂ­ realizovanĂ©ho na skupinÄ› zĂˇkaznĂ­kĹŻ banky.
+# Jeho dotaz znĂ­: jak bych mÄ›l navĂ˝Ĺˇit zisk banky?
+# VaĹˇĂ­m Ăşkolem je vymyslet svou vlastnĂ­ optimĂˇlnĂ­ strategii pĹŻsobenĂ­ na zĂˇkaznĂ­ky tak,
+# aby se vylepĹˇil jejich vztah k bance.
+
+# Mezi marketĂ©ry velkĂ˝ch firem se klade zĂˇsadnĂ­ dĹŻraz na nĂˇsledujĂ­cĂ­
+# tĹ™i promÄ›nnĂ©: celkovĂˇ spokojenost, ochota firmu doporuÄŤit, vĂ­ra Ĺľe u firmy vydrĹľĂ­m.
+# MĹŻĹľete se zamÄ›Ĺ™it na nÄ›kterou z tÄ›chto promÄ›nnĂ˝ch, nebo na jejich kombinaci (napĹ™. pomocĂ­ vĂˇĹľenĂ©ho prĹŻmÄ›ru)
+# a hledat regresnĂ­ optimĂˇlnĂ­ model, na ÄŤem tato promÄ›nnĂˇ zĂˇvisĂ­.
+# NĂˇslednÄ› pak vyhodnotĂ­te, na kterĂ© faktory by se banka mÄ›la zamÄ›Ĺ™it pĹ™edevĹˇĂ­m.
+
+satisfaction <- get(load("SatData.RData"))
+View(satisfaction)
+
+# VĂ˝bÄ›r relevantnĂ­ch promÄ›nnĂ˝ch (vstupy + vĂ˝stup)
+model_data <- satisfaction[, c(
+  "reputation", "trustworthiness", "seriousness", "solidness", "care",
+  "exp_products", "exp_services", "service", "solutions",
+  "qual_products", "qual_services", "range_products", "qual_personal", "qual_overall",
+  "benefits", "investments", "quality", "price",
+  "satisfaction"
+)]
+
+# RegresnĂ­ model
+model <- lm(satisfaction ~ ., data = model_data)
+
+# ShrnutĂ­ vĂ˝sledkĹŻ
+summary(model)
+
+# SeĹ™azenĂ­ prediktorĹŻ podle vĂ˝znamnosti
+coeffs <- summary(model)$coefficients
+coeffs[order(coeffs[,4]), ]
+
+### End of C:\Users\ondre\source\repos\git\UJEP\PSM\seminar-work\seminar-work.R
+

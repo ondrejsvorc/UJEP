@@ -1,0 +1,2480 @@
+﻿### Start of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-1\CAS_cviceni1.R
+#############################
+### Dekompozice casove rady
+
+# ts = vytvĂˇĹ™Ă­ ÄŤasovou Ĺ™adu (time series)
+# decompose = dekompozice ÄŤasovĂ© Ĺ™ady
+
+births <- scan("http://robjhyndman.com/tsdldata/data/nybirths.dat")
+  # mesicni pocty narozenych v New Yorku od ledna 1946 do prosince 1959
+  # frekvence - 12 mÄ›sĂ­cĹŻ, takĹľe 12 hodnot za rok
+  # start - poÄŤĂˇteÄŤnĂ­ ÄŤasovĂ˝ Ăşdaj (rok a mÄ›sĂ­c) - abychom vÄ›dÄ›li, kdy ÄŤasovĂˇ Ĺ™ada zaÄŤĂ­nĂˇ
+births.ts <- ts(births, frequency=12, start=c(1946,1))
+  # prevedeni na casovou radu
+plot(births.ts)
+  # vykresleni rady
+  # rada ma konstantni rozptyl, uvazuje se aditivni model
+
+births.dec <- decompose(births.ts)
+plot(births.dec)
+  # rada byla rozlozena na trend, sezonni slozku a nahodnou chybu
+  # pokud je sezonnĂ­ sloĹľka menĹˇĂ­ neĹľ trendovĂˇ, tak nenĂ­ zajĂ­mavĂˇ
+(sez <- births.dec$seasonal)
+  # sezonni slozka
+(trend <- births.dec$trend)
+  # je mozne odhadnout krivkou logistickeho trendu
+(ns <- births.dec$random)
+  # nahodna slozka
+
+plot(AirPassengers)
+  # pocty cestujicich vybranou leteckou spolecnosti v letech 1949 - 1960
+  # rada ma rostouci rozptyl, uvazuje se multiplikativni model
+  # zde nenĂ­ vhodnĂ˝ aditivnĂ­ model
+AirP.dec <- decompose(AirPassengers, type = "multiplicative")
+plot(AirP.dec)
+
+# muzete vyzkouset na radach co2, lynx
+plot(co2)
+plot(decompose(co2))
+
+plot(lynx)
+# Za kaĹľdĂ˝ rok 1 ÄŤĂ­slo
+# MĂˇ frekvenci 1, takĹľe nemĂˇ ĹľĂˇdnou sezonnost
+(lynx)
+
+
+#############################
+#### Hledani trendu v ukazkovych datech
+
+load("Trendy.RData")
+
+### Linearni trend
+time<-1971:2000
+
+rada<-Examples1[,1]
+rada.ts<-ts(rada,start=1971)
+plot(rada.ts)
+
+mod1<-lm(rada.ts~time)
+summary(mod1)
+coef(mod1)
+# AIC - dobrĂ˝ pro porovnĂˇnĂ­ vĂ­ce modelĹŻ se stejnĂ˝mi daty (kterĂ˝ je lepĹˇĂ­)
+# Pro ohodnocenĂ­ jednoho modelu je lepĹˇĂ­ koeficient determinace 
+AIC(mod1)
+lines(time,fitted(mod1),col=2)
+
+############################
+## Kvadraticky trend
+
+rada<-Examples1[,2]
+rada.ts<-ts(rada,start=1971)
+plot(rada.ts)
+
+# otestovĂˇnĂ­ kvadratickĂ©ho modelu
+mod1<-lm(rada.ts~time+time2)
+summary(mod1)
+coef(mod1)
+AIC(mod1)
+lines(time,fitted(mod1),col=2)
+
+# otestovĂˇnĂ­ lineĂˇrnĂ­ho modelu
+mod1<-lm(rada.ts~time)
+summary(mod1)
+coef(mod1)
+AIC(mod1)
+lines(time,fitted(mod1),col=3)
+# ÄŚĂ­m menĹˇĂ­ AIC, tĂ­m lepĹˇĂ­ model (kvadratickĂ˝ je tedy vhodnÄ›jĹˇĂ­)
+
+############################
+## Exponencialni trend
+
+rada<-Examples1[,3]
+rada.ts<-ts(rada,start=1971)
+plot(rada.ts)
+
+ln.rada.ts<-log(rada.ts)
+mod1<-lm(ln.rada.ts~time)
+summary(mod1)
+coef(mod1)
+exp(coef(mod1))
+AIC(mod1)
+lines(time,exp(fitted(mod1)),col=2)
+
+time2 <- time * time
+mod1<-lm(rada.ts~time+time2)
+summary(mod1)
+coef(mod1)
+AIC(mod1)
+lines(time,fitted(mod1),col=3)
+
+mod1<-lm(rada.ts~time)
+summary(mod1)
+coef(mod1)
+AIC(mod1)
+lines(time,fitted(mod1),col=4)
+
+##############################
+## Logisticky trend
+x<-1:30
+
+rada<-Examples1[,4]
+rada.ts<-ts(rada,start=1971)
+plot(rada.ts)
+-(log(120))/log(0.7)
+
+# S-kĹ™ivka = SSLogic
+mod1<-nls(rada.ts ~ SSlogis(time, Asym, xmid, scal))
+mod1<-nls(rada.ts ~ SSlogis(x, Asym, xmid, scal))
+summary(mod1)
+coef(mod1)
+AIC(mod1)
+lines(time,fitted(mod1),col=4)
+
+# Gompertzova kĹ™ivka = SSgompertz
+mod1<-nls(rada.ts ~ SSgompertz(time, Asym, b2, b3))
+mod1<-nls(rada.ts ~ SSgompertz(x, Asym, b2, b3))
+summary(mod1)
+coef(mod1)
+AIC(mod1)
+lines(time,fitted(mod1),col=2)
+
+##############################
+## Gompertzova krivka
+
+rada<-Examples1[,5]
+rada.ts<-ts(rada,start=1971)
+plot(rada.ts)
+-(log(13.2))/log(0.8)
+
+mod1<-nls(rada.ts ~ SSgompertz(time, Asym, b2, b3))
+mod1<-nls(rada.ts ~ SSgompertz(x, Asym, b2, b3))
+summary(mod1)
+coef(mod1)
+AIC(mod1)
+lines(time,fitted(mod1),col=4)
+
+mod1<-nls(rada.ts ~ SSlogis(time, Asym, xmid, scal))
+mod1<-nls(rada.ts ~ SSlogis(x, Asym, xmid, scal))
+summary(mod1)
+coef(mod1)
+AIC(mod1)
+lines(time,fitted(mod1),col=2)
+
+##############################
+## zkuste dalsi rady ze souboru Examples1
+rada<-Examples1[,6]
+rada.ts<-ts(rada,start=1971)
+plot(rada.ts)
+time<-1971:2000
+mod1<-lm(rada.ts~time)
+AIC(mod1)
+lines(time,fitted(mod1),col=4)
+
+rada<-Examples1[,7]
+rada.ts<-ts(rada,start=1971)
+plot(rada.ts)
+
+rada<-Examples1[,8]
+rada.ts<-ts(rada,start=1971)
+plot(rada.ts)
+
+rada<-Examples1[,9]
+rada.ts<-ts(rada,start=1971)
+plot(rada.ts)
+
+rada<-Examples1[,10]
+rada.ts<-ts(rada,start=1971)
+plot(rada.ts)
+### End of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-1\CAS_cviceni1.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-10\CAS_cviceni10.R
+####################
+### Nektere dalsi moznosti casovych rad
+
+library(fpp3)
+
+####################
+### Porovnani deterministickeho trendu a stochastickeho trendu
+#   tj. porovnani regrese s ARMA chybou a ARIMA modelu
+
+# vstupni data - letecka doprava v australii 
+aus_airpassengers |>
+  autoplot(Passengers) +
+  labs(y = "Passengers (millions)",
+       title = "Total annual air passengers")
+# je videt rostouci trend
+
+## deterministicky model - linearni zavislost na case a modelovani residui jako ARMA
+fit_deterministic <- aus_airpassengers |>
+  model(deterministic = ARIMA(Passengers ~ 1 + trend() +
+                                pdq(d = 0)))
+report(fit_deterministic)
+  # model: Yt = 0.9014 + 1.4151 * t + et
+  #        et = 0.9564 * e(t-1) + ft
+  #        ft ~ iid N(0, 4.343)
+
+## stochasticky trend - ARIMA
+fit_stochastic <- aus_airpassengers |>
+  model(stochastic = ARIMA(Passengers ~ pdq(d = 1)))
+report(fit_stochastic)
+  # model: Yt = Y0 + 1.4191 * t + et
+  #        et = e(t-1) + ft
+  #        ft ~ iid N(0, 4.271)
+
+# rozdil neni ani tak v odhadech modelu, ale v presnosti predikce do budoucna
+aus_airpassengers |>
+  autoplot(Passengers) +
+  autolayer(fit_stochastic |> forecast(h = 20),
+            colour = "#0072B2", level = 95) +
+  autolayer(fit_deterministic |> forecast(h = 20),
+            colour = "#D55E00", alpha = 0.65, level = 95) +
+  labs(y = "Air passengers (millions)",
+       title = "Forecasts from trend models")
+  # modre je stochasticky model, oranzove deterministicky
+  # deterministicky model ma mensi chybovost
+
+#####################################
+### Modely harmonicke regrese ( s vyuzitim fourierova rozvoje)
+
+# vstupni data
+recent_production <- aus_production |>
+  filter(year(Quarter) >= 1992)
+recent_production |>
+  autoplot(Beer) +
+  labs(y = "Megalitres",
+       title = "Australian quarterly beer production")
+  # periodicka data s klesajicim trendem
+
+# linearni model
+fit_beer <- recent_production |>
+  model(TSLM(Beer ~ trend() + season()))
+report(fit_beer)
+  # bezny zpusob modelovani trendu a sezonnosti
+  # model: Yt = 441.8 - 0.34 * t -34.66 * Q2 - 17.82 * Q3 + 72.8 * Q4 + et  
+
+# jak odhad sedi na data
+augment(fit_beer) |>
+  ggplot(aes(x = Quarter)) +
+  geom_line(aes(y = Beer, colour = "Data")) +
+  geom_line(aes(y = .fitted, colour = "Fitted")) +
+  scale_colour_manual(
+    values = c(Data = "black", Fitted = "#D55E00")
+  ) +
+  labs(y = "Megalitres",
+       title = "Australian quarterly beer production") +
+  guides(colour = guide_legend(title = "Series"))
+
+# predpovedi
+fc_beer <- forecast(fit_beer)
+fc_beer |>
+  autoplot(recent_production) +
+  labs(
+    title = "Forecasts of beer production using regression",
+    y = "megalitres"
+  )
+
+# harmonicka regrese - model pomoci clenu Fourierovy rady
+fourier_beer <- recent_production |>
+  model(TSLM(Beer ~ trend() + fourier(K = 2)))
+report(fourier_beer)
+  # model: Yt - 446.9 - 0.34 * t + 8.9 * cos(2pit/4) - 53.7 * sin(2pit/4) - 14 * cos(4pit/4) + et
+
+# jak model sedi na data
+augment(fourier_beer) |>
+  ggplot(aes(x = Quarter)) +
+  geom_line(aes(y = Beer, colour = "Data")) +
+  geom_line(aes(y = .fitted, colour = "Fitted")) +
+  scale_colour_manual(
+    values = c(Data = "black", Fitted = "#D55E00")
+  ) +
+  labs(y = "Megalitres",
+       title = "Australian quarterly beer production") +
+  guides(colour = guide_legend(title = "Series"))
+
+# predpovedi
+fc_beer <- forecast(fourier_beer)
+fc_beer |>
+  autoplot(recent_production) +
+  labs(
+    title = "Forecasts of beer production using regression",
+    y = "megalitres"
+  )
+
+# modely jsou prakticky totozne
+
+#################################
+### Kombinace harmonicke regrese a ARMA chyb
+# vstupni data - naklady na jidlo v Autralii
+aus_cafe <- aus_retail |>
+  filter(
+    Industry == "Cafes, restaurants and takeaway food services",
+    year(Month) %in% 2004:2018
+  ) |>
+  summarise(Turnover = sum(Turnover))
+aus_cafe |>
+  autoplot(Turnover) +
+  labs(y = "$ billions",
+       title = "Australian eating out expenditure")
+  # periodicka data s rostoucim trendem
+
+# 6 modelu vyuzivajicich az 6 clenu fourierovy rady
+#   nahodna slozka rady je modelovana jako ARMA model bez periodicke casti
+fit <- model(aus_cafe,
+             `K = 1` = ARIMA(log(Turnover) ~ fourier(K=1) + PDQ(0,0,0)),
+             `K = 2` = ARIMA(log(Turnover) ~ fourier(K=2) + PDQ(0,0,0)),
+             `K = 3` = ARIMA(log(Turnover) ~ fourier(K=3) + PDQ(0,0,0)),
+             `K = 4` = ARIMA(log(Turnover) ~ fourier(K=4) + PDQ(0,0,0)),
+             `K = 5` = ARIMA(log(Turnover) ~ fourier(K=5) + PDQ(0,0,0)),
+             `K = 6` = ARIMA(log(Turnover) ~ fourier(K=6) + PDQ(0,0,0))
+)
+
+fit |>
+  forecast(h = "2 years") |>
+  autoplot(aus_cafe, level = 95) +
+  facet_wrap(vars(.model), ncol = 2) +
+  guides(colour = "none", fill = "none", level = "none") +
+  geom_label(
+    aes(x = yearmonth("2007 Jan"), y = 4250,
+        label = paste0("AICc = ", format(AICc))),
+    data = glance(fit)
+  ) +
+  labs(title= "Total monthly eating-out expenditure",
+       y="$ billions")
+  # vykresleni vylepsujici se predikce
+
+# nejlepsi model
+fit_best <- model(aus_cafe,
+                  ARIMA(log(Turnover) ~ fourier(K=6) + PDQ(0,0,0)))
+report(fit_best)
+  # jak vypada model?
+
+############################
+### Zavislost na jinych radach s ARMA chybami
+
+# vstupni data - zavislost spotreby energie na teplote
+vic_elec_daily <- vic_elec |>
+  filter(year(Time) == 2014) |>
+  index_by(Date = date(Time)) |>
+  summarise(
+    Demand = sum(Demand) / 1e3,
+    Temperature = max(Temperature),
+    Holiday = any(Holiday)
+  ) |>
+  mutate(Day_Type = case_when(
+    Holiday ~ "Holiday",
+    wday(Date) %in% 2:6 ~ "Weekday",
+    TRUE ~ "Weekend"
+  ))
+
+# je videt nelinearni zavislost na teplote
+vic_elec_daily |>
+  pivot_longer(c(Demand, Temperature)) |>
+  ggplot(aes(x = Date, y = value)) +
+  geom_line() +
+  facet_grid(name ~ ., scales = "free_y") + ylab("")
+
+# jsou zrejme rozdily v pracovnich dnech a o vikendech
+vic_elec_daily |>
+  ggplot(aes(x = Temperature, y = Demand, colour = Day_Type)) +
+  geom_point() +
+  labs(y = "Electricity demand (GW)",
+       x = "Maximum daily temperature")
+
+# model nelinearni zavislosti na teplote se zavislosti na pracovnim dni a ARMA chybami
+fit <- vic_elec_daily |>
+  model(ARIMA(Demand ~ Temperature + I(Temperature^2) +
+                (Day_Type == "Weekday")))
+report(fit)
+  # pomerne slozita cast pro ARMA chyby
+
+fit |> gg_tsresiduals()
+  # kontrola chyb modelu
+
+# predikce - nejprve je treba predikovat teplotu a pracovni dny
+vic_elec_future <- new_data(vic_elec_daily, 14) |>
+  mutate(
+    Temperature = 26,
+    Holiday = c(TRUE, rep(FALSE, 13)),
+    Day_Type = case_when(
+      Holiday ~ "Holiday",
+      wday(Date) %in% 2:6 ~ "Weekday",
+      TRUE ~ "Weekend"
+    )
+  )
+  # teplota se vzala konstantne 26 a pridaly se k tomu charakteristiky jednotlivych dni
+
+# predpoved spotreby el. energie
+forecast(fit, vic_elec_future) |>
+  autoplot(vic_elec_daily) +
+  labs(title="Daily electricity demand: Victoria",
+       y="GW")
+
+##########################
+### Vicenasobna (dvojita) perioda v rade 
+
+# vstupni data - telefonaty do banky
+bank_calls |>
+  fill_gaps() |>
+  autoplot(Calls) +
+  labs(y = "Calls",
+       title = "Five-minute call volume to bank")
+
+calls <- bank_calls |>
+  mutate(t = row_number()) |>
+  update_tsibble(index = t, regular = TRUE)
+  # v datech jsou chybejici hodnotz mimo pracovni dobu - vynechame je
+
+# dekompozice rady na trend, prvni sezonnost a druhou sezonnost
+calls |>
+  model(
+    STL(sqrt(Calls) ~ season(period = 169) +
+          season(period = 5*169),
+        robust = TRUE)
+  ) |>
+  components() |>
+  autoplot() + labs(x = "Observation")
+
+## Porovnani predpovedi z dekompozice + exponencialniho vyrovnani 
+#   a harmonicke regrese
+# dekompozice + exponencialni vyrovnani
+my_dcmp_spec <- decomposition_model(
+  STL(sqrt(Calls) ~ season(period = 169) +
+        season(period = 5*169),
+      robust = TRUE),
+  ETS(season_adjust ~ season("N"))
+)
+# predpovedi
+fc <- calls |>
+  model(my_dcmp_spec) |>
+  forecast(h = 5 * 169)
+
+# Priprava dat pro vykresleni (pridani chybejicich hodnot)
+fc_with_times <- bank_calls |>
+  new_data(n = 7 * 24 * 60 / 5) |>
+  mutate(time = format(DateTime, format = "%H:%M:%S")) |>
+  filter(
+    time %in% format(bank_calls$DateTime, format = "%H:%M:%S"),
+    wday(DateTime, week_start = 1) <= 5
+  ) |>
+  mutate(t = row_number() + max(calls$t)) |>
+  left_join(fc, by = "t") |>
+  as_fable(response = "Calls", distribution = Calls)
+
+# Vykresleni predpovedi na 3 tydny
+fc_with_times |>
+  fill_gaps() |>
+  autoplot(bank_calls |> tail(14 * 169) |> fill_gaps()) +
+  labs(y = "Calls",
+       title = "Five-minute call volume to bank")
+
+# harmonicka regrese - vyplati se pri dlouhych periodach (jine postupy na nich kolabuji)
+fit <- calls |>
+  model(
+    dhr = ARIMA(sqrt(Calls) ~ PDQ(0, 0, 0) + pdq(d = 0) +
+                  fourier(period = 169, K = 10) +
+                  fourier(period = 5*169, K = 5)))
+
+# predpovedi
+fc <- fit |> forecast(h = 5 * 169)
+
+# Priprava dat pro vykresleni (pridani chybejicich hodnot)
+fc_with_times <- bank_calls |>
+  new_data(n = 7 * 24 * 60 / 5) |>
+  mutate(time = format(DateTime, format = "%H:%M:%S")) |>
+  filter(
+    time %in% format(bank_calls$DateTime, format = "%H:%M:%S"),
+    wday(DateTime, week_start = 1) <= 5
+  ) |>
+  mutate(t = row_number() + max(calls$t)) |>
+  left_join(fc, by = "t") |>
+  as_fable(response = "Calls", distribution = Calls)
+
+# Vykresleni predpovedi na 3 tydny
+fc_with_times |>
+  fill_gaps() |>
+  autoplot(bank_calls |> tail(14 * 169) |> fill_gaps()) +
+  labs(y = "Calls",
+       title = "Five-minute call volume to bank")
+
+#### 
+# vstupni data: zavislost spotreby el.energie na teplote
+vic_elec |>
+  pivot_longer(Demand:Temperature, names_to = "Series") |>
+  ggplot(aes(x = Time, y = value)) +
+  geom_line() +
+  facet_grid(rows = vars(Series), scales = "free_y") +
+  labs(y = "")
+
+# pridani pracovnich dni
+elec <- vic_elec |>
+  mutate(
+    DOW = wday(Date, label = TRUE),
+    Working_Day = !Holiday & !(DOW %in% c("Sat", "Sun")),
+    Cooling = pmax(Temperature, 18)
+  )
+elec |>
+  ggplot(aes(x=Temperature, y=Demand, col=Working_Day)) +
+  geom_point(alpha = 0.6) +
+  labs(x="Temperature (degrees Celsius)", y="Demand (MWh)")
+
+# harmonicky model
+## pozor, velka data - bezi dlouho!!!
+fit <- elec |>
+  model(
+    ARIMA(Demand ~ PDQ(0, 0, 0) + pdq(d = 0) +
+            Temperature + Cooling + Working_Day +
+            fourier(period = "day", K = 7) +
+            fourier(period = "week", K = 4) +
+            fourier(period = "year", K = 2))
+  )
+
+# priprava dat pro vypocet predpovedi
+elec_newdata <- new_data(elec, 2*48) |>
+  mutate(
+    Temperature = tail(elec$Temperature, 2 * 48),
+    Date = lubridate::as_date(Time),
+    DOW = wday(Date, label = TRUE),
+    Working_Day = (Date != "2015-01-01") &
+      !(DOW %in% c("Sat", "Sun")),
+    Cooling = pmax(Temperature, 18)
+  )
+# predpovedi
+fc <- fit |>
+  forecast(new_data = elec_newdata)
+
+fc |>
+  autoplot(elec |> tail(10 * 48)) +
+  labs(title="Half hourly electricity demand: Victoria",
+       y = "Demand (MWh)", x = "Time [30m]")
+
+#####################################
+
+plot(lynx)
+lynx_tsbl <- as_tsibble(lynx)
+lynx_tsbl2 <- lynx_tsbl |> mutate(Time = 1:length(lynx))
+fit <- lynx_tsbl2 |> model(TSLM(value ~ fourier(period = 10, K = 1)))
+report(fit)
+
+fits <- lynx_tsbl2 %>% model(
+  K1 = ARIMA(value ~ fourier(period = 10, K = 1) + fourier(period = 40, K = 1)),
+  K2 = ARIMA(value ~ fourier(period = 10, K = 1) + fourier(period = 40, K = 2)),
+  K3 = ARIMA(value ~ fourier(period = 10, K = 1) + fourier(period = 40, K = 3)),
+  K4 = ARIMA(value ~ fourier(period = 10, K = 1) + fourier(period = 40, K = 4))
+)
+
+best <- fits %>% select(which.min(glance(fits)$AICc))
+report(best)
+best %>% forecast(h = 20) %>% autoplot(lynx_tsbl2)
+
+augment(best) %>% 
+  mutate(Time = row_number()) %>%
+  ggplot(aes(Time, value)) +
+  geom_line() +
+  geom_line(aes(y = .fitted), size = 1)
+
+### End of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-10\CAS_cviceni10.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-2\CAS_cviceni2.R
+############################
+### nacteni knihoven, ktere pracuji s casovymi radami
+library(TTR)
+library(zoo)
+library(forecast)
+  # dalsi uzitecne funkce obsazene primo v knihovne stats
+
+############################
+### Vyhlazeni casovych rad
+
+### Vyhlazeni pomoci klouzavych prumeru 
+
+kings <- scan("http://robjhyndman.com/tsdldata/misc/kings.dat",skip=3)
+  # veky, ve kterych zemreli anglicti kralove
+kings.ts <- ts(kings)
+plot(kings.ts)
+  # trendova slozka bez sezonnosti
+
+# klouzave prumery prvniho radu ruzne delky
+kings.rm3 <- rollmean(kings.ts, 3)
+kings.rm5 <- rollmean(kings.ts, 5)
+kings.rm7 <- rollmean(kings.ts, 7)
+kings.rm9 <- rollmean(kings.ts, 9)
+kings.rm11 <- rollmean(kings.ts, 11)
+  # pro krajni body odhady nejsou
+
+# DobrĂ˝ odhad vyhlazuje
+# DobrĂ˝ odhad nejde proti hodnotĂˇm (okno je moc krĂˇtkĂ© - musĂ­me brĂˇt delĹˇĂ­) - nemĂˇ jĂ­t obrĂˇcenÄ› neĹľ pĹŻvodnĂ­ Ĺ™ada (ÄŤasovĂˇ Ĺ™ada tĹ™eba nÄ›kde stoupĂˇ, ale vyhlazenĂ­ tĹ™eba klesĂˇ v danĂ© oblasti)
+# SvÄ›tle modrĂˇ je asi nejlepĹˇĂ­, fialovĂˇ "ukrojila" pĹ™Ă­liĹˇ pozorovĂˇnĂ­
+plot(kings.ts)
+lines(kings.rm3, col = 2)
+lines(kings.rm5, col = 3)
+lines(kings.rm7, col = 4)
+lines(kings.rm9, col = 5)
+lines(kings.rm11, col = 6)
+legend(34, 40, legend=c("puvodni rada", "KP delky 3", "KP delky 5", "KP delky 7", "KP delky 9", "KP delky 11"),
+       lty=1, col=1:6, cex=0.8)
+  # podivame se na vysledky a podle toho, jak detailni vyhlazeni chceme, volime delku klouzaveho prumeru
+  # neni dobre, kdyz vyhlazena rada vykazuje opacne vykyvy nez rada puvodni 
+  #   to znaci male vyhlazeni
+
+# klouzave prumery tretiho radu
+vahy <- (1/35)*c(-3, 12, 17, 12, -3)
+kings.rm3.5 <- rollapply(kings.ts, 5, 
+                    function(z){return(weighted_mean = weighted.mean(z, vahy))})
+vahy <- (1/231)*c(-21, 14, 39, 54, 59, 54, 39, 14, -21)
+kings.rm3.9<-rollapply(kings.ts, 9, 
+                    function(z){return(weighted_mean = weighted.mean(z, vahy))})
+
+plot(kings.ts)
+lines(kings.rm3.5, col = 2)
+lines(kings.rm3.9, col = 3)
+  # mame lepsi vysledky nez obycejnymi klouzavymi prumery?
+
+###################################
+### funkcne zapsatelny trend
+# pokud jsme tvar trendu schopni odhadnout z dat, je mozne pocitat primo model zavislosti na case
+cas <- 1:42
+lin.trend <- lm(kings ~ cas)
+kv.trend <- lm(kings ~ cas + I(cas^2))
+kub.trend <- lm(kings ~ cas + I(cas^2) + I(cas^3))
+
+plot(kings.ts)
+abline(lin.trend, col = 2)
+lines(cas,fitted(kv.trend), col = 3)
+lines(cas,fitted(kub.trend), col = 4)
+legend(34, 40, legend=c("puvodni rada", "linearni trend", "kvadraticky trend", "kubicky trend"),
+       lty=1, col=1:4, cex=0.7)
+
+# porovnani, ktery trend je lepsi
+summary(lin.trend)$r.squared # koeficient determinace (vysvÄ›tlĂ­ 16 % variability)
+summary(kv.trend)$r.squared # koeficient determinace (vysvÄ›tlĂ­ 29 % variability)
+summary(kub.trend)$r.squared # koeficient determinace (vysvÄ›tlĂ­ 32 % variability)
+  # procento variability vysvetlene modelem
+
+AIC(lin.trend)
+AIC(kv.trend)
+AIC(kub.trend)
+  # Akaikeho informacni kriterium - cim mensi tim lepsi
+BIC(lin.trend)
+BIC(kv.trend)
+BIC(kub.trend)
+  # Bayesovske informacni kriterium - cim mensi tim lepsi
+  # idealni model se jevi kvadraticky (ale stejnÄ› ho pouĹľĂ­vat nebudeme)
+
+#############################
+### Vyhlazeni pomoci exponencialniho vyrovnani
+
+## Jednoduche exponencialni vyhlazovani - vhodne pro lokalne konstantni trend
+rain <- scan("http://robjhyndman.com/tsdldata/hurst/precip1.dat",skip=1)
+  # rocni srazky v Londyne merene v palcich z let 1813 az 1912
+rain.ts <- ts(rain, start = c(1813))
+plot(rain.ts)
+  # aditivni rada s konstantnim trendem
+
+rain.exp <- HoltWinters(rain.ts, beta = FALSE, gamma = FALSE)
+  # jednoduche exponencialni vyrovnani
+plot(rain.exp)
+  # vykresli data i s odhadnutym trendem
+rain.exp$fitted
+  # predpovedi, neboli hodnoty trendu
+rain.exp$SSE
+  # sum of squared errors - soucet druhych mocnin chyb odhadu
+rain.exp
+  # odhadnuta hodnota parametru alpha
+
+# cim mensi alpha, tim vetsi vyhlazeni
+rain.exp2 <- HoltWinters(rain.ts, alpha = 0.01, beta = FALSE, gamma = FALSE)
+plot(rain.exp2)
+# cim vetsi alpha, tim mensi vyhlazeni
+rain.exp2 <- HoltWinters(rain.ts, alpha = 0.05, beta = FALSE, gamma = FALSE)
+# beta = linearni trend
+# gamma = sezonnost
+plot(rain.exp2)
+
+# pri exponencialnim vyhlazovani se bezne bere jako pocatek trendu prvni merena hodnota
+# pokud chceme trend zacit v jine hodnote, je mozne vyuzit parametr l.start
+plot(HoltWinters(rain.ts, beta = FALSE, gamma = FALSE, l.start = 25))
+  # jak vypada odhad trendu zacinajiciho na hodnote 25
+
+## Predpovedi z exponencialniho vyhlazovani
+rain.exp.for <- forecast(rain.exp, h = 10)
+  # vypocte 10 predpovedi na budouci uhrny srazek
+plot(rain.exp.for)
+lines(1814:1912, rain.exp$fitted[,1], col = 3)
+  # zakresleni predpovedi do grafu
+  # modra cara je bodova predpoved, tmave seda plocha 80% interval spolehlivosti
+  #   a svetle seda plocha 95% interval spolehlivosti
+
+## Dvojite exponencialni vyhlazovani - pri lokalne linearnim trendu
+skirts <- scan("http://robjhyndman.com/tsdldata/roberts/skirts.dat",skip=5)	
+  # rocni data o prumeru lemu sukni z let 1866 az 1911
+skirts.ts <- ts(skirts, start = c(1866))
+plot(skirts.ts)
+  # je videt nejprve rostouci a pak klesajici trend bez sezonni slozky s minimalni chybou
+
+skirts.exp <- HoltWinters(skirts.ts, gamma = FALSE)
+  # Holtova metoda - zobecnene dvojite exponencialni vyrovnani
+skirts.exp
+  # odhadnute hodnoty parametru alfa a beta nam rikaji, ze odhady jsou zalozene 
+  #   predevsim na nedavnych hodnotach (zavislost nejde daleko do minulosti)
+plot(skirts.exp)
+  # vykresleni odhadnuteho trendu
+skirts.exp$SSE # pro porovnĂˇnĂ­ alphy
+  # Soucet druhych mocnin chyb odhadu
+
+## Predpovedi z Holtova vyhlazovani
+skirts.exp.for <- forecast(skirts.exp, h = 20)
+  # vypocte 20 predpovedi
+plot(skirts.exp.for)
+lines(1868:1911, skirts.exp$fitted[,1], col = 3)
+  # zakresleni predpovedi do grafu
+  # modra cara je bodova predpoved, tmave seda plocha 80% interval spolehlivosti
+  #   a svetle seda plocha 95% interval spolehlivosti
+
+############################
+## Parametry funkce HoltWinters:
+# alpha - zodpovida za absolutni clen
+# beta - zodpovida za linearni clen
+# gamma - zodpovida za sezonni slozku
+
+# pocita se vyhlazeni v podobe Y(t+h) = a(t) + h*b(t) + s(t - p + 1 + (h-1) mod p)
+# jednotlive slozky jsou pocitany rekurentne a pri svem vypoctu vyuzivaji i ostatnich slozek:
+
+# a(t) = alpha*(Y(t) - s(t - p)) + (1 - alpha)*(a(t - 1) + b(t - 1))
+# b(t) = beta*(a(t) - a(t - 1)) + (1 - beta)*b(t - 1)
+# s(t) = gamma*(Y(t) - a(t)) + (1 - gamma)*s(t - p)
+
+# chcete-li vetsi vyhlazeni, pak pomuze volit mensi alpha
+# pokud menite i parametr beta, pak musite hledat vhodnou kombinaci alpha, beta 
+
+############################
+## Najdete optimalni zpusob vyhlazeni u nasledujicich rad
+
+## rocni hodnoty vysky hladiny Huronskeho jezera (nemĂˇ sezĂłnnost)
+plot(LakeHuron)
+data <- LakeHuron
+
+data.rm3 <- rollmean(data, 3)
+data.rm5 <- rollmean(data, 5)
+data.rm7 <- rollmean(data, 7)
+data.rm9 <- rollmean(data, 9)
+data.rm11 <- rollmean(data, 11)
+
+plot(data)
+lines(data.rm3, col = 2)
+lines(data.rm5, col = 3)
+lines(data.rm7, col = 4)
+lines(data.rm9, col = 5)
+lines(data.rm11, col = 6)
+legend(34, 40, legend=c("puvodni rada", "KP delky 3", "KP delky 5", "KP delky 7", "KP delky 9", "KP delky 11"),
+       lty=1, col=1:6, cex=0.8)
+
+## pocty lidi pripojenych k internetu za minutu (mĂˇ nÄ›jakĂ© trendy)
+plot(WWWusage)
+
+## rocni prumerne teploty v New Haven
+plot(nhtemp)
+
+## rocni prutoky Nilu
+plot(Nile)
+
+## rada hlavniho indikatoru prodeje
+plot(BJsales.lead)
+
+## koncentrace CO2 v ovzdusi v Mauna Loa
+plot(co2)
+plot(decompose(co2))
+co2.rm11 <- rollmean(co2, 11)
+plot(co2)
+lines(co2.rm11, col = 6)
+legend(34, 40, legend=c("puvodni rada", "KP delky 3", "KP delky 5", "KP delky 7", "KP delky 9", "KP delky 11"), lty=1, col=1:6, cex=0.8)
+plot(co2)
+cas <- time(co2)
+lin.trend <- lm(co2 ~ cas)
+abline(lin.trend, col = 2)
+
+## kvartalni hodnoceni americkych presidentu
+
+## mesicni pocty vaznych nehod v Britanii
+plot(UKDriverDeaths)
+plot(decompose(UKDriverDeaths))
+data <- UKDriverDeaths
+data.rm13 <- rollmean(data, 13) # mÄ›sĂ­ÄŤnĂ­ data, takĹľe alespoĹ 12 pozorovĂˇnĂ­ (to je ale sudĂ© ÄŤĂ­slo, takĹľe 13)
+plot(data)
+lines(data.rm13, col = 6)
+
+### End of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-2\CAS_cviceni2.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-3\CAS_cviceni3.R
+############################
+## Dekompozice casovych rad - hledani trendu a sezonni slozky
+# nacteni knihoven, ktere pracuji s casovymi radami
+library(TTR)
+library(zoo)
+library(forecast)
+library(randtests)
+# dalsi uzitecne funkce obsazene primo v knihovne stats
+
+#############################
+### Vyhlazeni pomoci exponencialniho vyrovnani
+
+## Jednoduche exponencialni vyhlazovani - vhodne pro lokalne konstantni trend
+rain <- scan("http://robjhyndman.com/tsdldata/hurst/precip1.dat",skip=1)
+# rocni srazky v Londyne merene v palcich z let 1813 az 1912
+rain.ts <- ts(rain, start = c(1813))
+plot(rain.ts)
+  # aditivni rada s konstantnim trendem
+
+rain.exp <- HoltWinters(rain.ts, beta = FALSE, gamma = FALSE)
+  # jednoduche exponencialni vyrovnani
+plot(rain.exp)
+  # vykresli data i s odhadnutym trendem (zde odhadnul konstatni trend)
+rain.exp
+  # odhadnuta hodnota parametru alpha
+rain.exp$fitted
+  # predpovedi, neboli hodnoty trendu
+rain.exp$SSE
+  # sum of squared errors - soucet druhych mocnin chyb odhadu
+
+# pomoci hodnoty alpha muzeme nastavit miru vyhlazeni
+rain.exp2 <- HoltWinters(rain.ts, alpha = 0.01, beta = FALSE, gamma = FALSE)
+plot(rain.exp2)
+  # cim mensi alpha, tim vetsi vyhlazeni (vic to zohlednuje stare pozorovani)
+rain.exp2 <- HoltWinters(rain.ts, alpha = 0.05, beta = FALSE, gamma = FALSE)
+plot(rain.exp2)
+  # cim vetsi alpha, tim mensi vyhlazeni (min to zohlednuje stare pozorovani)
+
+## Predpovedi z exponencialniho vyhlazovani
+(rain.exp.for <- forecast(rain.exp, h = 10))
+  # vypocte 10 predpovedi na budouci uhrny srazek
+  # jelikoz se odhaduje konstntni trend, jsou vsechny tyto odhadnute hodnoty stejne
+plot(rain.exp.for)
+lines(1814:1912, rain.exp$fitted[,1], col = 3)
+  # zakresleni predpovedi do grafu
+  # modra cara je bodova predpoved, tmave seda plocha 80% interval spolehlivosti
+  #   a svetle seda plocha 95% interval spolehlivosti
+
+########################
+## Dvojite exponencialni vyhlazovani - vhodne pro lokalne linearni trend
+
+births <- scan("http://robjhyndman.com/tsdldata/data/nybirths.dat")
+  # mesicni pocty narozenych v New Yorku od ledna 1946 do prosince 1959
+births.ts <- ts(births, frequency=12, start=c(1946,1))
+  # prevedeni na casovou radu
+plot(births.ts)
+  # vykresleni rady (ma linearni trend, ma sezonnost- je to mereno po mesicich)
+
+# chceme-li data vyhladit
+births.exp <- HoltWinters(births.ts, gamma=FALSE)
+  # zobecnene dvojite exponencialni vyrovnani
+plot(births.exp)
+  # vykresleni odhadnuteho trendu
+births.exp
+  # odhadnute hodnoty parametru alfa a beta nam rikaji, ze odhady jsou zalozene 
+  #   predevsim na nedavnych hodnotach (zavislost nejde daleko do minulosti - 
+  #   - relativne vysoke alfa)
+# chceme-li hladsi prubeh (vetsi vyhlazeni) volime male alfa
+births.exp2 <- HoltWinters(births.ts, alpha=0.1, gamma=FALSE)
+plot(births.exp2)
+  # prubeh je hladsi, ale nesedi mi na data (je posunuty)
+  # pro mala alpha jsem na zacatku rady "mimo"
+  births.exp3 <- HoltWinters(births.ts, alpha=0.8, gamma=FALSE)
+  plot(births.exp3)
+    # kdyz naopak alpha zvetsim, dostanu relativne presny, i kdyz mirne posunuty
+    #   odhad, ale nemam vzhlazeno
+  
+# JednoduchĂ© exponcencionĂˇlnĂ­ vyrovnĂˇnĂ­
+
+plot(forecast(births.exp, h=10))
+
+########################
+  
+# nechci-li vyhlazovat, ale odhadovat (presneji se trefit),
+#   je dobre pouzit pro sezonni data Holt-Wintersovu metodu
+births.hw <- HoltWinters(births.ts)
+  # podobna myslenka jako u dvojiteho exponencialniho vyhlazeni, 
+  #   ale pridam sezonnost
+
+plot(forecast(births.hw, h=10))
+
+plot(births.hw)
+  # vykresleni odhadnuteho trendu
+  # na data sedi mnohem lepe 
+births.hw
+  # vidim i vykyvy pro jenotlive mesice
+
+# hladsi odhady nedostanu ani pro jine volby parametru
+births.hw2 <- HoltWinters(births.ts, alpha=0.1)
+plot(births.hw2)
+  # vzhlayuji trendovou slozku
+births.hw3 <- HoltWinters(births.ts, gamma=0.1)
+plot(births.hw3)
+  # pri odhadu sezonnosti pripoustim vetsi vliv starsich hodnot
+
+# porovnani, jak modely sedi na data
+births.exp$SSE
+births.exp3$SSE
+births.hw$SSE
+births.hw2$SSE
+births.hw3$SSE
+  # Soucet druhych mocnin chyb odhadu - chci co nejmensi
+
+############################
+### Multiplikativni model
+souvenir <- scan("http://robjhyndman.com/tsdldata/data/fancy.dat")
+  # mesicni data o prodeji suvenyru v Queendslandu v Australii od ledna 1987 do prosince 1993
+souvenir.ts <- ts(souvenir, frequency=12, start=c(1987,1))	
+  # prevedeni na casovou radu
+plot(souvenir.ts)
+  # vykresleni rady
+  # vykyvy se zvetsuji -> multplikativni sezonni rada
+
+# Vyzkousim bezny HoltWintersuv model
+souvenir.hw <- HoltWinters(souvenir.ts)
+plot(souvenir.hw)
+  # vykresleni odhadnuteho trendu
+souvenir.hw$SSE
+  # nic moc
+
+# Ale existuje i Holt-Wintersova metoda pro multiplikativni rady
+souvenir.hwm <- HoltWinters(souvenir.ts, seasonal = "multiplicative")
+plot(souvenir.hwm)
+  # vykresleni odhadnuteho trendu
+souvenir.hwm$SSE
+  # vyrazne lepsi (o rad)
+
+# druha moznost je logaritmovat
+ln.souvenir.ts <- log(souvenir.ts)
+  # logaritmem casto prevedu multiplikativni model na aditivni
+  # oduvodneni: logaritmus soucinu rovna se soucet logaritmus
+plot(ln.souvenir.ts)
+
+ln.souvenir.exp <- HoltWinters(ln.souvenir.ts)
+ln.souvenir.exp
+  # nizka hodnota koeficientu alpha ukazuje, ze uroven se meni v zavislosti na 
+  #   nedavnych i davnych datech
+  # beta = 0 rika, ze sklon trendu se v case nemeni
+  # vysoka hodnota gamma rika, ze sezonnost je zalozena na nedavnych/poslednich datech
+plot(ln.souvenir.exp)
+  # odhad je velmi dobry
+
+########################
+## Obecna dekompozice rady se sezonni slozkou 
+births.dec <- decompose(births.ts)
+plot(births.dec)
+  # rada byla rozlozena na trend, sezonni slozku a nahodnou chybu
+births.dec$seasonal
+  # sezonni slozka
+births.dec$trend
+  # je mozne odhadnout krivkou logistickeho trendu
+(ns <- births.dec$random)
+  # nahodna slozka
+
+## test o nevyznamnosti korelaci v nahodne slozce
+Box.test(ns, lag=20, type="Ljung-Box")
+  # jsou vsechny autokorelace az do casu 20 nevyznamne?
+acf(ns,na.action=na.omit)
+  # vykresleni autokorelacni funkce s mezemi -> viz priste
+
+#######################
+## Testy nahodnosti pro radu typu bily sum
+plot(discoveries)
+
+# Je tato rada nahodna?
+difference.sign.test(discoveries)
+  # test zalozeny na znamenkach diferenci
+diff(discoveries,1)
+  # takto vypadaji diference
+sign(diff(discoveries,1))
+  # takto vypadaji znamenka diferenci
+table(sign(diff(discoveries,1)))
+  # a tady vidime pocty kladnych a zapornych diferenci
+  # podle tohoto testu je rada nahodna
+
+# pro testy zalozene na korelacnich koeficientech potrebuji poradove cislo hodnot
+index <- 1:length(discoveries)
+cor.test(discoveries, index, method="kendall")
+  # test zalozeny na Kandallove korelacnim koeficientu
+  # korelacni koeficient pro usporadane promenne
+cor.test(discoveries, index, method="spearman")
+  # test zalozeny na Spearmanove korelacnim koeficientu
+  # test pro spojite promenne zalozeny na poradich
+  # oba tyto testy ukazuji mirnou zapornou korelaci (rada klesa),
+  #   ktera je na hladine vyznamnosti 5% vyznamna
+
+# dalsi testy
+runs.test(discoveries)
+  # Wald-Wolfowitz Runs Test (mediĂˇnovĂ˝ test)
+discoveries - median(discoveries)
+  # rada odchylek od medianu
+sign(discoveries - median(discoveries))
+  # znamenka odchylek
+(zn <- sign(discoveries - median(discoveries))[sign(discoveries - median(discoveries))!=0])
+  # znamenka s vynechanymi nulami
+abs(diff(zn))
+  # body, kde se mi meni znamenko
+sum(abs(diff(zn)))/2
+  # pocet useku se stejnymi znamenky
+  # rada se tvari nahodne
+
+# pro zajemce
+cox.stuart.test(discoveries)
+  # znamenkovy test porovnavajici dve poloviny casove rady proti sobe
+bartels.rank.test(discoveries)
+  # poradova verze Neumannova podiloveho testu
+
+###############################
+### Samostatne
+
+# popiste + odhadnete radu airmiles
+  # Passenger Miles on Commercial US Airlines, 1937â€“1960
+plot(airmiles)
+airmiles.hw <- HoltWinters(airmiles, gamma = FALSE)
+plot(airmiles.hw)
+plot(forecast(airmiles.hw, h = 10))
+
+# popiste + odhadnete radu BJsales
+  # Sales Data with Leading Indicator
+plot(BJsales)
+
+# popiste + odhadnete radu AirPassengers
+  # Monthly Airline Passenger Numbers 1949-1960
+plot(AirPassengers)
+
+# popiste + odhadnete radu fdeaths
+  # Monthly Deaths from Lung Diseases in the UK
+plot(fdeaths)
+fdeaths.hw <- HoltWinters(fdeaths, gamma = FALSE) # gamma = FALSE -> v datech nenĂ­ sezĂłnnost
+plot(fdeaths.hw)
+plot(forecast(fdeaths.hw))
+
+fdeaths.hw <- HoltWinters(fdeaths) # gamma = TRUE -> v datech je sezĂłnnost (zde skuteÄŤnÄ› je, takĹľe bychom nemÄ›li nastavovat gamma na FALSE)
+plot(fdeaths.hw)
+plot(forecast(fdeaths.hw))
+
+# je rada LakeHuron nahodna?
+  # hladina Huronskeho jezera
+plot(LakeHuron)
+
+# je rada lh nahodna?
+  # Luteinizing Hormone in Blood Samples
+plot(lh)
+
+# je rada nhtemp nahodna?
+  # Average Yearly Temperatures in New Haven
+plot(nhtemp)
+
+
+### End of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-3\CAS_cviceni3.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-4\CAS_cviceni4.R
+#######################
+## Testy nahodnosti pro radu typu bily sum
+library(randtests)
+plot(discoveries)
+
+# Je tato rada nahodna?
+difference.sign.test(discoveries)
+  # test zalozeny na znamenkach diferenci
+diff(discoveries,1)
+  # takto vypadaji diference
+sign(diff(discoveries,1))
+  # takto vypadaji znamenka diferenci
+table(sign(diff(discoveries,1)))
+  # a tady vidime pocty kladnych a zapornych diferenci
+  # podle tohoto testu je rada nahodna
+
+# pro testy zalozene na korelacnich koeficientech potrebuji poradove cislo hodnot
+index <- 1:length(discoveries)
+cor.test(discoveries, index, method = "kendall")
+  # test zalozeny na Kandallove korelacnim koeficientu
+  # korelacni koeficient pro usporadane promenne
+cor.test(discoveries, index, method = "spearman")
+  # test zalozeny na Spearmanove korelacnim koeficientu
+  # test pro spojite promenne zalozeny na poradich
+  # oba tyto testy ukazuji mirnou zapornou korelaci (rada klesa),
+  #   ktera je na hladine vyznamnosti 5% vyznamna
+
+# dalsi testy
+runs.test(discoveries)
+  # Wald-Wolfowitz Runs Test
+discoveries - median(discoveries)
+  # rada odchylek od medianu
+sign(discoveries - median(discoveries))
+  # znamenka odchylek
+(zn <- sign(discoveries - median(discoveries))[sign(discoveries - median(discoveries)) != 0])
+  # znamenka s vynechanymi nulami
+abs(diff(zn))
+  # body, kde se mi meni znamenko
+sum(abs(diff(zn)))/2 + 1
+  # pocet useku se stejnymi znamenky
+  # rada se tvari nahodne
+
+# pro zajemce
+cox.stuart.test(discoveries)
+  # znamenkovy test porovnavajici dve poloviny casove rady proti sobe
+bartels.rank.test(discoveries)
+  # poradova verze Neumannova podiloveho testu
+
+###############################
+### Samostatne
+
+# H0: Ĺ™ada je nĂˇhodnĂˇ
+# H1: Ĺ™ada nenĂ­ nĂˇhodnĂˇ
+# ÄŚili, kdyĹľ je p-hodnota < 0.05, zamĂ­tĂˇme H0 (Ĺ™ada nenĂ­ nĂˇhodnĂˇ)
+# Pokud je p-hodnota >= 0.05, nemĂˇme dĹŻkazy pro zamĂ­tnutĂ­ H0, platĂ­ H1 (Ĺ™ada je nĂˇhodnĂˇ)
+
+# MĂˇme 4 testy, pĹ™iÄŤemĹľ kaĹľdĂ˝ test je zaloĹľen na nÄ›ÄŤem jinĂ©m
+# Podle toho se mĹŻĹľeme rozhodnout, kterĂ˝ je sprĂˇvnĂ˝ pro konkrĂ©tnĂ­ Ĺ™adu
+# 1. Test zaloĹľenĂ˝ na znamenkĂˇch diferencĂ­
+#    - mÄ›Ĺ™Ă­ pouze to, kolikrĂˇt jde Ĺ™ada nahoru a kolikrĂˇt jde dolĹŻ
+#    - ten tedy Ĺ™Ă­kĂˇ, Ĺľe ano, data jsou nĂˇhodnĂˇ, klesajĂ­ a stoupajĂ­, ale mylnÄ› (pro LakeHuron nevhodnĂ˝ test)
+# 2. Testy zaloĹľenĂ© na korelaÄŤnĂ­m koeficientu (KendalĹŻv test, SpearmanĹŻv test)
+#    - mÄ›Ĺ™Ă­ trend, jestli monotĂłnnÄ› stoupĂˇ nebo monotĂłnnÄ› klesĂˇ, je pro nÄ›j tedy dĹŻleĹľitĂ˝ monotĂłnnĂ­ trend (lineĂˇrnĂ­?)
+# 3. Test zaloĹľenĂ˝ na rozdĂ­lu od mediĂˇnu
+#    - mÄ›Ĺ™Ă­, kolik hodnot je nad mediĂˇnem a kolik pod mediĂˇnem
+#    - 
+
+# je rada LakeHuron nahodna?
+data("LakeHuron")
+plot(LakeHuron)
+difference.sign.test(LakeHuron) # Ĺ™ada je nĂˇhodnĂˇ (takĹľe ĹˇpatnĂ˝ test)
+runs.test(LakeHuron) # Ĺ™ada nenĂ­ nĂˇhodnĂˇ
+cor.test(LakeHuron, 1:length(LakeHuron), method = "kendall") # Ĺ™ada nenĂ­ nĂˇhodnĂˇ
+cor.test(LakeHuron, 1:length(LakeHuron), method = "spearman") # mĂˇme shodnĂ© hodnoty, udÄ›lĂˇ pouze aproximaci, Ĺ™ada nenĂ­ nĂˇhodnĂˇ
+
+#   hladina Huronskeho jezera
+# je rada lh nahodna?
+data("lh")
+plot(lh)
+runs.test(lh) # Ĺ™ada nenĂ­ nĂˇhodnĂˇ
+table(sign(diff(lh,1)))
+
+#   Luteinizing Hormone in Blood Samples
+# je rada nhtemp nahodna?
+data("nhtemp")
+plot(nhtemp)
+runs.test(nhtemp) # Ĺ™ada nenĂ­ nĂˇhodnĂˇ
+table(sign(diff(nhtemp,1)))
+
+#   Average Yearly Temperatures in New Haven
+###############################
+
+# Autokorelacni a parcialni autokorelacni funkce 
+data(lh)
+  # Luteinizing Hormone in Blood Samples
+plot(lh)
+  # v rade neni evidentni zadny trend ani sezonnost
+
+# autokovariancni funkce
+acf(lh,type="covariance")
+acf(lh,type="covariance",plot=F)
+  # vypis hodnot, prvni z nich je rozptyl rady
+# autokorelacni funkce
+acf(lh)
+# Bartletova aproximace
+# nad mezĂ­ - autokorelaÄŤnĂ­ funkce je vĂ˝znamnĂˇ
+# pod mezĂ­ - autokorelaÄŤnĂ­ funkc je nevĂ˝znamnĂˇ
+
+acf(lh,plot=F)
+  # opet si muzeme nechat hodnoty vypsat
+# parcialni autokorelacni funkce
+pacf(lh)
+  # parcialni autokorelacni funkce
+pacf(lh,plot=F)
+  # vypis hodnot, prvni z nich je stejna jako u autokorelacni funkce
+
+# Ktere korelace jsou nenulove? Ktere modely pripadaji pro radu v uvahu?
+par(mfrow=c(2,1))
+acf(lh);pacf(lh)
+par(mfrow=c(1,1))
+  # nakresleni obou funkci pod sebe
+
+# test na nulovost autokorelacni funkce
+Box.test(lh, lag=2, type="Ljung-Box")
+  # rucne najdete hodnotu, kterou by nemela prekrocit druha autokorelace
+
+# nulovost autokorelacni funkce residui znamena, ze mame spravny model
+
+# pomoci funkce arima.sim(n = ,list(ar = ,ma = )) nasimulujte rady typu
+#   MA(1) s parametrem theta1 = 0.75
+#   MA(1) s parametrem theta1 = -0.75
+#   MA(1) s parametrem theta1 = 1.5
+#   AR(1) s parametrem phi1 = 0.75
+#   AR(1) s parametrem phi1 = - 0.75
+#   AR(1) s parametrem phi1 = 1.5
+# podivejte se, jak rady vypadaji a jak vypadaji jejich autokorelacni a parcialni autokorelacni funkce
+
+rada <- arima.sim(n=100, list(ar = 0.75))
+plot(rada)
+par(mfrow=c(2,1))
+acf(rada)
+pacf(rada)
+par(mfrow=c(1,1))
+
+rada <- arima.sim(n=100, list(ar = -0.75))
+plot(rada)
+par(mfrow=c(2,1))
+acf(rada)
+pacf(rada)
+par(mfrow=c(1,1))
+
+rada <- arima.sim(n=100, list(ar = 1.5)) # rada nesplnuje predpoklady (neni stacionarni)
+plot(rada)
+par(mfrow=c(2,1))
+acf(rada)
+pacf(rada)
+par(mfrow=c(1,1))
+
+rada <- arima.sim(n=100, list(ma = 0.75))
+plot(rada)
+par(mfrow=c(2,1))
+acf(rada)
+pacf(rada)
+par(mfrow=c(1,1))
+
+rada <- arima.sim(n=100, list(ma = -0.75))
+plot(rada)
+par(mfrow=c(2,1))
+acf(rada)
+pacf(rada)
+par(mfrow=c(1,1))
+
+rada <- arima.sim(n=100, list(ma = 1.5))
+plot(rada)
+par(mfrow=c(2,1))
+acf(rada)
+pacf(rada)
+par(mfrow=c(1,1))
+
+# podivejte se na radu ldeaths
+#   vypoctete jeji autokorelacni a parcialni autokorelacni funkci
+#   ocistete ji od trendu a sezonnosti a podivejte se na autokorelacni funkci 
+#     a parcialni autokorelacni funkci jejich residui
+
+### End of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-4\CAS_cviceni4.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-5\CAS_cviceni5.R
+#######################
+### knihovny
+library(forecast)
+library(lmtest)
+
+#######################
+### Opakovani
+# Autokorelacni a parcialni autokorelacni funkce 
+# vyzkousime pro radu nhtemp
+plot(nhtemp)
+  # prumerna rocni teplota ve stupnich Fahrenheita v New Haven z let 1912 az 1971
+  # rada bez zasadniho trendu ci sezonnosti
+  # teoreticky tam nejaky trend je (mirne to roste)
+
+# autokorelacni funkce
+acf(nhtemp)
+acf(nhtemp,plot=F)
+  # konkretni hodnoty
+# parcialni autokorelacni funkce
+pacf(nhtemp)
+pacf(nhtemp,plot=F)
+  # vypis hodnot
+# Ktere hodnoty jsou nenulove? Muzeme jednoznacne urcit model?
+  # zasadni hodnoty ani u jedne funkce nejsou
+  # hodnoty ACF klesaji pomaleji
+  # hodnoty PACF jsou od zpozdeni (bod useknuti) 2 temer nulove
+
+# ACF nemĂˇ bod useknutĂ­
+# Pokud predpokladame, ze jen PACF ma bod useknuti a to na zpozdeni k=2
+#   mela by rada byt typu AR(2)
+
+# Kontrola pres odhady ruznych AR a MA modelu
+# VĂ˝znam vektoru c: (Ĺ™Ăˇd procesu AR, diference, Ĺ™Ăˇd procesu MA)
+# Rozptyl bĂ­lĂ©ho Ĺˇumu (sigma kvadrĂˇt = sigma^2)
+# Logaritmus vÄ›rohodnosti odhadnutĂ©ho modelu (log likelihood)
+# AIC (Akaikeho kritĂ©rium) - slouĹľĂ­ pro porovnĂˇnĂ­ modelĹŻ mezi sebou, ÄŤĂ­m menĹˇĂ­ hodnota, tĂ­m lepĹˇĂ­
+# Intercept - absolutnĂ­ ÄŤlen
+# s.e. - stĹ™ednĂ­ chyba odhadu
+(fit1 <- arima(nhtemp, order = c(1,0,0)))
+  # rada AR(1) 
+(fit2 <- arima(nhtemp, order = c(2,0,0)))
+  # rada AR(2)
+(fit3 <- arima(nhtemp, order = c(3,0,0)))
+  # rada AR(3)
+(fit4 <- arima(nhtemp, order = c(0,0,1)))
+  # rada MA(1)
+(fit5 <- arima(nhtemp, order = c(0,0,2)))
+  # rada MA(2)
+  # podle AIC kriteria je nejvhodnejsi rada typu AR(2)
+  # z vystupu dostavame odhad Y(t) = 51.19 + 0.22Y(t-1) + 0.32Y(t-2)
+plot(nhtemp)
+lines(fitted(fit2), col = 4)
+  # prestoze je model ze zkoumanych moznosti nejlepsi, uplne dobre data nekopiruje
+fit.hw <- HoltWinters(nhtemp, gamma = F)
+plot(fit.hw)
+  # ani dvojite exponencialni vyrovnani nesedi na data zcela optimalne
+
+# A co rada LakeHuron
+plot(LakeHuron)
+  # rocni hodnoty vysky hladiny Huronskeho jezera ve stopach z let 1875-1972
+
+# autokorelacni a parcialni autokorelacni funkce
+acf(LakeHuron)
+pacf(LakeHuron)
+  # ktere korelace jsou nenulove zde?
+  # ktery model bychom odhadovali?
+  # a jak takovy model sedi na data?
+(fit1 <- arima(LakeHuron, order = c(1,0,0))) # rada AR(1) 
+(fit2 <- arima(LakeHuron, order = c(2,0,0))) # rada AR(2)
+(fit3 <- arima(LakeHuron, order = c(3,0,0))) # rada AR(3)
+(fit4 <- arima(LakeHuron, order = c(0,0,1))) # rada MA(1)
+(fit5 <- arima(LakeHuron, order = c(0,0,2))) # rada MA(2)
+plot(LakeHuron) # NejlepĹˇĂ­ model je AR(2)
+lines(fitted(fit2), col = 4) 
+lines(lag(fitted(fit2), 1), col = 4) # NejlepĹˇĂ­ model je AR(2)
+fit.hw <- HoltWinters(nhtemp, gamma = F)
+plot(fit.hw)
+
+########################
+## Hledani modelu ARMA
+# rada presidents
+plot(presidents)
+  # ctvrtletni hodnoceni americkych prezidentu
+  # rada bez zjevneho trendu, budu na ni hledat model ARMA
+
+# autokorelacni a parcialni autokorelacni funkce
+par(mfrow = c(2,1))
+acf(presidents, na.action = na.pass); pacf(presidents, na.action = na.pass)
+par(mfrow = c(1,1))
+  # autokorelacni funkce nema bod useknuti, parcialni autokorelacni funkce ho ma, k0 = 1
+  # optimalni model by mel byt AR(1)
+
+# odhadnu vice jednoduchych modelu
+(fit1 <- arima(presidents, order = c(1,0,0)))
+  # AR(1)
+(fit2 <- arima(presidents, order = c(2,0,0)))
+  # AR(2)
+(fit3 <- arima(presidents, order = c(0,0,1)))
+  # MA(1)
+(fit4 <- arima(presidents, order = c(1,0,1)))
+  # ARMA(1,1)
+
+# ke kazdemu modelu vidim Akaikeho informacni kriterium
+#   podle nej by mel byt nejlepsi model AR(1) : aic = 839.78
+
+# Bayesovske informacni kriterium - pro vyber optimalniho modelu je lepsi
+BIC(fit1)
+BIC(fit2)
+BIC(fit3)
+BIC(fit4)
+  # i timto kriteriem vyberu model AR(1)
+
+# v knihovne forecast existuje i funkce, ktera hleda idealni model automaticky
+(fit.a <- auto.arima(presidents, seasonal = F))
+  # vybira optimalni model se slozitosti az do radu ARMA(5,5)
+  # optimalni model vybira podle Akaikeho kriteria
+BIC(fit.a)  
+  # na zaklade BIC kriteria bych radeji volila jednodussi model AR(1)
+  (fit.b <- auto.arima(presidents, seasonal = F, ic = "bic"))
+    # mohu BIC nastavit i primo do funkce auto.arima
+
+# vykresleni obou modelu proti sobe
+plot(presidents)
+lines(fitted(fit1),col=2)
+lines(fitted(fit.a),col=3)
+  # rozdil neni prilis velky - zelena krivka je hladsi
+
+# Odhadnute modely (umÄ›t takto zapsat v seminĂˇrce)
+#   AR(1): Y(t) = 56.15 + 0.82Y(t-1)
+#   ARMA(3,2): Y(t) = 56.07 - 0.5Y(t-1) + 0.36Y(t-2) + 0.62Y(t-3) + 1.35e(t-1) + 0.92e(t-2)
+
+### Dalsi kriteria pro urceni idealniho modelu:
+  # hodnoty parametru by mely byt alespon 2x vetsi nez jejich stredni chyba
+  #   tj. mely by byt vyznamne
+  # autokorelacni funkce residui modelu by mely byt male
+# AR(1) model
+coeftest(fit1)
+  # vyznamnost vypoctenych koeficientu
+par(mfrow = c(2,1))
+acf(residuals(fit1), na.action = na.pass); pacf(residuals(fit1), na.action = na.pass)
+par(mfrow = c(1,1))
+  # minimalni zbyla autoregrese
+# ARMA(3,2) model
+coeftest(fit.a)
+  # vyznamnost vypoctenych koeficientu
+par(mfrow = c(2,1))
+acf(residuals(fit.a), na.action = na.pass); pacf(residuals(fit.a), na.action = na.pass)
+par(mfrow = c(1,1))
+  # nulova autokorelace
+
+## test na nulovost autokorelacni funkce
+#   nulovost autokorelacni funkce residui znamena, ze mame spravny model
+Box.test(residuals(fit1), lag=5, type = "Ljung-Box")
+Box.test(residuals(fit.a), lag=5, type = "Ljung-Box")
+  # u ARMA(3,2) modelu vychazi autokorelacni funkce primo nulova
+  #   u modelu AR(1) je mirna odchylka
+
+# Jaky model tedy vybrat? - subjektivni rozhodnuti :)
+
+#############################
+### Samostatne
+
+# hledejte optimalni model pro rady 
+#	  airquality$Wind, discoveries, treering, lh
+
+plot(airquality$Wind)
+
+
+plot(discoveries)
+(fit <- auto.arima(discoveries, seasonal = F))
+lines(fitted(fit),col=2)
+
+plot(treering)
+(fit <- auto.arima(treering, seasonal = F))
+lines(fitted(treering),col=2)
+
+plot(lh)
+(fit <- auto.arima(lh, seasonal = F))
+lines(fitted(lh), col=2)
+
+### End of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-5\CAS_cviceni5.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-6\CAS_cviceni6.R
+library(TSA)
+library(forecast)
+library(lmtest)
+
+############################
+## Najdete optimalni ARMA model pro radu bluebird - price
+data(bluebird)
+plot(bluebird)
+  # tydenni data o cenach "Bluebird standard potato chip"
+
+# pomoci autokorelacni a parcialni autokorelacni funkce odhadnete rad modelu
+# odhadnete konkretni model, jimz se rada ridi
+# jsou vysledna residua nekorelovana?
+plot(bluebird[,2], main = "Bluebird", ylab = "Price")
+acf(bluebird[,2])
+pacf(bluebird[,2])
+(fit <- Arima(bluebird[,2], order = c(1,0,0))) # NejlepĹˇĂ­ by mÄ›l bĂ˝t AR(1)
+plot(bluebird[,2])
+lines(fitted(fit), col=2)
+acf(residuals(fit))
+# Residua jsou nevĂ˝znĂˇmnĂˇ, protoĹľe jsou v rĂˇmci pĂˇsuu
+# Pokud by nÄ›kolik hodnot ACF vyboÄŤovalo z pĂˇsu, mohli by bĂ˝t vĂ˝znamnĂ©
+# Lag = posun
+# AR(1): Y(t) = 1.7156 + 0.6648Y(t-1)
+# Ani jedna z funkcĂ­ nemĂˇ vyloĹľenÄ› bod useknutĂ­
+
+###########################
+### Hledani modelu arima
+
+# pro radu Nile, lynx
+plot(Nile)
+  # Flow of the River Nile
+  # rada, ktera alespon v uvodu stacionarni neni
+  # napĹ™ed jde Ĺ™ada dolĹŻ, a aĹľ pak je nÄ›jakĂ˝m zpĹŻsobem konstantnĂ­
+par(mfrow = c(2,1))
+acf(Nile, na.action = na.pass); pacf(Nile, na.action = na.pass)
+par(mfrow = c(1,1))
+  # autokorelacni funkce klesa moc pomalu
+  # Pod hornĂ­ mez neklesĂˇ aĹľ do zpoĹľdÄ›nĂ­ 8,
+  # coĹľ by znamenalo, Ĺľe to, co protĂ©kĂˇ Nilem nynĂ­
+  # by zĂˇviselo na tom, co protĂ©kalo Nilem pĹ™ed 8 lety (coĹľ ne)
+acf(Nile, na.action = na.pass, type = "covariance", plot = F) # AutokovariaÄŤnĂ­ funkce
+  # prvni z uvedenych hodnot je rozptyl rady
+  # bod useknutĂ­ jde vidÄ›t
+  n <- length(Nile)
+  var(Nile)*(n - 1)/n
+
+d1 <- diff(Nile) # rada prvnich diferenci
+plot(d1)
+par(mfrow = c(2,1))
+acf(d1, na.action = na.pass); pacf(d1, na.action = na.pass)
+par(mfrow = c(1,1))
+  # rada se jevi jako stacionarni
+  # pro radu diferenci se jevi jako optimalni model MA(1)
+  # nemĂˇ pomalĂ˝ pokles
+acf(d1, na.action = na.pass, type = "covariance", plot = F)
+  # rozptyl se zmensil
+d2 <- diff(Nile, differences = 2) # rada druhych diferenci
+plot(d2)
+par(mfrow = c(2,1))
+acf(d2, na.action = na.pass); pacf(d2, na.action = na.pass)
+par(mfrow = c(1,1))
+acf(d2, na.action = na.pass, type = "covariance", plot = F)
+  # rozptyl se zvetsil - druha diference uz je spatna
+
+(fit1 <- Arima(Nile, order = c(1,1,0)))
+  # ARIMA(1,1,0)
+(fit2 <- Arima(Nile, order = c(0,1,1)))
+  # ARIMA(0,1,1)
+(fit3 <- Arima(Nile, order = c(0,1,2)))
+  # ARIMA(0,1,2)
+(fit4 <- Arima(Nile, order = c(0,1,3)))
+  # ARIMA(0,1,3)
+(fit5 <- Arima(Nile, order = c(1,1,1)))
+  # ARIMA(1,1,1)
+(fit6 <- Arima(Nile, order = c(1,1,2)))
+  # ARIMA(1,1,2)
+# podle AIC kriteria je optimalni rada ARIMA(1,1,1)
+BIC(fit2)
+BIC(fit3)
+BIC(fit4)
+BIC(fit5)
+BIC(fit6)
+  # podle BIC kriteria rada ARIMA(0,1,1)
+
+(fit.a <- auto.arima(Nile))
+  # automaticky se voli na zaklade AIC kriteria
+
+# predpoved
+(for.fit5 <- forecast(fit5))
+  # predpoved s intervalem spolehlivosti
+predict(fit5, 10)
+  # predpoved bez intervalu spolehlivosti pouze se stredni chybou
+plot(for.fit5)
+  # zakresneni predpovedi do grafu
+
+# simulace budoucich hodnot
+s <- matrix(0, 10, 10)
+(s[1,] <- simulate(fit5, nsim = 10, future = T))
+  # simulovane pokracovani rady
+plot(Nile, xlim=c(1871,1980), ylim=c(100,1700))
+lines(1971:1980, s[1,], col=3)
+  # zakresleni simulovane rady do grafu
+for(i in 2:10){
+  s[i,] <- simulate(fit5, nsim = 10, future = T)
+  lines(1971:1980, s[i,], col = 3)
+}
+  # pripocitani a prikresleni dalsich moznych deviti pruchodu
+
+############################
+### Hledani modelu SARIMA
+
+# Najdete optimalni ARIMA model pro radu BJSales
+# A predikujte nĂˇsledujĂ­cĂ­ch 1000 hodnot
+plot(BJsales) # vĂ˝raznÄ› nestacionĂˇrnĂ­, mĂˇ trend
+(fit.a <- auto.arima(BJsales))
+acf(BJsales) # takhle vypadĂˇ autokoleraÄŤnĂ­ funkce pro Ĺ™adu, kterĂˇ mĂˇ trend
+pacf(BJsales)
+BJsales.diff <- diff(BJsales)
+plot(BJsales.diff)
+
+s <- matrix(0, 1000, 10)
+for (i in 1:1000) {
+  (s[i,] <- simulate(fit.a, nsim = 10, future = T))
+}
+quantile(s[,1], c(0.05,0.95))
+quantile(s[,2], c(0.05,0.95))
+quantile(s[,3], c(0.05,0.95))
+forecast(fit.a)
+
+# Zkusime najit optimalni model pro rady nottem, UKDriverDeaths
+
+plot(nottem)
+  # Average Monthly Temperatures at Nottingham, 1920â€“1939
+  # evidentne sezonni rada
+par(mfrow = c(2,1))
+acf(nottem, na.action = na.pass); pacf(nottem, na.action = na.pass) # sezonnĂ­ zĂˇvislost
+par(mfrow = c(1,1))
+  # sezonnost je videt v autokorelacni funkci
+
+d1 <- diff(nottem, lag = 12)
+# rada prvnich sezonnich diferenci
+plot(d1)
+par(mfrow = c(2,1))
+acf(d1, na.action = na.pass); pacf(d1, na.action = na.pass)
+par(mfrow = c(1,1))
+  # autokorelacni i parcialni autokorelacni funkce stale ukazuji vysoke hodnoty na delce sezony,
+  #   ale jinde jiz ne
+  # jevi se jako MA(1) model na sezonnich datech
+acf(d1, na.action = na.pass, type = "covariance", plot = F)
+  # rozptyl se zmensil
+
+fit1 <- Arima(nottem, order = c(1,0,0), seasonal = list(order = c(0,1,0)))
+fit2 <- Arima(nottem, order = c(0,0,1), seasonal = list(order = c(0,1,0)))
+fit3 <- Arima(nottem, order = c(1,0,1), seasonal = list(order = c(0,1,0)))
+fit4 <- Arima(nottem, order = c(0,0,0), seasonal = list(order = c(1,1,0)))
+fit5 <- Arima(nottem, order = c(0,0,0), seasonal = list(order = c(0,1,1)))
+fit6 <- Arima(nottem, order = c(0,0,0), seasonal = list(order = c(1,1,1)))
+fit7 <- Arima(nottem, order = c(1,0,0), seasonal = list(order = c(1,1,1)))
+BIC(fit1)
+BIC(fit2)
+BIC(fit3)
+BIC(fit4)
+BIC(fit5)
+BIC(fit6)
+BIC(fit7)
+  # jako optimalni se jevi posledni model
+  # SARIMA(1,0,0)x(1,1,1)[12]
+
+(fit.a <- auto.arima(nottem))
+BIC(fit.a)
+  # automaticky model rozhodne optimalni neni - je prilis komplikovany
+coeftest(fit.a)
+  # model ma spoustu nevyznamnych clenu
+(fit.b <- auto.arima(nottem, ic = "bic"))
+coeftest(fit.b)
+  # pomoci Bayesovskeho kriteria vybran jednodussi model
+
+# autokorelacni a parcialni autokorelacni funkce optimalniho modelu
+par(mfrow = c(2,1))
+acf(residuals(fit.b), na.action = na.pass); pacf(residuals(fit.b), na.action = na.pass)
+par(mfrow = c(1,1))
+  # zavislosti jiz v datech nejsou
+
+#############################
+### najdete optimalni model a spocitejte 15 predpovedi pro radu lynx
+### najdete optimalni model pro radu BJsales, UKDriverDeaths, CREF, electricity, flow
+
+### predikce pro kombinovanou radu
+
+# pracujte s daty airquality (nejsou zadany jako casove rady, je treba je transformovat)
+# vytvorte novou promennou, ktera bude pocitana jako Temp-0.2*Wind
+# predpovidejte nove hodnoty (10 hodnot) temp.ad z dat temp a wind vcetne intervalu spolehlivosti
+
+# predpovedi je mozne pocitat, jako predpovedi pro kazdou radu zvlast 
+#   a vysledek zkombinovat dle daneho vzorce
+# kombinovany interval spolehlivosti nebude fungovat
+# pro interval spolehlivosti je nutne nasimulovat velke mnozstvi budoucich pruchodu obou rad
+#   zkombinovat je dle daneho vzorce 
+#   a interval spolehlivosti vzit jako pozadovane kvantily ze simulovanych dat
+
+# kvantily z matice s, kde bude 10000 radku se simulovanymi pruchody rady
+quantile(s[,1], c(0.05,0.95))
+  # meze 90%-ni interval spolehlivosti v prvnim kroku
+
+# pro kazdou radu tedy najdete optimalni model, simulujte budouci pruchody,
+#   zkombinujte je a najdete kvantily intervalu spolehlivosti
+### End of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-6\CAS_cviceni6.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-7\CAS_cviceni7.R
+############################
+library(forecast)
+library(TSA)
+library(dynlm)
+library(lmtest)
+  # nacteni knihoven
+
+############################
+### Hledani modelu SARIMA
+
+# Zkusime najit optimalni model pro rady nottem, UKDriverDeaths
+
+plot(nottem)
+  # Average Monthly Temperatures at Nottingham, 1920â€“1939
+  # evidentne sezonni rada
+par(mfrow = c(2,1))
+acf(nottem, na.action = na.pass); pacf(nottem, na.action = na.pass)
+par(mfrow = c(1,1))
+  # sezonnost je videt v autokorelacni funkci
+n <- length(nottem)
+var(nottem)*(n - 1)/n
+  # rozptyl rady
+
+d1 <- diff(nottem, lag = 12)
+  # rada prvnich sezonnich diferenci
+plot(d1)
+  # rada je na prvni pohled bez trendu i sezonnosti
+par(mfrow = c(2,1))
+acf(d1, na.action = na.pass); pacf(d1, na.action = na.pass)
+par(mfrow = c(1,1))
+  # autokorelacni i parcialni autokorelacni funkce stale ukazuji vysoke hodnoty na delce sezony,
+  #   ale jinde jiz ne, tedy neni treba dalsi diference
+  # jevi se jako MA(1) model na sezonnich datech (PACF klesa pomaleji)
+n <- length(d1)
+var(d1)*(n - 1)/n
+  # rozptyl rady diferenci je mensi nez rozptyl puvodni rady
+
+(fit.a <- auto.arima(nottem))
+  # optimalni SARIMA model s vyuzitim AIC
+  coeftest(fit.a)
+    # prilis mnoho nevyznamnych clenu - zbytecne komplikovany model
+AIC(fit.a)
+BIC(fit.a)
+
+(fit.b <- auto.arima(nottem, ic = 'bic'))
+  # vyuzitim BIC ziskavame znacne jednodussi model
+  coeftest(fit.b)
+    # stale jeden nevyznamny clen
+AIC(fit.b)
+BIC(fit.b)
+acf(residuals(fit.b))
+  # autokorelacni funkce pro residua
+
+# rucni hledani modelu
+fit1 <- Arima(nottem, order = c(0,0,0), seasonal = list(order = c(1,1,1)))
+  # model pouze se sezonni zavislosti
+AIC(fit1)
+BIC(fit1)
+acf(residuals(fit1))
+  # vyuziti modelu pouze pro sezonni slozku ukazuje zavislost na minulych hodnotach
+pacf(residuals(fit1))
+  # zavislost by mela obsahovat clen AR
+
+fit2 <- Arima(nottem, order = c(1,0,0), seasonal = list(order = c(1,1,1)))
+coeftest(fit2)
+AIC(fit2)
+BIC(fit2)
+acf(residuals(fit2))
+  # jiny vypocet BIC preferuje jeste jednodussi model
+  # model pouze s vyznamnymi cleny a nekorelovanymi residui
+  # optimalni model: SARIMA(1,0,0)x(1,1,1)[12]
+    # oznacme Y(t) radu sezonnich diferenci
+    # optimalni model: Y(t) = 0.271*Y(t - 1) - 0.296*Y(t - 12) - 0.728*e(t - 12) + e(t)
+
+plot(nottem)
+lines(fitted(fit2), col = 2)
+  # model dobre kopiruje data
+
+# pro srovnani model bez sezonnosti
+(fit3 <- auto.arima(nottem, seasonal = FALSE))
+plot(nottem)
+lines(fitted(fit3), col = 2)
+  # i takovy model umi dobre kopirovat data
+
+# Rozdil je videt zejmena na predikci
+pred.s <- forecast(fit2, 30)
+plot(pred.s)
+pred.ns <- forecast(fit3, 30)
+plot(pred.ns)
+  # model bez sezonnosti ma vetsi chybu (sirsi interval spolehlivosti)
+  #   a klesajici sezonni vykyvy
+#############################
+## Samostatne
+
+# najdete optimalni model pro radu flow z knihovny TSA
+data(flow)
+plot(flow)
+plot(decompose(flow))
+
+par(mfrow = c(2,1))
+acf(flow, na.action = na.pass)
+pacf(flow, na.action = na.pass)
+par(mfrow = c(1,1))
+
+n <- length(flow)
+var(flow)*(n - 1)/n # 71511365
+
+d1 <- diff(flow, lag = 12)
+plot(d1)
+
+par(mfrow = c(2,1))
+acf(d1, na.action = na.pass); pacf(d1, na.action = na.pass)
+par(mfrow = c(1,1))
+
+n <- length(d1)
+var(d1)*(n - 1)/n # 105325274
+
+(fit.b <- auto.arima(flow, ic = 'bic'))
+coeftest(fit.b)
+AIC(fit.b) # 11669
+BIC(fit.b) # 11691
+acf(residuals(fit.b))
+
+plot(flow)
+lines(fitted(fit.b), col = 2)
+
+pred.s <- forecast(fit.b, 30)
+plot(pred.s)
+
+# najdete optimalni model pro radu co2
+
+############################
+### pouziti dynamickeho modelovani k odhaleni trendu a sezonnosti
+# funkce dynlm z knihovny dynlm
+# model pro radu nottem
+plot(nottem)
+
+# dynamicky linearni model
+dlm.not <- dynlm(nottem ~ trend(nottem) + season(nottem))
+summary(dlm.not)
+  # na vystupu vidim vyznamny absoutni clen (nenulova uroven rady)
+  # mirny rostouci linearni trend
+  # vyznamnou sezonnost (vysoke hodnoty od cervna do zari, nizke hodnoty listopad az brezen)
+  # referenÄŤnĂ­ kategorie je leden
+
+not <- ts.intersect(nottem, dlm.not$fitted.values)
+plot.ts(not, plot.type = "single", col=c("black","red"), 
+        lty=c(1,1), lwd=c(1,1),
+        main = "Dynamic Linear Model - Original (black) and Fitted series (red)")
+  # odhad modelu odpovida datum
+
+# predpovedi nutne rucne
+data <- data.frame(dlm.not$model)
+print(data)
+  # puvodni data, na nez sedi koeficienty
+data.new <- data.frame("cas" = data[1:30,2] + 20, "sezona" = as.factor(data[1:30,3]))
+  # nova data, pro nez chci predikovat
+dl.cof <- dlm.not$coefficients
+  # koeficienty modelu
+
+# predikce: trend + sezonnost
+data.new$trend <- dl.cof[1] + dl.cof[2]*data.new[,1]
+data.new$season <- rep(c(0,dl.cof[3:13]),3)[1:30]
+data.new$pred <- data.new$trend + data.new$season
+
+# zakresleni predikci do grafu
+cas.x <- c(time(nottem), data.new$cas + 1920)
+nottem.y <- c(nottem, data.new$pred)
+co.col <- c(rep("black", length(nottem)), rep("blue", length(data.new$pred)))
+plot(nottem.y ~ cas.x, xlab = "Time", ylab = "nottem", type = "n")
+lines(nottem)
+lines(data.new$cas + 1920, data.new$pred, col = "blue", lwd = 2)
+
+# kontrola residui
+acf(dlm.not$residuals)
+  # ackoliv semodel chova dobre, residua nejsou zcela nekorelovana
+auto.arima(dlm.not$residuals)
+  # residua ukazuji na vyznamnou zavislost na minule hodnote a na minule sezone
+
+# pridani zavislosti na minulych pozorovanich do modelu
+dlm.not2 <- dynlm(nottem ~ trend(nottem) + season(nottem) + L(nottem, -1))
+summary(dlm.not2)
+  # model se zavislosti na minule hodnote (AR(1) clen)
+acf(dlm.not2$residuals)
+  # stale je videt vyznamna sezonni zavislost
+
+dlm.not3 <- dynlm(nottem ~ trend(nottem) + season(nottem) + L(nottem, -1) + L(nottem, -12))
+summary(dlm.not3)
+  # model se zavislosti na minule hodnote (AR(1) clen)
+acf(dlm.not3$residuals)
+  # a mam nezavisla residua - finalni model
+# predikce by se musely pocitat rucne
+
+#################################
+## Samostatne 
+
+# hledejte optimalni dynamicky model pro radu co2
+plot(co2)
+plot(decompose(co2))
+
+dlm.not <- dynlm(co2 ~ trend(co2) + season(co2))
+summary(dlm.not)
+checkresiduals(dlm.not)
+
+dlm.not2 <- dynlm(co2 ~ trend(co2) + season(co2) + L(co2, -1)) # zĂˇvislost na pozorovĂˇnĂ­ o krok dotazu
+summary(dlm.not2)
+checkresiduals(dlm.not2)
+
+dlm.not3 <- dynlm(co2 ~ trend(co2) + season(co2) + L(co2, -1) + L(co2, -2))
+summary(dlm.not3)
+checkresiduals(dlm.not3)
+
+dlm.not4 <- dynlm(co2 ~ trend(co2) + season(co2) + L(co2, -1) + L(co2, -2) + L(co2, -3))
+summary(dlm.not4)
+checkresiduals(dlm.not4)
+
+dlm.not5 <- dynlm(co2 ~ trend(co2) + season(co2) + L(co2, -1) + L(co2, -2) + L(co2, -3) + L(co2, -4))
+summary(dlm.not5)
+checkresiduals(dlm.not5)
+
+AIC(dlm.not)
+BIC(dlm.not)
+
+AIC(dlm.not2)
+BIC(dlm.not2)
+
+AIC(dlm.not3)
+BIC(dlm.not3)
+
+AIC(dlm.not4)
+BIC(dlm.not4)
+
+AIC(dlm.not5)
+BIC(dlm.not5)
+
+shapiro.test(resid(dlm.not))
+shapiro.test(resid(dlm.not2))
+shapiro.test(resid(dlm.not3))
+shapiro.test(resid(dlm.not4))
+shapiro.test(resid(dlm.not5)) # nejlepĹˇĂ­?
+
+#################################
+### kroskorelacni funkce 
+# prozkoumejme vzajemne vztahy mezi radami souboru airquality
+ccf(ts(airquality$Wind),ts(airquality$Solar.R),na.action = na.pass)
+  # nejsou zavisle
+ccf(ts(airquality$Wind),ts(airquality$Ozone),na.action = na.pass)
+  # jsou zavisle, nejvyssi korelace je s nulovym zpozdenim
+
+###########################
+### dynamicke linearni modely
+# jak modelovat zavislost mezi casovymi radami
+
+## priklad pro umela data 
+# generovani dat
+set.seed(999)
+x_series <- arima.sim(n = 200, list(order = c(1,0,0), ar = 0.7, sd=1))
+  # nasimulovany AR(1) proces
+z <- ts.intersect(lag(x_series, 0), lag(x_series, 1)) 
+  # hodnoty rady x_series v case t a t-1
+y_series <- 15 + 0.8*z[,1] + 1.5*z[,2] + rnorm(199,0,1)
+  # kombinace aktualni a zpozdene hodnoty + nahodne chyby
+xy_series <- ts.intersect(y_series, z)
+  # datovy soubor s jednou zavislou a dvema znezavislymi promennymi
+
+# model pomoci bezne linearni regrese
+lm1 <- lm(xy_series[,1] ~ xy_series[,2] + xy_series[,3])
+summary(lm1)
+  # popis modelu
+
+checkresiduals(lm1)
+  # popis residui modelu
+  # abychom mohli pouzit klasicky linearni model, musi byt residua normalni, 
+  #   s konstantnim rozptylem a NEKORELOVANA
+  # nekorelovanosti residui se tyka i vypsany test (Breusch-Godfrey)
+  #   je-li p-hodnota > alfa 0.05, pak residua jsou nekorelovana az do radu 10
+
+# model pomoci dynamickeho modelovani
+dlm1 <- dynlm(y_series ~ L(x_series, 0) + L(x_series, -1))
+summary(dlm1)
+  # stejny vysledek
+
+### Jak pracovat s korelovanymi residui 
+# generovani dat
+set.seed(999)
+x2_series <- arima.sim(n = 200, list(order = c(1,0,0), ar = 0.7, sd=1))
+z2 <- ts.intersect(x2_series, lag(x2_series, 3), lag(x2_series, 4)) 
+y2_series <- 15 + 0.8*z2[,2] + 1.5*z2[,3] 
+y2_errors <- arima.sim(n = 196, list(order = c(1,0,1), ar = 0.6, ma = 0.6), sd=1)
+y2_series <- y2_series + y2_errors
+plot(y2_series)
+  # zavisle promenna - casova rada
+
+# chceme modelovat zavislost y2 na x2
+# nejprve hledame, zda je zavislost v case t nebo se zpozdenim
+ccf(x2_series, y2_series)
+(mc <- which.max(ccf(x2_series, y2_series, plot = F)$acf))
+  # maximalni korelace na 24 pozici
+ccf(x2_series, y2_series, plot=F)$lag[mc]
+  # se zpozdenim 4 kroku
+
+# dynamicky model
+dlm1 <- dynlm(y2_series ~ L(x2_series, -4))
+summary(dlm1)
+  # zavislost je prukazna
+# je to cela zavislost nebo jeste neco v datech zbylo?
+ccf(x2_series, dlm1$residuals)
+dlm2 <- dynlm(y2_series ~ L(x2_series, -3) + L(x2_series, -4))
+summary(dlm2)
+  # prukazna zavislost o 3 i 4 kroky zpet
+ccf(x2_series, dlm2$residuals)
+  # nyni uz v datech zadna zavislost neni
+
+# vyznamnost koeficientu
+lm2d <- ts.intersect(y2_series, dlm2$fitted.values)
+plot.ts(lm2d, plot.type = "single", col=c("black","red"), 
+        lty=c(1,1), lwd=c(1,1),
+        main = "'Classic' Linear Model - Original (black) and Fitted series (red)") 
+  # jak model sedi na data
+# kontrola residui
+checkresiduals(dlm2)
+  # autokorelovana residua
+
+# do modelu pridame autokorelovana residua
+x2Lagged <- cbind(
+  xLag0 = x2_series,
+  xLag3 = lag(x2_series, 3),
+  xLag4 = lag(x2_series, 4))
+xy2_series <- ts.union(y2_series, x2Lagged)
+  # matice se zavisle promennou a posunutymi nezavisle promennymi
+
+# do prikazu auto.arima muzeme pridat i matici regresoru
+arima1 <- auto.arima(xy2_series[,1], xreg = xy2_series[,3:4])
+arima1
+  # jak vypadaji residua tohoto modelu
+checkresiduals(arima1)
+  # ok
+
+# zakresleni modelu do dat
+arima1d <- ts.intersect(na.omit(xy2_series[,1]), arima1$fitted)
+plot.ts(arima1d, plot.type = "single", col=c("black","red"), 
+        lty=c(1,1), lwd=c(1,1),
+        main = "ARIMA errors model - Original (black) and Fitted series (red)") 
+
+# vyznamnost koeficientu ARIMA modelu
+coeftest(arima1)
+
+########################
+### Samostatne
+
+# najdete optimalni model pro radu AirPassengers
+plot(AirPassengers)
+
+# hledejte optimalni model pro radu ozonu v datech airquality v zavislosti na ostatnich promennych
+
+### End of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-7\CAS_cviceni7.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-8\CAS_cviceni8.R
+############################
+library(forecast)
+library(dynlm)
+library(lmtest)
+# nacteni knihoven
+
+############################
+### kroskorelacni funkce 
+# prozkoumejme vzajemne vztahy mezi radami souboru airquality
+ccf(ts(airquality$Wind),ts(airquality$Solar.R),na.action = na.pass)
+  # nejsou zavisle
+ccf(ts(airquality$Wind),ts(airquality$Ozone),na.action = na.pass)
+  # jsou zavisle, nejvyssi korelace je s nulovym zpozdenim
+
+###########################
+### dynamicke linearni modely
+# jak modelovat zavislost mezi casovymi radami
+
+## priklad pro umela data 
+# generovani dat
+set.seed(999)
+x_series <- arima.sim(n = 200, list(order = c(1,0,0), ar = 0.7, sd=1))
+  # nasimulovany AR(1) proces
+z <- ts.intersect(lag(x_series, 0), lag(x_series, 1)) 
+  # hodnoty rady x_series v case t a t-1
+y_series <- 15 + 0.8*z[,1] + 1.5*z[,2] + rnorm(199,0,1)
+  # kombinace aktualni a zpozdene hodnoty + nahodne chyby
+xy_series <- ts.intersect(y_series, z)
+  # datovy soubor s jednou zavislou a dvema znezavislymi promennymi
+
+# jak vypada kroskorelacni funkce?
+ccf(x_series, y_series)
+  # nejvetsi zavislost o 1 krok dozadu
+
+# model pomoci bezne linearni regrese
+lm1 <- lm(xy_series[,1] ~ xy_series[,2] + xy_series[,3])
+summary(lm1)
+  # popis modelu
+
+checkresiduals(lm1)
+  # popis residui modelu
+  # abychom mohli pouzit klasicky linearni model, musi byt residua normalni, 
+  #   s konstantnim rozptylem a NEKORELOVANA
+  # nekorelovanosti residui se tyka i vypsany test (Breusch-Godfrey)
+  #   je-li p-hodnota > alfa 0.05, pak residua jsou nekorelovana az do radu 10
+
+# model pomoci dynamickeho modelovani
+dlm1 <- dynlm(y_series ~ L(x_series, 0) + L(x_series, -1))
+summary(dlm1)
+  # stejny vysledek
+
+### Jak pracovat s korelovanymi residui 
+# generovani dat
+set.seed(999)
+x2_series <- arima.sim(n = 200, list(order = c(1,0,0), ar = 0.7, sd=1))
+z2 <- ts.intersect(x2_series, lag(x2_series, 3), lag(x2_series, 4)) 
+y2_series <- 15 + 0.8*z2[,2] + 1.5*z2[,3] 
+y2_errors <- arima.sim(n = 196, list(order = c(1,0,1), ar = 0.6, ma = 0.6), sd=1)
+y2_series <- y2_series + y2_errors
+plot(y2_series)
+  # zavisle promenna - casova rada
+
+# chceme modelovat zavislost y2 na x2
+# nejprve hledame, zda je zavislost v case t nebo se zpozdenim
+ccf(x2_series, y2_series)
+(mc <- which.max(ccf(x2_series, y2_series, plot = F)$acf))
+  # maximalni korelace na 24 pozici
+ccf(x2_series, y2_series, plot=F)$lag[mc]
+  # se zpozdenim 4 kroku
+
+# dynamicky model
+dlm1 <- dynlm(y2_series ~ L(x2_series, -4))
+summary(dlm1)
+  # zavislost je prukazna
+  # je to cela zavislost nebo jeste neco v datech zbylo?
+ccf(x2_series, dlm1$residuals)
+dlm2 <- dynlm(y2_series ~ L(x2_series, -3) + L(x2_series, -4))
+summary(dlm2)
+  # prukazna zavislost o 3 i 4 kroky zpet
+ccf(x2_series, dlm2$residuals)
+  # nyni uz v datech zadna zavislost neni
+
+# vyznamnost koeficientu
+lm2d <- ts.intersect(y2_series, dlm2$fitted.values)
+plot.ts(lm2d, plot.type = "single", col=c("black","red"), 
+        lty=c(1,1), lwd=c(1,1),
+        main = "'Classic' Linear Model - Original (black) and Fitted series (red)") 
+  # jak model sedi na data
+
+# kontrola residui
+checkresiduals(dlm2)
+  # autokorelovana residua
+
+# do modelu pridame autokorelovana residua
+x2Lagged <- cbind(
+  xLag0 = x2_series,
+  xLag3 = lag(x2_series, 3),
+  xLag4 = lag(x2_series, 4))
+xy2_series <- ts.union(y2_series, x2Lagged)
+  # matice se zavisle promennou a posunutymi nezavisle promennymi
+
+# do prikazu auto.arima muzeme pridat i matici regresoru
+arima1 <- auto.arima(xy2_series[,1], xreg = xy2_series[,3:4])
+arima1
+
+# jak vypadaji residua tohoto modelu
+checkresiduals(arima1)
+  # ok
+
+# zakresleni modelu do dat
+arima1d <- ts.intersect(na.omit(xy2_series[,1]), arima1$fitted)
+plot.ts(arima1d, plot.type = "single", col=c("black","red"), 
+        lty=c(1,1), lwd=c(1,1),
+        main = "ARIMA errors model - Original (black) and Fitted series (red)") 
+
+# vyznamnost koeficientu ARIMA modelu
+coeftest(arima1)
+
+########################
+### Samostatne 
+
+# hledejte optimalni model pro radu ozonu v datech airquality v zavislosti na ostatnich promennych
+data("airquality")
+
+airq <- na.omit(airquality)
+wind <- ts(airq$Wind)
+solar <- ts(airq$Solar.R)
+temp <- ts(airq$Temp)
+ozone <- ts(airq$Ozone)
+
+par(mfrow = c(2, 2))
+plot(wind)
+plot(solar)
+plot(temp)
+plot(ozone)
+par(mfrow = c(1, 1))
+
+par(mfrow = c(3,1))
+ccf(wind, ozone, main = "Wind vs Ozone") # nejvyĹˇĹˇĂ­ zpoĹľdÄ›nĂ­ v bodÄ› 0
+ccf(solar, ozone, main = "Solar.R vs Ozone") # nejvyĹˇĹˇĂ­ zpoĹľdÄ›nĂ­ v bodÄ› 0
+ccf(temp, ozone, main = "Temp vs Ozone") # nejvyĹˇĹˇĂ­ zpoĹľdÄ›nĂ­ v bodÄ› 0
+par(mfrow = c(1,1))
+
+model_dyn <- dynlm(ozone ~ wind + solar + temp)
+summary(model_dyn)
+checkresiduals(model_dyn)
+plot(ozone, main = "Ozone in Time", col = "black") # nemĂˇ normĂˇlnĂ­ rozdÄ›lenĂ­
+lines(fitted(model_dyn), col = "red")
+
+########################
+data("M1Germany")
+head(M1Germany)
+  # ekonomicka ctvrtletni data z Nemecka
+  # M1 index "financni zasoby"
+
+plot(M1Germany$logm1)
+  # casova rada s trendem a sezonnosti, jak pro ni najit optimalni model?
+
+# autokorelacni funkce
+par(mfrow = c(2, 1))
+acf(M1Germany$logm1, na.action = na.pass)
+pacf(M1Germany$logm1, na.action = na.pass)
+par(mfrow = c(1, 1))
+  # je videt vysoka autokorelovanost (diky trendu)
+
+# zavislost na ostatnich raddach
+par(mfrow = c(3, 1))
+ccf(M1Germany$logm1, M1Germany$logprice, na.action = na.pass)
+ccf(M1Germany$logm1, M1Germany$loggnp, na.action = na.pass)
+ccf(M1Germany$logm1, M1Germany$interest, na.action = na.pass)
+par(mfrow = c(1, 1))
+  # je videt vysoka korelovanost s ostatnimi radami
+  # s logprice a loggnp s nulovym zpozdenim
+  # s interest se zpozdenim 4 roky
+
+dm1 <- diff(M1Germany$logm1)
+dm2 <- diff(M1Germany$logm1, lag = 4)
+dm3 <- diff(dm2, lag = 1)
+
+acf(dm1, na.action = na.pass)
+acf(dm2, na.action = na.pass)
+acf(dm3, na.action = na.pass)
+
+plot(dm1)
+plot(dm2)
+plot(dm3)
+
+arima.dm1 <- auto.arima(dm1, ic = "bic")
+arima.dm2 <- auto.arima(dm2, ic = "bic")
+arima.dm3 <- auto.arima(dm3, ic = "bic")
+
+coeftest(arima.dm1)
+coeftest(arima.dm2)
+coeftest(arima.dm3)
+
+# nejprve se podivame na radu jako takovou
+plot(decompose(M1Germany$logm1))
+
+m1 <- dynlm(M1Germany$logm1 ~ trend(M1Germany$logm1) + season(M1Germany$logm1))
+summary(m1)
+  # odhady koeficientu trendu i sezonni slozky
+acf(m1$residuals)
+  # residua jsou korelovana, je treba pridat arima model pro ne
+
+# potrebuji matici "vysvetlujicich promennych tohoto modelu
+m1$model[1:20,]
+zavisla <- m1$model[,1]
+  # namisto puvodni rady logm1 pouzivam tu z modelu, kde jsou vynechana chybejici pozorovani
+x.reg1 <- m1$model[,2:3]
+  # regresory
+x.reg2 <- cbind("trend" = x.reg1[,1],"Q2" = ifelse(x.reg1[,2] == "Q2", 1, 0),
+              "Q3" = ifelse(x.reg1[,2] == "Q3", 1, 0),"Q4" = ifelse(x.reg1[,2] == "Q4", 1, 0))
+head(x.reg2)
+  # vytvoreni "dummy variables" do modelu
+x.reg3 <- as.matrix(x.reg2)
+  # auto.arima potrebuje regresory ve tvaru matice
+m2 <- auto.arima(zavisla, xreg = x.reg3)
+summary(m2)
+  # vysledny model
+acf(m2$residuals)
+  # mam nekorelovana residua - dobry model
+checkresiduals(m2)
+
+# zavislost na ostatnich promennych
+m3 <- dynlm(M1Germany$logm1 ~ M1Germany$logprice + M1Germany$loggnp + M1Germany$interest)
+  # zavislost v aktualnim case
+summary(m3)
+  # shrnuti modelu
+# ale neni lepsi brat i promenne interest zavislost se zpozdenim?
+m4 <- dynlm(M1Germany$logm1 ~ M1Germany$logprice + M1Germany$loggnp + L(M1Germany$interest, -4))
+  # zpozdeni o 4 kroky
+summary(m4)
+  # nevypada to
+
+acf(m3$residuals)
+  # mam korelovana residua, musim pridat jeste cast arima
+# vytvoreni matice regresoru
+x.reg <- as.matrix(M1Germany[,2:4])
+m5 <- auto.arima(M1Germany$logm1, xreg = x.reg)
+summary(m5)               
+coeftest(m5)
+  # vsechny koeficienty modelu jsou vyznamne
+acf(m5$residuals, na.action = na.pass)
+  # nekorelovana residua - dobry model
+checkresiduals(m5)
+
+# auto arima
+m6 <- auto.arima(M1Germany$logm1)
+summary(m6)
+acf(m6$residuals, na.action = na.pass)
+  # nekorelovana residua - dobry model
+
+# ktery model je nejlepsi?
+BIC(m1)
+BIC(m2)
+BIC(m3)
+BIC(m5)
+BIC(m6)
+  # m2 a m5 jsou srovnatelne
+
+plot(M1Germany$logm1)
+lines(m2$fitted, col = 2)
+lines(m5$fitted, col = 3)
+  # oba modely sedi dobre
+
+# predpovedi
+# mohu pocitat jen pro model m2, pro model m5 nemam hodnoty regresoru
+newd1 <- data.frame("trend" = seq(36.25, 38, by = 0.25), "Q2" = c(0,1,0,0,0,1,0,0),
+                "Q3" = c(0,0,1,0,0,0,1,0), "Q4" = c(0,0,0,1,0,0,0,1))
+newd2 <- as.matrix(newd1)
+f2 <- forecast(m2, xreg = newd2)
+plot(f2)
+f2
+  # vykresleni a vypsani predpovedi s intervaly spolehlivosti
+
+#############################
+### Samostatne
+
+# pouzijte databazi EuStockMarkets a zkuste najit optimalni model pro index DAX
+  # databaze burzovnich indexu
+plot(EuStockMarkets[,1])
+
+# sezonnost si vyzkousejte na rade
+plot(UKgas)
+
+# nactete data EMG a hledejte optimalni model pro radu iEMG
+
+### End of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-8\CAS_cviceni8.R
+
+### Start of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-9\CAS_cviceni9.R
+############################
+library(forecast)
+library(dynlm)
+library(lmtest)
+library(TSA)
+# nacteni knihoven
+
+############################
+data("M1Germany")
+head(M1Germany)
+  # ekonomicka ctvrtletni data z Nemecka
+  # M1 index "financni zasoby"
+
+plot(M1Germany)
+  # ctyri casove rady, kdy nas zajima, jaky je vztah mezi logm1 a ostatnimi
+
+# Crosskorelacni funkce
+par(mfrow = c(3,1))
+ccf(M1Germany$logm1, M1Germany$logprice, na.action = na.pass)
+ccf(M1Germany$logm1, M1Germany$loggnp, na.action = na.pass)
+ccf(M1Germany$logm1, M1Germany$interest, na.action = na.pass)
+par(mfrow = c(1,1))
+  # je videt vysoka korelovanost s ostatnimi radami
+  # s logprice a loggnp s nulovym zpozdenim
+  # s interest se zpozdenim 4 roky
+
+# regresni modely
+fit1 <- dynlm(M1Germany$logm1 ~ M1Germany$logprice + M1Germany$loggnp + M1Germany$interest)
+  # zavislost v aktualnim case
+summary(fit1)
+  # shrnuti modelu
+# ale neni lepsi brat i promenne interest zavislost se zpozdenim?
+fit2 <- dynlm(M1Germany$logm1 ~ M1Germany$logprice + M1Germany$loggnp + L(M1Germany$interest, -16))
+  # zpozdena zavislost o 4 kroky na Interest
+summary(fit2)
+  # zavislost na interest se zde neprojevila
+
+acf(fit1$residuals)
+  # mam korelovana residua, musim pridat jeste cast arima 
+  #   nebo zavislost na vlastnich zpozdenych pozorovanich
+
+fit3 <- dynlm(M1Germany$logm1 ~ M1Germany$logprice + M1Germany$loggnp + M1Germany$interest + 
+                L(M1Germany$logm1, 1))
+summary(fit3)
+acf(fit3$residuals)
+  # zavislost na minule hodnote
+
+fit4 <- dynlm(M1Germany$logm1 ~ M1Germany$logprice + M1Germany$loggnp + M1Germany$interest + 
+                L(M1Germany$logm1, 4))
+summary(fit4)
+acf(fit4$residuals)
+  # zavislost o jednu sezonu zpet dava lepsi vysledky
+
+fit5 <- dynlm(M1Germany$logm1 ~ M1Germany$logprice + M1Germany$loggnp + M1Germany$interest + 
+                L(M1Germany$logm1, 1) + L(M1Germany$logm1, 4))
+summary(fit5)
+acf(fit5$residuals)
+  # zavislost o jednu sezonu i na minule hodnote
+  # autokorelovanost residui se tim prilis nevyresila - bude lepsi sahnout k ARMA modelum pro residua
+
+# vytvoreni matice regresoru
+x.reg <- as.matrix(M1Germany[,2:4])
+fit6 <- auto.arima(M1Germany$logm1, xreg = x.reg)
+summary(fit6)
+  # residua se ridi ARMA procesem az na prvnich sezonnich diferencich
+coeftest(fit6)
+  # vsechny koeficienty modelu jsou vyznamne
+acf(fit6$residuals, na.action = na.pass)
+  # nekorelovana residua - dobry model
+checkresiduals(fit6)
+
+# jak model sedi na data
+figure <- ts.intersect(M1Germany$logm1, fitted(fit6))
+plot.ts(figure, plot.type = "single", col=c("black","red"), 
+        lty=c(1,1), lwd=c(1,1),
+        main = "'Classic' Linear Model - Original (black) and Fitted series (red)") 
+
+# pokud budu chtit predikovat bez znalosti jinych rad, tento model mi prilis nepomuze
+# samostatna auto arima
+fit7 <- auto.arima(M1Germany$logm1)
+summary(fit7)
+coeftest(fit7)
+acf(fit7$residuals, na.action = na.pass)
+  # nekorelovana residua - dobry model
+
+# jak model sedi na data
+figure <- ts.intersect(M1Germany$logm1, fitted(fit7))
+plot.ts(figure, plot.type = "single", col=c("black","red"), 
+        lty=c(1,1), lwd=c(1,1),
+        main = "'Classic' Linear Model - Original (black) and Fitted series (red)") 
+
+# ktery model je lepsi?
+BIC(fit6)
+BIC(fit7)
+  # model s regresory je lepsi
+
+BIC(fit5)
+  # dynamicky model s korelovanymi residui
+
+# predpovedi pro model fit7
+for7 <-forecast(fit7)
+plot(for7)
+for7
+  # vykresleni a vypsani predpovedi s intervaly spolehlivosti
+
+#############################
+### Samostatne
+
+# pouzijte databazi EuStockMarkets a zkuste najit optimalni model pro index DAX
+  # databaze burzovnich indexu
+plot(EuStockMarkets)
+head(EuStockMarkets)
+dax <- EuStockMarkets[,"DAX"]
+plot(dax, main="Index DAX", ylab="Hodnota", col="blue")
+
+fit_dax <- auto.arima(dax, seasonal = FALSE)
+summary(fit_dax)
+checkresiduals(fit_dax)
+
+forecast_dax <- forecast(fit_dax, h=20)
+plot(forecast_dax)
+
+x.reg <- as.matrix(EuStockMarkets[,2:4])
+fit <- auto.arima(dax, xreg = x.reg, seasonal = FALSE)
+checkresiduals(fit)
+
+# nactete data EMG a hledejte optimalni model pro radu iEMG
+#############################
+## periodogram - hledani cyklu
+plot(lynx)
+  # data s evidentnimi cykly, ale nejedna se o sezonni data
+
+n <- length(lynx)
+FF <- abs(fft(lynx)/sqrt(n))^2
+  # Fast Discrete Fourier Transform
+P <- (4/n)*FF[1:(n/2 + 1)] 
+  # potrebujeme prvnich (n/2)+1 hodnot FFT transformace
+P <- P[-1]
+  # prvni hodnota je nesmzslna
+
+f <- (0:(n/2))/n 
+  # this creates harmonic frequencies from 0 to .5 in steps of 1/n.
+f <- f[-1]
+plot(f, P, type="l")
+  # periodogram rucne
+(fr.max <- f[which.max(P)])
+  # frekvence s maximalni hodnotou periodogramu
+1/fr.max
+
+per <- periodogram(lynx)
+abline(h=0)
+
+per$freq
+per$spec
+(fr.max <- per$freq[which.max(per$spec)])
+  # frekvence s maximalni hodnotou periodogramu
+1/fr.max
+  # delka cyklu
+
+############################
+### Samostatne 
+
+# hledejte delku cyklu pro slunecni aktivitu
+data("sunspots")
+  # mesicni data
+plot(sunspots)
+
+per <- periodogram(sunspots)
+(fr.max <- per$freq[which.max(per$spec)])
+frequency(sunspots) # frekvence 12 mÄ›sĂ­cĹŻ
+1/fr.max/12 # 10
+
+df <- data.frame(freq = per$freq, spec = per$spec)
+df_sorted <- df[order(-df$spec), ]
+second_max_freq <- df_sorted$freq[2]
+second_max_period <- 1 / second_max_freq
+second_max_period # 120
+
+plot(M1Germany$interest)
+frequency(M1Germany$interest)
+
+### End of C:\Users\ondre\source\repos\git\UJEP\CAS\CAS-cviceni-9\CAS_cviceni9.R
+
