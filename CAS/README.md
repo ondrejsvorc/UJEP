@@ -1,10 +1,21 @@
 ### Časová řada
+- posloupnost dat měřených v pravidelných časových intervalech
 - osa x: čas
 - osa y: pozorovaná data
 
 ### Sezónnost
+- pravidelné, opakující se kolísání během pevného období (např. rok, měsíc, týden), způsobené sezónními vlivy
+- má konstantní délku periody, cyklus nikoli
+
 ### Trend
+- dlouhodobý směr vývoje časové řady, ukazuje stoupání nebo klesání hodnot napříč časem
+- může být lineární i nelineární
+
+### Cyklus
+- dlouhodobé, nepravidelné kolísání časové řady, často spojované s hospodářskými/ekonomickými vzestupy a pády, které nemá pevnou délku trvání jako sezónnost
+
 ### Náhodná složka
+- nezachytitelné, nepredikovatelné odchylky, způsobené náhodnými faktory
 
 ### ACF
 - autokorelační funkce
