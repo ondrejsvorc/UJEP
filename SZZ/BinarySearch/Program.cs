@@ -33,4 +33,11 @@ Console.WriteLine(targetIndex);
 // int middleIndex = leftIndex + ((rightIndex - leftIndex) / 2)
 // int middleIndex = leftIndex + ((rightIndex - leftIndex) >> 1)
 
+// Overflow problem of (leftIndex + rightIndex) / 2:
+// x + x > int.MaxValue
+// 2x > 2,147,483,647
+// x > 1,073,741,823
+// where x = leftIndex = rightIndex
+// Impossible in C#
+
 // https://github.com/dotnet/runtime/blob/main/src/libraries/System.Private.CoreLib/src/System/Array.cs#L996
