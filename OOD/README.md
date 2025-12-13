@@ -233,3 +233,19 @@ INotificationSender určuje, jakou operaci musí odesílači notifikací poskyto
 - základní případ užití dává smysl i bez rozšíření
 - šipka míří na rozšiřovaný (základní) případ
 - např. Uplatnit slevu extend Zaplatit objednávku
+
+### Scénář případu užití
+- anglicky: Use Case Scenario
+- je textový popis toho, jak krok za krokem probíhá jeden případ užití
+- zpřesňuje význam případu užití z diagramu případů užití
+- odhaluje výjimky, alternativy a edge cases
+- slouží jako podklad pro návrh UI, testovací scénáře a celkový návrh chování systému
+- popisuje pozorovatelné chování systému, bez technických detailů
+- struktura:
+    - Název případu užití
+    - Aktér
+    - Předpoklady (preconditions)
+    - Hlavní scénář
+    - Alternativní scénáře
+    - Výjimky / chybové stavy
+    - Výsledek (postconditions)
