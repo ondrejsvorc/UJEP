@@ -25,6 +25,8 @@
 - standardizovaný grafický jazyk pro modelování (nejen softwarových) systémů
 - smyslem je sjednotit způsob, jak lidé přemýšlejí a mluví o systému, ještě před jeho implementací
 - definuje používané pojmy, symboly a vztahy
+- vztahy nejsou vlastnosti dvojice tříd, ale vlastnosti modelovaného kontextu
+- vztahy nejsou absolutní vlastností tříd, ale vyjadřují význam vztahu v konkrétním modelovaném kontextu
 - umožňuje popsat systém jednotným způsobem
 
 ### UML vztahy
