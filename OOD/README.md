@@ -32,8 +32,8 @@
 ### UML vztahy
 ![UML Relationship Types](https://www.umlboard.com/docs/relations/assets/images/relations-in-uml.png)
 
-### Dependency
-- česky: závislost
+### Závislost 
+- anglicky: dependency
 - vyjadřuje dočasnou závislost, kdy jeden prvek používá jiný prvek ke splnění své úlohy, ale není s ním trvale svázán a neřídí jeho existenci
 
 ```csharp
@@ -52,8 +52,8 @@ classDiagram
 ```
 OrderService závisí na Order, ale neukládá si ho ani nevlastní jeho životní cyklus.
 
-### Association
-- česky: asociace
+### Asociace
+- anglicky: association
 - vyjadřuje trvalý vztah spolupráce mezi prvky
 - prvky existují nezávisle na sobě
 - jeden prvek udržuje referenci na druhý a používá ho při své činnosti
@@ -77,8 +77,8 @@ classDiagram
 ```
 OrderService má k dispozici OrderRepository, se kterým opakovaně pracuje, ale nijak neřeší, kdy vznikne ani kdy zanikne.
 
-### Aggregation
-- česky
+### Agregace
+- anglicky: aggregation
 - vyjadřuje vztah celek–část, ve kterém části existují nezávisle na celku a nejsou jím vlastněny
 - něco někam patří (hráč do týmu), ale není na tom existenčně závislé (hráč může v rámci systému existovat i mimo tým)
 
@@ -95,8 +95,8 @@ classDiagram
 ```
 Team si udržuje seznam Player, ale samotní hráči nejsou vytvářeni ani ničeni týmem a mohou existovat i mimo něj.
 
-### Composition
-- česky: kompozice
+### Kompozice
+- anglicky: composition
 - vyjadřuje vztah celek–část, ve kterém část nemůže existovat bez celku a sdílí s ním životní cyklus
 - něco je vnitřní součástí něčeho jiného a bez toho nemůže existovat
 
@@ -118,8 +118,8 @@ classDiagram
 ```
 UserSession vlastní a vytváří SessionToken, který existuje pouze jako její vnitřní součást.
 
-### Generalization
-- česky: generalizace
+### Generalizace
+- anglicky: generalization
 - vyjadřuje vztah, kdy jeden prvek je specializovaným typem obecnějšího prvku a přebírá jeho vlastnosti a chování
 
 ```csharp
@@ -151,9 +151,9 @@ classDiagram
     Notification <|-- PushNotification
 ```
 
-### Realization
-- česky: realizace
-- realizace popisuje vztah, kdy prvek implementuje rozhraní a tím plní definovaný kontrakt
+### Realizace
+- anglicky: Realization
+- popisuje vztah, kdy prvek implementuje rozhraní a tím plní definovaný kontrakt
 
 ```csharp
 interface INotificationSender
@@ -184,7 +184,6 @@ INotificationSender určuje, jakou operaci musí odesílači notifikací poskyto
 - standardizované grafické modely, které popisují strukturu a chování systému z různých pohledů za účelem jeho pochopení a návrhu
 
 ### Typy UML diagramů
-
 ![UML Diagram Types](https://cdn-images.visual-paradigm.com/guide/uml/learn-the-14-uml-diagram-types/01-uml-diagram-types.png)
 
 ### Strukturální
@@ -196,3 +195,41 @@ INotificationSender určuje, jakou operaci musí odesílači notifikací poskyto
 - odpovídají na otázku: Co systém dělá, kdy a v jakém pořadí?
 - popisují chování systému v čase
 - př.: u e-shopu popisují, jak a kdy zákazník přidá produkt do košíku, odešle objednávku, proběhne platba, ...
+
+### Diagram případů užití
+- anglicky: Use Case Diagram
+- popisuje, jaké funkce systém poskytuje jednotlivým aktérům a jak s nimi interagují
+- slouží k vymezení požadavků na systém a k dohodě mezi zadavatelem, uživateli a vývojáři
+- používá se na začátku analýzy, kdy se ještě neřeší technické detaily
+
+![Use Case Diagram](https://www.uml-diagrams.org/use-case-diagrams/use-case-diagram-elements.png)
+
+### Aktér
+- anglicky: Actor
+- představuje roli, která se systémem interaguje (nikoli konkrétní osobu) a využívá jeho funkce k dosažení svých cílů
+- aktér není součástí systému, stojí vždy mimo hranici systému
+- pojmenovává se podstatným jménem
+- jeden aktér se může účastnit na více případech užití
+- jeden uživatel může vystupovat jako více aktérů (rolí)
+- aktérem může být člověk (např. zákazník), jiný systém (platební brána) nebo externí služba (e-mailová služba)
+
+### Případ užití
+- anglicky: Use Case
+- popis funkce systému, která umožňuje aktérovi dosáhnout konkrétního cíle
+- popisuje co systém dělá, ne jak to dělá
+- pojmenovává se slovesem + podstatným jménem (např. Vytvořit objednávku)
+- jeden případ užití může mít více aktérů anebo může být sdílen mezi aktéry¨
+
+### Include
+- vyjadřuje, že jeden případ užití vždy používá jiný
+- základní případ užití nemůže proběhnout bez includovaného
+- slouží k odstranění opakování společného chování
+- šipka míří na zahrnutý případ
+- např. Vytvořit objednávku include Ověřit uživatele
+
+### Extend
+- vyjadřuje, že další chování nastane jen za určité situace
+- znamená, že případ užití může být za určitých podmínek rozšířen o další chování
+- základní případ užití dává smysl i bez rozšíření
+- šipka míří na rozšiřovaný (základní) případ
+- např. Uplatnit slevu extend Zaplatit objednávku
