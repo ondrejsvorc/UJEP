@@ -34,10 +34,6 @@ Když vezmeme c = (1 + 2) / 2 = 1.5, a pak spočítáme f(c) = f(1,5) = 0.1, pak
 
 ```r
 bisection <- function(f, a, b, eps) {
-  # f   : function f(x)
-  # a,b : numeric, interval endpoints
-  # eps : numeric, required accuracy
-
   fa <- f(a)
   fb <- f(b)
 
@@ -87,20 +83,4 @@ print(root)
 print(f(root))
 ```
 
-### Metoda regula falsi
-### Metoda prostých iterací
-### Newtonova metoda tečen
-### Hornerovo schéma
-### Newtonova-Hornerova metoda
-### Gaussova eliminační metoda
-### Metoda LU rozkladu
-### Jacobiova metoda
-### Gaussova-Seidelova metoda
-### Interpolace po částech lineární
-### Interpolace po částech polynomem
-### Aproximace metodou nejmenších čtverců
-### Newtonovy-Cotesovy vzorce jednoduché
-### Newtonovy-Cotesovy vzorce složené
-### Rombergova kvadratura
-### Eulerova metoda
-### Metody Rungeho-Kutty
+viz [METHODS.md](https://github.com/ondrejsvorc/UJEP/blob/main/2.%20year/NUM/METHODS.md)
