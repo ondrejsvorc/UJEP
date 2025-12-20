@@ -1,3 +1,12 @@
+## Numerické metody
+
+### Užitečné odkazy
+- [StudySession - Numerical Methods Course (YouTube)](https://www.youtube.com/watch?v=IOR31yN43Kg&list=PLDea8VeK4MUTOBXLpvx_WKtVrMkojEh52)
+- [marty-thane/num (GitHub)](https://github.com/marty-thane/num)
+- [markuss23/ujep (GitHub)](https://github.com/markuss23/ujep/tree/main/num)
+- [~jskvor/NME](https://physics.ujep.cz/~jskvor/NME/)
+- [KopyTKG/KI-NUM](https://github.com/KopyTKG/KI-NUM)
+
 ### Metoda půlení intervalu
 - anglicky: bisection method
 - též se nazývá bisekce
@@ -22,3 +31,76 @@ f(b) = 5
 Na levém konci je funkce záporná, na pravém kladná.
 Jelikož je funkce spojitá, musí někde mezi těmito body projít nulou, jinak by se nemohla plynule změnit ze záporné na kladnou.
 Když vezmeme c = (1 + 2) / 2 = 1.5, a pak spočítáme f(c) = f(1,5) = 0.1, pak f(c) má stejné znaménko jako f(a), a to znamená, že kořen leží mezi c a b, protože v této části se funkce mění ze záporné na kladnou.
+
+```r
+bisection <- function(f, a, b, eps) {
+  # f   : function f(x)
+  # a,b : numeric, interval endpoints
+  # eps : numeric, required accuracy
+
+  fa <- f(a)
+  fb <- f(b)
+
+  if (fa * fb >= 0) {
+    stop("Function does not change sign on the interval")
+  }
+
+  while (abs(b - a) > eps) {
+    c  <- (a + b) / 2
+    fc <- f(c)
+
+    if (fa * fc < 0) {
+      b  <- c
+      fb <- fc
+    } else {
+      a  <- c
+      fa <- fc
+    }
+  }
+
+  return((a + b) / 2)
+}
+```
+
+```r
+# f(x) = 7x − 9
+f <- function(x) { 7*x - 9 }
+
+# interval ⟨1, 2⟩ a přesnost ε = 1e-6
+root <- bisection(f, a = 1, b = 2, eps = 1e-6)
+
+# root ≈ hodnota x, kde hledáme řešení rovnice f(x) = 0
+print(root)
+
+# f(x) = 0 -> f(root) ≈ 0
+print(f(root))
+```
+
+#### Příklad zadání
+
+Najděte numericky řešení rovnice x^3 - x - 1 = 0 na intervalu <1, 2> s přesností eps = 1e-6.
+
+```r
+f <- function(x) { x^3 - x - 1 }
+root <- bisection(f, a = 1, b = 2, eps = 1e-6)
+print(root)
+print(f(root))
+```
+
+### Metoda regula falsi
+### Metoda prostých iterací
+### Newtonova metoda tečen
+### Hornerovo schéma
+### Newtonova-Hornerova metoda
+### Gaussova eliminační metoda
+### Metoda LU rozkladu
+### Jacobiova metoda
+### Gaussova-Seidelova metoda
+### Interpolace po částech lineární
+### Interpolace po částech polynomem
+### Aproximace metodou nejmenších čtverců
+### Newtonovy-Cotesovy vzorce jednoduché
+### Newtonovy-Cotesovy vzorce složené
+### Rombergova kvadratura
+### Eulerova metoda
+### Metody Rungeho-Kutty
