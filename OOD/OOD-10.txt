@@ -1,0 +1,25 @@
+@startuml
+title Proces importu výkazu
+
+actor "Uživatel" as User
+
+participant "Frontend" as FE
+participant "Backend" as BE
+database "Databáze" as DB
+participant "Excel soubor" as XLS
+
+User -> FE : Vybere soubor výkazu (.xls / .xlsx)
+FE -> BE : POST /api/attendance/import (multipart/form-data)
+
+BE -> BE : Ověření formátu souboru
+BE -> XLS : Načtení dat ze souboru
+XLS --> BE : Výkazová data (docházka, úvazky)
+
+BE -> BE : Validace dat
+BE -> DB : Uložení záznamů
+DB --> BE : Potvrzení o uložení
+
+BE --> FE : Výsledek importu výkazu (JSON)
+FE --> User : Zobrazení výkazu formou tabulky
+
+@enduml

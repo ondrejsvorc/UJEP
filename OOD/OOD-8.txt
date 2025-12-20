@@ -1,0 +1,50 @@
+@startuml
+object "attendanceTimesheet : AttendanceTimesheet" as attendanceTimesheet {
+  year = 2025
+  month = 1
+  workload = 1.0
+  totalHours = 6.0
+}
+
+object "attendanceDay1 : AttendanceDay" as attendanceDay1 {
+  date = 2025-01-01
+  hours = 6.0
+  workload = 0.7
+}
+
+object "projectTimesheet : ProjectTimesheet" as projectTimesheet {
+  year = 2025
+  month = 1
+  workload = 0.2
+  totalHours = 2.0
+}
+
+object "projectDay1 : ProjectDay" as projectDay1 {
+  date = 2025-01-01
+  hours = 2.0
+  workload = 0.2
+}
+
+object "combinedTimesheet : CombinedTimesheet" as combinedTimesheet {
+  year = 2025
+  month = 1
+  totalHours = 8.0
+  totalWorkload = 0.9
+}
+
+object "combinedDay1 : CombinedDay" as combinedDay1 {
+  date = 2025-01-01
+  hours = 8.0
+  totalWorkload = 0.9
+}
+
+attendanceTimesheet *-- attendanceDay1
+projectTimesheet *-- projectDay1
+
+combinedTimesheet *-- combinedDay1
+combinedDay1 o-- attendanceDay1
+combinedDay1 o-- projectDay1
+
+combinedTimesheet o-- attendanceTimesheet
+combinedTimesheet o-- projectTimesheet
+@enduml
