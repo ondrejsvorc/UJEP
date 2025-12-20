@@ -5,7 +5,7 @@
 #### Metoda půlení intervalů (bisekce)
 
 ```r
-bisection <- function(f, a, b, eps) {
+Bisection <- function(f, a, b, eps) {
   fa <- f(a)
   fb <- f(b)
 
