@@ -167,6 +167,10 @@ HS <- function(x, xi, yi, hi, di, dip, deltai) {
 #### Lichoběžníkové pravidlo
 
 ```r
+# f - funkce, kterou integrujeme
+# a - kde integrál začíná
+# b - kde integrál končí
+# n - počet rozdělení intervalu (= počet lichoběžníků = počet lokálních intervalů <ai, bi>)
 Trapezoid <- function(f, a, b, n) {
   h <- (b - a) / n
   integral <- 0

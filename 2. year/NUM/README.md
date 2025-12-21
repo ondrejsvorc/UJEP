@@ -84,5 +84,25 @@ print(root)
 print(f(root))
 ```
 
+### Gaussova eliminační metoda
+
+#### Eliminační faktor
+- říká, kolikrát musím vynásobit pivotní řádek, aby se jeho odečtením vynuloval konkrétní prvek pod pivotem
+- eliminačním faktorem se násobí pivotní řádek a tento násobek se odečte od celého řádku, ve kterém nuluji prvek; tím se vynuluje příslušná buňka a konzistentně se přepočítají všechny další prvky v řádku
+
+#### Částečná pivotace
+- = výměna řádků tak, aby byl pivot co největší (v absolutní hodnotě)
+- V každém kroku p prohodíme řádky tak, aby prvek Ab[p,p] byl největší absolutní hodnotou v aktuálním sloupci p mezi řádky p … N.
+- `imax` hledá řádek s největším možným pivotem v aktuálním sloupci, + p − 1 převádí lokální index na globální, a výměna řádků zajišťuje, že Gaussova eliminace nedělí malým číslem a zůstane numericky stabilní.
+
+
+### Interpolace
+- vektor x musí být seřazený od nejmenšího po největší (a jeho příslušné y podle toho, aby nepatřili najednou k jinému x)
+- pokud existuje ve vektor x stejná hodnota vícekrát, interpolace není definovaná
+```r
+ord <- order(x)
+x <- x[ord]
+y <- y[ord]
+```
 
 viz [METHODS.md](https://github.com/ondrejsvorc/UJEP/blob/main/2.%20year/NUM/METHODS.md)
