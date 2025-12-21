@@ -5,6 +5,7 @@
 - [marty-thane/num (GitHub)](https://github.com/marty-thane/num)
 - [markuss23/ujep (GitHub)](https://github.com/markuss23/ujep/tree/main/num)
 - [~jskvor/NME](https://physics.ujep.cz/~jskvor/NME/)
+- [~jskvor/NME/skripta](https://physics.ujep.cz/~jskvor/NME/skripta/)
 - [KopyTKG/KI-NUM](https://github.com/KopyTKG/KI-NUM)
 
 ### Metoda půlení intervalu
@@ -82,5 +83,6 @@ root <- bisection(f, a = 1, b = 2, eps = 1e-6)
 print(root)
 print(f(root))
 ```
+
 
 viz [METHODS.md](https://github.com/ondrejsvorc/UJEP/blob/main/2.%20year/NUM/METHODS.md)
