@@ -3,7 +3,7 @@ load("SatData.RData");
 
 cat("Počet respondentů:", nrow(satisfaction), "\n")
 summary(satisfaction$switch)
-hist(satisfaction$switch, breaks=10, main="Rozložení odpovědí: Ochota odejít", xlab="switch")
+hist(satisfaction$switch, breaks=seq(0.5, 10.5, by = 1), main="Rozložení odpovědí: Ochota odejít", xlab="switch")
 
 # Škála proměnných
 summary(satisfaction)
