@@ -1,0 +1,23 @@
+@startuml
+skinparam shadowing false
+skinparam componentStyle rectangle
+
+component "Frontend" as FE {
+  component "React + TypeScript" as React
+}
+
+component "Backend" as BE {
+  component "ASP.NET Web API" as API
+}
+
+database "PostgreSQL" as DB
+
+cloud "Univerzitní systémy" as UNIV {
+  component "Identity Provider (IdP)" as IDP
+}
+
+React --> API : REST API (JSON)
+API --> DB : ORM
+API --> IDP : OAuth 2.0
+
+@enduml

@@ -1,0 +1,83 @@
+@startuml
+node "Backend\nASP.NET Core" as BE {
+
+  package "Aplikační logika" {
+    component "Projekty" as Projects <<service>>
+    component "Zakázky" as Contracts <<service>>
+    component "Výkazy" as Timesheets <<service>>
+    component "Validace výkazu" as Validation <<domain-rules>>
+    component "Posuzování výkazu" as Approval <<service>>
+    component "Uživatelé a role" as Users <<service>>
+  }
+
+  package "Integrace" {
+    component "Import výkazu" as Import <<integration>>
+    component "Export výkazu" as Export <<integration>>
+    component "Autentizace" as Auth <<security>>
+    component "Notifikace" as Notifications <<integration>>
+  }
+
+  package "Infrastruktura" {
+    component "ORM" as ORM <<persistence>>
+    component "Logování" as Logging <<infrastructure>>
+  }
+}
+
+Projects --> Contracts
+Contracts --> Timesheets
+Timesheets --> Validation
+Timesheets --> Approval
+Timesheets --> Import
+Timesheets --> Export
+
+@enduml
+
+
+
+
+
+
+
+
+
+@startuml
+node "Backend" as BE {
+
+  package "Projekty" {
+
+    interface "GET /api/projects\n?search=&from=&to=" as GetProjectsApi <<REST>>
+    interface "GET /api/projects/{id}" as GetProjectByIdApi <<REST>>
+    interface "POST /api/projects" as CreateProjectApi <<REST>>
+    interface "PATCH /api/projects/{id}" as UpdateProjectApi <<REST>>
+    interface "DELETE /api/projects/{id}" as DeleteProjectApi <<REST>>
+
+    component "GetProjectsEndpoint" as GetProjectsEp <<endpoint>>
+    component "GetProjectByIdEndpoint" as GetProjectByIdEp <<endpoint>>
+    component "CreateProjectEndpoint" as CreateProjectEp <<endpoint>>
+    component "UpdateProjectEndpoint" as UpdateProjectEp <<endpoint>>
+    component "DeleteProjectEndpoint" as DeleteProjectEp <<endpoint>>
+
+    component "IProjectService" as ProjectService <<service>>
+    component "IProjectRepository" as ProjectRepository <<repository>>
+
+    component "ORM (EF Core)" as ORM <<persistence>>
+    component "ILogger" as Logging <<infrastructure>>
+
+    GetProjectsApi --> GetProjectsEp
+    GetProjectByIdApi --> GetProjectByIdEp
+    CreateProjectApi --> CreateProjectEp
+    UpdateProjectApi --> UpdateProjectEp
+    DeleteProjectApi --> DeleteProjectEp
+
+    GetProjectsEp --> ProjectService
+    GetProjectByIdEp --> ProjectService
+    CreateProjectEp --> ProjectService
+    UpdateProjectEp --> ProjectService
+    DeleteProjectEp --> ProjectService
+
+    ProjectService --> ProjectRepository
+    ProjectRepository --> ORM
+    ProjectService --> Logging
+  }
+}
+@enduml
