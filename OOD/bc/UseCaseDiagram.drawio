@@ -28,7 +28,7 @@
         <mxCell id="1LCkqq1MxHMioZqXLxXg-2" parent="1" style="rounded=0;whiteSpace=wrap;html=1;strokeColor=#2F4A66;" value="" vertex="1">
           <mxGeometry height="590" width="200" x="414" y="190" as="geometry" />
         </mxCell>
-        <mxCell id="1LCkqq1MxHMioZqXLxXg-3" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" value="&lt;p data-pm-slice=&quot;0 0 []&quot;&gt;Systém výkazy&lt;/p&gt;" vertex="1">
+        <mxCell id="1LCkqq1MxHMioZqXLxXg-3" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontStyle=1" value="&lt;p data-pm-slice=&quot;0 0 []&quot;&gt;Aplikace Výkazy&lt;/p&gt;" vertex="1">
           <mxGeometry height="30" width="340" x="344" y="190" as="geometry" />
         </mxCell>
         <mxCell id="1LCkqq1MxHMioZqXLxXg-4" parent="1" style="ellipse;whiteSpace=wrap;html=1;fillColor=#E6EEF6;strokeColor=#2F4A66;" value="Spravovat projekty" vertex="1">

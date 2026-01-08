@@ -32,7 +32,7 @@
 ### UML vztahy
 ![UML Relationship Types](https://www.umlboard.com/docs/relations/assets/images/relations-in-uml.png)
 
-### Závislost 
+### Závislost
 - anglicky: dependency
 - vyjadřuje dočasnou závislost, kdy jeden prvek používá jiný prvek ke splnění své úlohy, ale není s ním trvale svázán a neřídí jeho existenci
 
@@ -84,7 +84,7 @@ OrderService má k dispozici OrderRepository, se kterým opakovaně pracuje, ale
 
 ```csharp
 class Team
-{ 
+{
     public List<Player> Players { get; } = [];
 }
 ```
@@ -249,3 +249,24 @@ INotificationSender určuje, jakou operaci musí odesílači notifikací poskyto
     - Alternativní scénáře
     - Výjimky / chybové stavy
     - Výsledek (postconditions)
+
+### Diagram aktivit
+- anglicky: Activity Diagram
+- popisuje tok aktivit v systému
+- ukazuje jak systém postupuje krok za krokem
+- zdůrazňuje pořadí činností, nikoli strukturu tříd
+- zaměřuje se na sekvenci kroků, rozhodování a paralelismus
+- používá se k popisu případů užití, procesů anebo algoritmů
+
+### Počáteční uzel
+- anglicky: Initial node
+- plná černá tečka
+- označuje začátek toku
+- v diagramu existuje právě jeden
+
+### Akce
+- anglicky: Action
+- zaoblený obdélník
+- představuje atomickou činnost
+- pojmenovává se slovesem (např. „Ověřit uživatele“)
+- neřeší vnitřní implementaci
