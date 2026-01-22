@@ -7,7 +7,9 @@ hist(satisfaction$switch, breaks=seq(0.5, 10.5, by = 1), main="Rozložení odpov
 
 # Škála proměnných
 summary(satisfaction)
-summary(satisfaction$switch)
+lapply(satisfaction, function(x) sort(unique(x)))
+prop.table(table(satisfaction$switch))
+
 cor(satisfaction[, c("switch","loyalty","return","recommendation")], use="complete.obs")
 
 blocks <- list(
@@ -52,3 +54,4 @@ boxplot(LOYX ~ switch_bin, data=dat,
 
 cat("\nVýznamné prediktory (p < 0.05):\n")
 print(summary(model)$coefficients[summary(model)$coefficients[,4] < 0.05, ])
+
