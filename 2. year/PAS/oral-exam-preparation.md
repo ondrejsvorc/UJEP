@@ -9,15 +9,15 @@ summary(selected_var)
 sd(selected_var)
 var(selected_var)
 
-hist(selected_var, 
-     main = "Histogram proměnné mpg", 
-     xlab = "mpg", 
-     col = "skyblue", 
+hist(selected_var,
+     main = "Histogram proměnné mpg",
+     xlab = "mpg",
+     col = "skyblue",
      border = "black")
 
-boxplot(selected_var, 
-        main = "Boxplot proměnné mpg", 
-        ylab = "mpg", 
+boxplot(selected_var,
+        main = "Boxplot proměnné mpg",
+        ylab = "mpg",
         col = "lightgreen")
 ```
 
@@ -33,19 +33,19 @@ data.frame(cbind(
   "KumulativniRelativni" = cumsum(prop.table(table(selected_var)))
 ))
 
-barplot(abs_freq, 
-        main = "Sloupcový graf proměnné gear", 
-        xlab = "Počet rychlostních stupňů", 
-        ylab = "Počet vozidel", 
+barplot(abs_freq,
+        main = "Sloupcový graf proměnné gear",
+        xlab = "Počet rychlostních stupňů",
+        ylab = "Počet vozidel",
         col = "orange")
 
 colors <- rainbow(length(abs_freq))
-pie(abs_freq, 
-    main = "Koláčový graf proměnné gear", 
+pie(abs_freq,
+    main = "Koláčový graf proměnné gear",
     col = colors)
-legend("topright", 
-       legend = paste(names(abs_freq), "- stupňů"), 
-       fill = colors, 
+legend("topright",
+       legend = paste(names(abs_freq), "- stupňů"),
+       fill = colors,
        title = "Počet rychlostí")
 ```
 
@@ -58,16 +58,16 @@ legend("topright",
 - výběrový soubor = vzorek
 
 ### Bodový odhad střední hodnoty
-- Jediná hodnota sloužící jako odhad skutečné střední hodnoty populace.  
-- Nejčastěji se používá **aritmetický průměr** ze vzorku.  
+- Jediná hodnota sloužící jako odhad skutečné střední hodnoty populace.
+- Nejčastěji se používá **aritmetický průměr** ze vzorku.
 - Každý vzorek z populace může mít jiný průměr kvůli náhodné variabilitě.
-- Náhoda může způsobit, že vzorek obsahuje více extrémních hodnot, což ovlivní průměr.  
+- Náhoda může způsobit, že vzorek obsahuje více extrémních hodnot, což ovlivní průměr.
 - **Malé vzorky** jsou náchylnější k chybám, **větší vzorky** poskytují přesnější odhad.
 
 ### Intervalový odhad střední hodnoty
-- Určuje **rozmezí hodnot**, kde se s určitou spolehlivostí nachází skutečný průměr populace.  
-- Zohledňuje **variabilitu dat** a **velikost vzorku**.  
-- **Interval spolehlivosti** ukazuje rozmezí, kde by mohl být skutečný průměr.  
+- Určuje **rozmezí hodnot**, kde se s určitou spolehlivostí nachází skutečný průměr populace.
+- Zohledňuje **variabilitu dat** a **velikost vzorku**.
+- **Interval spolehlivosti** ukazuje rozmezí, kde by mohl být skutečný průměr.
 - Pokud použijeme 95% interval spolehlivosti, znamená to, že kdybychom vzali 100 různých vzorků a pro každý spočítali interval, tak 95 z těchto intervalů by pravděpodobně obsahovalo skutečný průměr, a 5 intervalů by ho neobsahovalo.
 
 ```r
@@ -110,12 +110,12 @@ mean(group_4_hp) - mean(group_4_hp) # -106.1
 
 # Intervalový odhad rozdílu středních hodnot
 
-# meandiff    lwr.ci    upr.ci 
-# 106.10000 -20.72102 232.92102 
+# meandiff    lwr.ci    upr.ci
+# 106.10000 -20.72102 232.92102
 MeanDiffCI(group_5_hp, group_4_hp)
 
-# meandiff     lwr.ci     upr.ci 
-# -106.10000 -232.92102   20.72102 
+# meandiff     lwr.ci     upr.ci
+# -106.10000 -232.92102   20.72102
 MeanDiffCI(group_4_hp, group_5_hp)
 ```
 Výsledky ukazují, že auta s 5 převodovými stupni mají průměrně o 106,1 hp vyšší výkon než auta se 4 stupni. Intervalový odhad rozdílu středních hodnot <–20,72; 232,92> znamená, že s 95% spolehlivostí se skutečný rozdíl výkonu může pohybovat od –20,72 hp do +232,92 hp. Protože tento interval obsahuje nulu, nelze s jistotou říct, že mezi těmito skupinami existuje statisticky významný rozdíl. Stejný výsledek s opačnými znaménky získáme při prohození skupin, což potvrzuje, že směr rozdílu je závislý na pořadí skupin. Pokud změníme pořadí skupin na group_4_hp - group_5_hp, výsledný bodový odhad je totiž –106,1 hp. To znamená, že auta se 4 převodovými stupni mají průměrně o 106,1 hp méně než auta s 5 stupni.
@@ -123,13 +123,13 @@ Výsledky ukazují, že auta s 5 převodovými stupni mají průměrně o 106,1 
 Interval není statisticky významný proto, že skutečný rozdíl může být kladný, záporný nebo dokonce nulový (dolní mez intervalu je záporná, interval jako takový zahrnuje nulu, a horní mez je kladná). Jinými slovy, nemůžeme s jistotou tvrdit, že mezi skupinami existuje rozdíl – je možné, že žádný rozdíl neexistuje. Statisticky významný rozdíl existuje pouze tehdy, když celý interval leží buď nad nulou (kladný rozdíl) nebo pod nulou (záporný rozdíl).
 
 ### Bodový odhad podílu
-- Vyjadřuje, jaká část vzorku má určitou vlastnost.  
+- Vyjadřuje, jaká část vzorku má určitou vlastnost.
 
 ### Intervalový odhad podílu
 - Udává rozmezí, ve kterém se s určitou spolehlivostí nachází skutečná míra výskytu dané vlastnosti v celé populaci.
 
 ### Bodový odhad rozdílu podílů
-- Rozdíl podílů dvou skupin.  
+- Rozdíl podílů dvou skupin.
 
 ### Intervalový odhad podílu
 - Rozmezí, ve kterém se s určitou spolehlivostí nachází rozdíl mezi mírami výskytu dané vlastnosti ve dvou populacích.
@@ -170,6 +170,8 @@ BinomDiffCI(x1 = sum(group_4$am == 0), n1 = nrow(group_4), x2 = sum(group_5$am =
 - **p-hodnota**: Nejmenší hladina významnosti, při které ještě zamítneme nulovou hypotézu
 - **p-hodnota ≤ α**: Zamítáme nulovou hypotézu
 - **p-hodnota > α**: Nezamítáme nulovou hypotézu v prospěch alternativní hypotézy
+- test NIKDY nedokazuje alternativní hypotézu přímo, ale snaží se zpochybnit nulovou hypotézu
+- test nehledá důkaz pro H₁, ale proti H₀
 
 ```r
 library(DescTools)
@@ -242,9 +244,9 @@ pairs(mtcars[, c("hp", "mpg")],
       labels = c("Výkon (hp)", "Spotřeba (mpg)"))
 ```
 
-**Tvar**: Lineární vztah potvrzený regresní přímkou.  
-**Směr**: Nepřímá souvislost (když se výkon zvyšuje, spotřeba paliva klesá).  
-**Síla**: Silná souvislost (hodnota je blízko -1).  
+**Tvar**: Lineární vztah potvrzený regresní přímkou.
+**Směr**: Nepřímá souvislost (když se výkon zvyšuje, spotřeba paliva klesá).
+**Síla**: Silná souvislost (hodnota je blízko -1).
 
 **Silná nepřímá lineární souvislost**.
 
@@ -328,10 +330,10 @@ print(distributions_comparison)
 plot_qq <- function(distribution, name, data) {
   params <- distribution$estimate
   p_points <- ppoints(length(data))
-  
+
   param1 <- params[1]  # První parametr (mean, meanlog, rate, shape, location)
   param2 <- params[2]  # Druhý parametr (sd, sdlog, rate, scale)
-  
+
   quantiles <- switch(distribution$distname,
               norm = qnorm(p_points, param1, param2),      # mean, sd
               lnorm = qlnorm(p_points, param1, param2),    # meanlog, sdlog
@@ -341,7 +343,7 @@ plot_qq <- function(distribution, name, data) {
               logis = qlogis(p_points, param1, param2),    # location, scale
               cauchy = qcauchy(p_points, param1, param2)   # location, scale
   )
-  
+
   qqplot(quantiles, mtcars$hp, main = paste("Q-Q Plot:", name))
   abline(0, 1, col = "red")
 }
@@ -457,8 +459,8 @@ Více informací [zde](https://github.com/ondrejsvorc/UJEP/blob/main/PAS/summary
 
 ## Tradiční versus robustní přístupy k odhadování
 ### Tradiční přístup
-- Využívá **průměr** a **rozptyl** pro odhadování parametrů.  
-- **Citlivý na odlehlé hodnoty (extrémy)**.  
+- Využívá **průměr** a **rozptyl** pro odhadování parametrů.
+- **Citlivý na odlehlé hodnoty (extrémy)**.
 
 ### Robustní přístup
 - Odolný vůči **odlehlým hodnotám** a **extrémům**
@@ -475,13 +477,13 @@ mad(data)                  # Mediánová absolutní odchylka (měří průměrno
 
 ## Tradiční versus bootstrapový přístup k statistické inferenci
 ### Tradiční přístup
-- Využívá **vzorce** a **teoretická pravidla** (např. t-test).  
-- Počítá s **předpoklady** (např. normální rozdělení dat).  
+- Využívá **vzorce** a **teoretická pravidla** (např. t-test).
+- Počítá s **předpoklady** (např. normální rozdělení dat).
 - **Rychlý**, ale méně flexibilní.
 
 ### Bootstrapový přístup
-- Vzorkuje data **náhodně s navracením** a počítá statistiky.  
-- Nezávisí na **předpokladech** o rozdělení dat.  
+- Vzorkuje data **náhodně s navracením** a počítá statistiky.
+- Nezávisí na **předpokladech** o rozdělení dat.
 - **Flexibilní**, ale **výpočetně náročnější**.
 
 ## Zákon velkých čísel a jeho využití, centrální limitní věta a její využití
@@ -532,39 +534,39 @@ legend("topright", legend = c("Histogram průměrů", "Normální rozdělení", 
 ## Interpretační problémy a aspekty intervalového odhadu a p-hodnoty
 
 ### Intervalový odhad
-- **Intervalový odhad** poskytuje interval, ve kterém se s určitou pravděpodobností (spolehlivostí) nachází **neznámý populační parametr**.  
+- **Intervalový odhad** poskytuje interval, ve kterém se s určitou pravděpodobností (spolehlivostí) nachází **neznámý populační parametr**.
 - Typicky se používá **95% interval spolehlivosti (CI)**.
 
 #### Interpretační problémy intervalového odhadu
-- **Chybná interpretace:** Interval neznamená, že s pravděpodobností 95 % parametr leží uvnitř intervalu. Znamená to, že **95 % všech takto vypočtených intervalů** pokryje skutečný parametr.  
-- **Záměna s predikčním intervalem:** Intervalový odhad se vztahuje na **parametr**, nikoli na budoucí pozorování.  
+- **Chybná interpretace:** Interval neznamená, že s pravděpodobností 95 % parametr leží uvnitř intervalu. Znamená to, že **95 % všech takto vypočtených intervalů** pokryje skutečný parametr.
+- **Záměna s predikčním intervalem:** Intervalový odhad se vztahuje na **parametr**, nikoli na budoucí pozorování.
 - **Citlivost na velikost vzorku:** Malý vzorek → širší interval; velký vzorek → užší interval.
 
 ### p-hodnota
-- **p-hodnota** je pravděpodobnost, že při platnosti **nulové hypotézy (H₀)** získáme **stejně extrémní nebo extrémnější výsledek**, než jaký jsme pozorovali.  
+- **p-hodnota** je pravděpodobnost, že při platnosti **nulové hypotézy (H₀)** získáme **stejně extrémní nebo extrémnější výsledek**, než jaký jsme pozorovali.
 - Slouží k rozhodování, zda **zamítnout** nulovou hypotézu.
 
-**Rozhodovací pravidlo:**  
-- Pokud **p ≤ α** (např. 0,05), **zamítáme** nulovou hypotézu.  
+**Rozhodovací pravidlo:**
+- Pokud **p ≤ α** (např. 0,05), **zamítáme** nulovou hypotézu.
 - Pokud **p > α**, **nezamítáme** nulovou hypotézu.
 
 #### Interpretační problémy p-hodnoty
-- **p-hodnota není pravděpodobnost, že nulová hypotéza platí.**  
-- **Malá p-hodnota** neznamená automaticky **prakticky významný** výsledek.  
-- Výsledek **závisí na velikosti vzorku** – velké vzorky mohou odhalit i nevýznamné rozdíly jako statisticky významné.  
+- **p-hodnota není pravděpodobnost, že nulová hypotéza platí.**
+- **Malá p-hodnota** neznamená automaticky **prakticky významný** výsledek.
+- Výsledek **závisí na velikosti vzorku** – velké vzorky mohou odhalit i nevýznamné rozdíly jako statisticky významné.
 - **Nadměrné spoléhání** na arbitrární hranici (např. α = 0,05) může vést k chybným závěrům.
 
 ## Kovariance a korelace
 
 ### Kovariance
-- Kovariance měří, **jak dvě proměnné společně kolísají** (mění se).  
-- Pokud mají obě proměnné tendenci **růst nebo klesat společně**, kovariance je **kladná**.  
-- Pokud jedna roste a druhá klesá, kovariance je **záporná**.  
+- Kovariance měří, **jak dvě proměnné společně kolísají** (mění se).
+- Pokud mají obě proměnné tendenci **růst nebo klesat společně**, kovariance je **kladná**.
+- Pokud jedna roste a druhá klesá, kovariance je **záporná**.
 - **Nevýhoda:** Kovariance je závislá na jednotkách měření, a proto není snadno interpretovatelná.
 
 ### Korelace
-- Korelace měří **sílu a směr lineárního vztahu** mezi dvěma proměnnými.  
-- Na rozdíl od kovariance je **normalizovaná** (nemá jednotky) a je snadno interpretovatelná.  
+- Korelace měří **sílu a směr lineárního vztahu** mezi dvěma proměnnými.
+- Na rozdíl od kovariance je **normalizovaná** (nemá jednotky) a je snadno interpretovatelná.
 - Korelace je tedy **standardizovaná kovariance**.
 
 ### Korelační koeficient
@@ -630,13 +632,13 @@ legend("topright", legend = c("Histogram", "Jádrový odhad", "Modus"),
 
 ### Populace (základní soubor)
 - **Soubor všech prvků**, které zkoumáme.
-- Může být konečná nebo nekonečná.  
-- Zahrnuje všechny jednotky, o kterých chceme získat informace.  
+- Může být konečná nebo nekonečná.
+- Zahrnuje všechny jednotky, o kterých chceme získat informace.
 - Např. všichni obyvatelé ČR, všechny výrobky z výrobní linky.
 
 ### Náhodný výběr
 - Výběr, kde každý prvek populace má **stejnou pravděpodobnost** být vybrán (např. losování).
-- Minimalizuje zkreslení. 
+- Minimalizuje zkreslení.
 
 # Nenáhodný výběr
 - Výběr, který není náhodný a může být **zkreslený**.
@@ -644,15 +646,15 @@ legend("topright", legend = c("Histogram", "Jádrový odhad", "Modus"),
 # Populační charakteristiky a výběrové charakteristiky
 
 ## Populační charakteristiky
-- Populační charakteristiky (parametry) popisují celou populaci:  
-  - **Populační průměr (μ):** Průměrná hodnota celé populace.  
-  - **Populační rozptyl (σ²):** Variabilita dat v populaci.  
+- Populační charakteristiky (parametry) popisují celou populaci:
+  - **Populační průměr (μ):** Průměrná hodnota celé populace.
+  - **Populační rozptyl (σ²):** Variabilita dat v populaci.
   - **Populační proporce (P):** Podíl určité vlastnosti v populaci.
 
 ## Výběrové charakteristiky
-- Výběrové charakteristiky (statistiky) popisují výběr z populace:  
-  - **Výběrový průměr:** Průměrná hodnota ve vzorku.  
-  - **Výběrový rozptyl (s²):** Variabilita ve vzorku.  
+- Výběrové charakteristiky (statistiky) popisují výběr z populace:
+  - **Výběrový průměr:** Průměrná hodnota ve vzorku.
+  - **Výběrový rozptyl (s²):** Variabilita ve vzorku.
   - **Výběrová proporce (p):** Podíl určité vlastnosti ve vzorku.
 - Výběrové charakteristiky slouží jako odhady populačních parametrů.
 - Čím větší výběr, tím přesnější odhad populačních parametrů.
@@ -748,24 +750,24 @@ legend("topright", legend = c("Data 1", "Data 2"),
 - Tvar histogramu silně závisí na šířce okna (bin width) a offsetu (posunutí začátku binů)
 
 ## Šířka okna (bin width)
-- Určuje velikost intervalů (binů), do kterých jsou data rozdělena.  
-- Malá šířka znamená více binů a detailní, ale možná chaotické zobrazení.  
-- Velká šířka znamená méně binů a zjednodušené zobrazení, které může skrývat důležité informace.  
+- Určuje velikost intervalů (binů), do kterých jsou data rozdělena.
+- Malá šířka znamená více binů a detailní, ale možná chaotické zobrazení.
+- Velká šířka znamená méně binů a zjednodušené zobrazení, které může skrývat důležité informace.
 
 ## Offset (posun binů)
 - Offset určuje, kde začíná první interval (bin), a tím posouvá všechny následující biny. Nemění jejich šířku, ale mění jejich počáteční bod (a tedy konečný bod)
-- Posunutí může ovlivnit rozložení dat mezi biny a změnit tvar histogramu.  
+- Posunutí může ovlivnit rozložení dat mezi biny a změnit tvar histogramu.
 - Dva histogramy se stejnou šířkou binů, ale různým offsetem mohou vypadat zcela odlišně.
 
-`POZOR`: Když nastavíš offset na hodnotu 1, histogram začne dělit data od hodnoty 1. Ignorují se tím hodnoty mezi 0 a 1? Ano, ale jen pokud v datech existují hodnoty v intervalu <0;1).  
+`POZOR`: Když nastavíš offset na hodnotu 1, histogram začne dělit data od hodnoty 1. Ignorují se tím hodnoty mezi 0 a 1? Ano, ale jen pokud v datech existují hodnoty v intervalu <0;1).
 V příkladových datech (1, 2, 3, ..., 10) žádné hodnoty mezi 0 a 1 nejsou, takže se nic neignoruje.
-Pokud bys měl v datech např. hodnotu 0.5, tak by se do histogramu nezahrnula, protože žádný bin nezačíná dříve než 1.  
+Pokud bys měl v datech např. hodnotu 0.5, tak by se do histogramu nezahrnula, protože žádný bin nezačíná dříve než 1.
 
 ```r
 data <- c(1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
 
 # 2x2 grafy vedle sebe
-par(mfrow = c(2, 2))  
+par(mfrow = c(2, 2))
 
 # Šířka binu = 2, Offset = 0
 # Intervaly: <0;2), <2;4), <4;6), <6;8), <8;10)
@@ -858,12 +860,12 @@ print(statistiky_meritkova)
 - Zachovává tvar rozdělení dat, ale mění jejich měřítko.
 - Používá se, když data obsahují odlehlé hodnoty.
 - `z = (x - μ) / σ`
-  - x: původní hodnota  
-  - μ: průměr dat  
+  - x: původní hodnota
+  - μ: průměr dat
   - σ: směrodatná odchylka
- 
+
 ### Z-skóre
-- Udává, kolik **směrodatných odchylek** leží hodnota od **průměru**.  
+- Udává, kolik **směrodatných odchylek** leží hodnota od **průměru**.
 - Bez Z-skóre bychom museli srovnávat hodnoty s průměrem ručně.
 - Pomáhá jednoznačně identifikovat, zda je hodnota **běžná** (průměrná) nebo **výjimečná** (nadprůměrná/podprůměrná).
 - **Příklad:** Z-skóre \( z = 2 \) znamená, že hodnota je **dvě směrodatné odchylky nad průměrem**.
@@ -871,7 +873,7 @@ print(statistiky_meritkova)
 - `z > 0`: Hodnota je nadprůměrná (Čím vyšší kladné Z-skóre, tím víc je hodnota nadprůměrná).
 - `z < 0`: Hodnota je podprůměrná (Čím je Z-skóre více záporné, tím víc je hodnota podprůměrná).
 - Čím větší absolutní hodnota Z-skóre, tím více se hodnota odchyluje od průměru.
-  
+
 ```r
 data(mtcars)
 
@@ -940,28 +942,28 @@ abline(model, col = "red", lwd = 2)
 ```
 
 ## Předpoklady lineární regrese
-- Vztah mezi závislou proměnnou a nezávislou by měl být **lineární** (tedy pak přímý/nepřímý).  
-- **Rezidua** (chyby modelu) by měla mít **normální rozdělení** s průměrem 0.  
-- Rozptyl reziduí by měl být **stejný** pro všechny hodnoty (tzv. **homoskedasticita**).  
-- **Prediktory** (vstupy modelu) by neměly být silně **korelované** mezi sebou (**žádná multikolinearita**).  
-- V datech by neměly být **odlehlé hodnoty**, které by mohly ovlivnit výsledky.  
+- Vztah mezi závislou proměnnou a nezávislou by měl být **lineární** (tedy pak přímý/nepřímý).
+- **Rezidua** (chyby modelu) by měla mít **normální rozdělení** s průměrem 0.
+- Rozptyl reziduí by měl být **stejný** pro všechny hodnoty (tzv. **homoskedasticita**).
+- **Prediktory** (vstupy modelu) by neměly být silně **korelované** mezi sebou (**žádná multikolinearita**).
+- V datech by neměly být **odlehlé hodnoty**, které by mohly ovlivnit výsledky.
 - **Prediktory** by neměly být propojené s **rezidui** (chyby by měly být náhodné).
 
 ### Rezidua
-- `Reziduum = Skutečná hodnota - Predikovaná hodnota`  
-- Rozdíl mezi skutečnými a predikovanými hodnotami závislé proměnné.  
-- Vyjadřují chybu modelu při odhadu.  
-- Ideálně by měla mít normální rozdělení s průměrem 0.  
-- Rozptyl reziduí by měl být konstantní (homoskedasticita).  
+- `Reziduum = Skutečná hodnota - Predikovaná hodnota`
+- Rozdíl mezi skutečnými a predikovanými hodnotami závislé proměnné.
+- Vyjadřují chybu modelu při odhadu.
+- Ideálně by měla mít normální rozdělení s průměrem 0.
+- Rozptyl reziduí by měl být konstantní (homoskedasticita).
 
 ### Prediktory
-- Nezávislé proměnné, které slouží k předpovědi závislé proměnné.  
-- Jsou vstupy modelu, které ovlivňují výslednou predikci.  
-- Neměly by být silně korelované mezi sebou (bez multikolinearity).  
-- Neměly by být korelované s rezidui.  
+- Nezávislé proměnné, které slouží k předpovědi závislé proměnné.
+- Jsou vstupy modelu, které ovlivňují výslednou predikci.
+- Neměly by být silně korelované mezi sebou (bez multikolinearity).
+- Neměly by být korelované s rezidui.
 
 ### Příklad
-Model předpovídá cenu auta na základě jeho stáří a počtu najetých kilometrů.  
-- **Prediktory:** stáří auta, počet najetých kilometrů.  
-- **Závislá proměnná:** cena auta.  
-- **Rezidua:** rozdíly mezi skutečnou cenou auta a cenou, kterou model vypočítal.  
+Model předpovídá cenu auta na základě jeho stáří a počtu najetých kilometrů.
+- **Prediktory:** stáří auta, počet najetých kilometrů.
+- **Závislá proměnná:** cena auta.
+- **Rezidua:** rozdíly mezi skutečnou cenou auta a cenou, kterou model vypočítal.
