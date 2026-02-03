@@ -128,24 +128,30 @@ interpret_pca <- function(pca, target_variance) {
 }
 ```
 
-### Porovnání výběrů
-- x
-
 ### Faktorová analýza
 - předpokládá, že existuje skrytý faktor, který způsobuje korelace mezi proměnnými
+- př.: máme 20 otázek na spokojenost v práci. Faktorová analýza zjistí, že 10 z nich spolu souvisí kvůli faktoru „peníze“ a dalších 10 kvůli faktoru „kolektiv“.
+- využití: Psychologie, marketingové průzkumy.
 
 ### Diskriminační analýza
-- x
+- snaží se najít pravidlo, jak rozdělit objekty do předem známých skupin na základě jejich vlastností
+- podobá se logistické regresi, ale je zaměřená na to, které proměnné nejlépe „diskriminují“ (oddělují) skupiny od sebe
+- př.: máme data o lebkách (šířka, délka). Analýza určí, které rozměry nejlépe odliší, zda jde o muže nebo ženu.
 
 ### Shluková analýza
-- x
+- na rozdíl od diskriminační analýzy tady skupiny předem neznáme. Algoritmus hledá v datech „shluky“ podobných objektů
+- nejčastěji se používá K-means nebo hierarchické shlukování
+- př.: rozdělení zákazníků e-shopu do skupin (např. „šetrní“, „lovci slev“, „vážení klienti“) podle jejich nákupního chování.
 
 ### Kanonické korelace
-- x
-
+- hledá vztah mezi dvěma sadami proměnných (nejen dvěma čísly)
+- snaží se zjistit, jak spolu souvisí jeden balík dat s druhým
+- najde lineární kombinace (kanonické proměnné), které mají mezi sebou nejvyšší možnou korelaci
+- př: souvisí sada proměnných o „psychickém zdraví“ (deprese, úzkost, stres) se sadou proměnných o „životním stylu“ (spánek, strava, pohyb)?
 
 ## Testy
 - t-test
+- dvouvýběrový t-test
 - ANOVA
 - Hotellingovo T²
 - MANOVA
@@ -159,6 +165,10 @@ interpret_pca <- function(pca, target_variance) {
 | >1                 | 2            | Hotellingovo T² |
 | >1                 | >2           | MANOVA          |
 
+### t-test
+### ANOVA
+### Hotellingovo T²
+### MANOVA
 
 ## Regrese
 - jednoduchá lineární regrese
@@ -600,4 +610,3 @@ mod_poly <- lm(vykon ~ poly(stres, degree = 2, raw = TRUE), data = data_vykon)
 plot(vykon ~ stres, data = data_vykon, pch = 16, main = "Polynomická regrese (Kvadratická)")
 curve(predict(mod_poly, data.frame(stres = x)), add = TRUE, col = "red", lwd = 2)
 ```
-
