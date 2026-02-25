@@ -1,0 +1,45 @@
+<mxfile host="app.diagrams.net" agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/145.0.0.0 Safari/537.36" version="29.2.10">
+  <diagram name="Stránka-1" id="sFdf7FzDJH1-AWycbAZ_">
+    <mxGraphModel dx="925" dy="516" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+        <mxCell id="11Plrty3gSUHTlTwk1pK-18" parent="1" style="rounded=0;whiteSpace=wrap;html=1;labelBorderColor=none;strokeColor=none;" value="" vertex="1">
+          <mxGeometry height="400" width="640" x="200" y="120" as="geometry" />
+        </mxCell>
+        <mxCell id="11Plrty3gSUHTlTwk1pK-14" parent="1" style="ellipse;whiteSpace=wrap;html=1;strokeWidth=0.5;" value="" vertex="1">
+          <mxGeometry height="310" width="380" x="420" y="170" as="geometry" />
+        </mxCell>
+        <mxCell id="11Plrty3gSUHTlTwk1pK-2" edge="1" parent="1" source="11Plrty3gSUHTlTwk1pK-1" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=0.5;" target="11Plrty3gSUHTlTwk1pK-3">
+          <mxGeometry relative="1" as="geometry">
+            <mxPoint x="450" y="315" as="targetPoint" />
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="11Plrty3gSUHTlTwk1pK-1" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=13;fontStyle=0;strokeWidth=0.5;" value="Program" vertex="1">
+          <mxGeometry height="40" width="120" x="240" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="11Plrty3gSUHTlTwk1pK-10" edge="1" parent="1" source="11Plrty3gSUHTlTwk1pK-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeWidth=0.5;" target="11Plrty3gSUHTlTwk1pK-6">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="11Plrty3gSUHTlTwk1pK-3" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=0.5;" value="Veřejné operace" vertex="1">
+          <mxGeometry height="40" width="120" x="460" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="11Plrty3gSUHTlTwk1pK-5" parent="1" style="text;html=1;whiteSpace=wrap;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;rounded=0;fontSize=15;fontStyle=1;strokeWidth=0.5;" value="Abstraktní datový typ" vertex="1">
+          <mxGeometry height="30" width="220" x="500" y="220" as="geometry" />
+        </mxCell>
+        <mxCell id="11Plrty3gSUHTlTwk1pK-6" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=0.5;" value="Privátní operace" vertex="1">
+          <mxGeometry height="40" width="120" x="640" y="285" as="geometry" />
+        </mxCell>
+        <mxCell id="11Plrty3gSUHTlTwk1pK-7" parent="1" style="rounded=1;whiteSpace=wrap;html=1;fontSize=13;strokeWidth=0.5;" value="Datová struktura" vertex="1">
+          <mxGeometry height="40" width="300" x="460" y="355" as="geometry" />
+        </mxCell>
+        <mxCell id="11Plrty3gSUHTlTwk1pK-12" edge="1" parent="1" source="11Plrty3gSUHTlTwk1pK-3" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.199;entryY=-0.006;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=0.5;" target="11Plrty3gSUHTlTwk1pK-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+        <mxCell id="11Plrty3gSUHTlTwk1pK-13" edge="1" parent="1" source="11Plrty3gSUHTlTwk1pK-6" style="edgeStyle=orthogonalEdgeStyle;rounded=0;orthogonalLoop=1;jettySize=auto;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.805;entryY=0;entryDx=0;entryDy=0;entryPerimeter=0;strokeWidth=0.5;" target="11Plrty3gSUHTlTwk1pK-7">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
