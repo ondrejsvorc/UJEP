@@ -34,7 +34,19 @@ flowchart TB
     Oral --> VP
 ```
 
-#### KI/SZZTP Teoretické základy informatiky
+### KI/SZZTP Teoretické základy informatiky
+- Algoritmizace a programování I a II (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/APR-I-II-3okruhy.pdf, https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/Tahaky/APR-Python.pdf)
+- Architektura počítačů (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/PCA-I.pdf, https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/PCA-II.pdf)
+- Základy elektroniky (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/ZEL-2okruhy.pdf, 
+- Základy počítačových sítí a protokolů (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/ZPS-A.pdf, https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/ZPS-B.pdf, https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/Tahaky/ZPS/)
+- Matematický software (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/SemiFinal/MSW.pdf)
+- Operační systémy (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/OPS.pdf)
+- Úvod do relačních databází (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/URDB.pdf, https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/Tahaky/URDB-SQL.pdf)
+- Základy kyberbezpečnosti (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/ZKB.pdf)
+- Základy zpracování dat (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/ZZD.pdf)
+- Multimédia a základy počítačové grafiky (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/MPG.pdf)
+- Projektové řízení (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZPP/PRIZ.pdf)
+
 ```mermaid
 flowchart TB
     classDef main fill:#1f2937,stroke:#111827,color:#ffffff,stroke-width:2px;
@@ -57,7 +69,15 @@ flowchart TB
     Q5 --> Q6
 ```
 
-#### KI/SZZPP Aplikovaná informatika: povinný základ
+### KI/SZZPP Aplikovaná informatika: povinný základ
+- Databázové systémy a zpracování dat (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZVP/SZZVP-DB.pdf)
+- Elektronika a automatizace (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZVP/SZZVP-EL.pdf)
+- Informační a počítačová bezpečnost (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZVP/SZZVP-SC.pdf, https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZVP/SZZVP-ZKR.pdf)
+- Operační systémy a virtualizace (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZVP/SZZVP-OS.pdf)
+- Počítačové sítě a protokoly (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZVP/SZZVP-CN.pdf)
+- Podniková informatika (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZVP/SZZVP-PI.pdf)
+- Programování a softwarové inženýrství (https://physics.ujep.cz/~jskvor/SZZ/BcAPI/SZZVP/SZZVP-SW.pdf)
+
 ```mermaid
 flowchart TB
     classDef main fill:#1f2937,stroke:#111827,color:#ffffff,stroke-width:2px;
@@ -82,7 +102,7 @@ flowchart TB
     S6 --> S7
 ```
 
-#### KI/SZZVP Aplikovaná informatika: volitelné bloky
+### KI/SZZVP Aplikovaná informatika: volitelné bloky
 ```mermaid
 flowchart TB
     classDef main fill:#1f2937,stroke:#111827,color:#ffffff,stroke-width:2px;
