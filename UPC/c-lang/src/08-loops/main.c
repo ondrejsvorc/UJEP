@@ -42,7 +42,7 @@ void pre_post_increment_example() {
     int i = 0;
     printf("Post-increment: %d\n", i++);
     printf("Pre-increment: %d\n", ++i);
-    printf("Post-increment: %d %d %d - ha!\n", i++, i++, i++);
+    printf("Post-increment: %d %d %d - ha!\n", i++, i++, i++); // stack (lifo)
 }
 
 void infinite_for_loop_with_break_example() {

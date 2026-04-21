@@ -18,9 +18,9 @@ void str_by_char2(cstr s) {
 }
 
 void find_char(char c, cstr s) {
-    cstr p = s;
+    cstr p;
 
-    for (/*cstr*/ p = s; *p && c != *p; ++p)
+    for (p = s; *p && c != *p; ++p) // for loop with no body
         ;
 
     if (*p) {

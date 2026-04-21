@@ -28,3 +28,8 @@ cd /src/01-hello
 [01-hello/README](./src/01-hello/README.md)
 
 ... etc.
+
+
+## Variadická funkce
+- funkce, která přijímá proměnlivý počet argumentů, a to i různých datových typů
+- např. printf()
