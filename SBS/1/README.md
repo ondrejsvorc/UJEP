@@ -193,8 +193,9 @@ B \ A = {5, 6}                  // Prvky, které jsou v B, ale nejsou v A.
 ![Queue](https://media.geeksforgeeks.org/wp-content/uploads/20260123124226975340/011.webp)
 
 #### Typické implementace
-- kruhové pole (circular array)
+- kruhová fronta
 - spojový seznam s ukazatelem na začátek i konec
+- obousměrnná fronta
 - dynamické pole (méně vhodné, dequeue bývá O(n))
 
 | Implementace                          | enqueue | dequeue | front | rear | Poznámka |
