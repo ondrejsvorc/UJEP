@@ -1,14 +1,16 @@
 ## Pokročilé statistické metody
 
 ### Užitečné odkazy
-- https://kma.ujep.cz/profil/alena-cernikova
-- https://docs.google.com/document/d/1WA2M25evFDn-AV-Sfsq3P2kv\_6thJBLe5C2jRokXucc/edit?tab=t.0
-- https://docs.google.com/document/d/1E-wic70lhKmbUqgHJUmuggUjI2Udx9I-L2yxrjuz0NM/edit?usp=sharing
-- https://is.muni.cz/el/1431/jaro2016/Z2069/um/54271982/56272282/PCA_prez_pondelniskupiny.pdf
-- https://naucse.python.cz/2021/pydata-praha-jaro/pydata/pca/
-- https://www.investopedia.com/terms/v/variance-inflation-factor.asp
-- https://medium.com/@arko_sengupta/stepwise-regression-a-comprehensive-guide-33d837a5e6c1
-- https://www.youtube.com/watch?v=IXB_GEuQWyA
+- https://kma.ujep.cz/profil/alena-cernikova (Univerzitní materiály)
+- https://www.investopedia.com/terms/v/variance-inflation-factor.asp (VIC)
+- https://medium.com/@arko_sengupta/stepwise-regression-a-comprehensive-guide-33d837a5e6c1 (Kroková regrese)
+- https://www.youtube.com/watch?v=IXB_GEuQWyA (Koeficient determinace)
+- https://is.muni.cz/el/1431/jaro2016/Z2069/um/54271982/56272282/PCA_prez_pondelniskupiny.pdf (Metoda hlavních komponent)
+- https://www.youtube.com/watch?v=_6UjscCJrYE (Metoda hlavních komponent)
+- https://www.youtube.com/watch?v=Bh_BvCOG1NA (Faktorová analýza)
+- https://www.youtube.com/watch?v=HoVrruVotho (Rozdíl mezi metodou hlavních komponent a faktorovou analýzou)
+- https://www.youtube.com/watch?v=8QCBl-xdeZI (Hiearchické shlukování)
+- https://www.youtube.com/watch?v=GZj6ikx8PAc (Nehiearchické shlukování - K-Means)
 
 ## Statistika
 - jednorozměrná
@@ -74,9 +76,11 @@ interpret_pca_loadings <- function(pca, components = 3, top_n = 5) {
 ```
 
 Každá komponenta má vlastní váhy a ty váhy říkají, které proměnné jsou pro danou komponentu více důležité a které méně. Komponenta funguje jako funkce, která z původních vlastností vína vypočte jedno číslo – skóre – určující jeho polohu vzhledem k dané komponentě.
-$$
-\mathrm{PC}_k = a_1 x_1 + a_2 x_2 + \cdots + a_p x_p
-$$
+
+```
+PC_k = a1·x1 + a2·x2 + … + ap·xp
+```
+
 kde:
 - $k$ označuje číslo hlavní komponenty,
 - $p$ je počet původních proměnných,
@@ -84,25 +88,22 @@ kde:
 - $a_1, \dots, a_p$ jsou váhy (zatížení) těchto proměnných v $k$-té hlavní komponentě.
 
 Konkrétní příklad:
-$$
-\begin{aligned}
-\mathrm{PC}_1 =\;&
--0.144 \cdot \text{Alcohol}
-+0.245 \cdot \text{Malic.acid}
-+0.002 \cdot \text{Ash}
-+0.239 \cdot \text{Alcalinity.of.ash} \\
-&-0.142 \cdot \text{Magnesium}
--0.395 \cdot \text{Total.phenols}
--0.423 \cdot \text{Flavanoids}
-+0.299 \cdot \text{Nonflavanoid.phenols} \\
-&-0.313 \cdot \text{Proanthocyanin}
-+0.089 \cdot \text{Color.intensity}
--0.297 \cdot \text{Hue}
--0.376 \cdot \text{OD280.OD315.of.diluted.wines} \\
-&-0.287 \cdot \text{Proline}
-\end{aligned}
-$$
-
+```
+PC1 =
+-0.144·Alcohol
++0.245·Malic acid
++0.002·Ash
++0.239·Alcalinity of ash
+-0.142·Magnesium
+-0.395·Total phenols
+-0.423·Flavanoids
++0.299·Nonflavanoid phenols
+-0.313·Proanthocyanin
++0.089·Color intensity
+-0.297·Hue
+-0.376·OD280/OD315 of diluted wines
+-0.287·Proline
+```
 
 #### Výstup a interpretace
 - hlavní komponenty (PC1, PC2, ...)
