@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>Bayes síť – vizualizace</title>
+<style>
+body { font-family: sans-serif; background:#111; color:#eee; }
+canvas { background:#000; display:block; margin-top:10px; }
+</style>
+</head>
+<body>
+
+<h3>Bayes síť (klikni na uzly = evidence)</h3>
+<p id="out"></p>
+
+<canvas id="c" width="600" height="400"></canvas>
+
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+const out = document.getElementById("out");
+
+// --- uzly ---
+const nodes = {
+    O: { x:300, y:50,  label:"Oblačno", state:null },
+    Z: { x:150, y:150, label:"Zavlažovač", state:null },
+    D: { x:450, y:150, label:"Déšť", state:null },
+    M: { x:300, y:260, label:"Mokrá tráva", state:null },
+    K: { x:300, y:350, label:"Kluzko", state:null }
+};
+
+// --- CPT ---
+function P_O(){ return 0.5; }
+function P_Z(O){ return O ? 0.1 : 0.5; }
+function P_D(O){ return O ? 0.8 : 0.2; }
+function P_M(Z,D){
+    if (Z&&D) return 0.99;
+    if (Z&&!D) return 0.90;
+    if (!Z&&D) return 0.90;
+    return 0.0;
+}
+function P_K(M){ return M ? 0.8 : 0.1; }
+
+// --- joint ---
+function joint(O,Z,D,M,K){
+    let p=1;
+    p*= O ? P_O() : 1-P_O();
+    p*= Z ? P_Z(O) : 1-P_Z(O);
+    p*= D ? P_D(O) : 1-P_D(O);
+    p*= M ? P_M(Z,D) : 1-P_M(Z,D);
+    p*= K ? P_K(M) : 1-P_K(M);
+    return p;
+}
+
+// --- inference ---
+function infer() {
+    let num=0, den=0;
+
+    for (let O of [true,false])
+    for (let Z of [true,false])
+    for (let D of [true,false])
+    for (let M of [true,false])
+    for (let K of [true,false]) {
+
+        if (nodes.O.state!==null && nodes.O.state!==O) continue;
+        if (nodes.Z.state!==null && nodes.Z.state!==Z) continue;
+        if (nodes.D.state!==null && nodes.D.state!==D) continue;
+        if (nodes.M.state!==null && nodes.M.state!==M) continue;
+        if (nodes.K.state!==null && nodes.K.state!==K) continue;
+
+        let p = joint(O,Z,D,M,K);
+        den += p;
+        if (D) num += p;
+    }
+
+    return num/den;
+}
+
+// --- viz ---
+function draw() {
+    ctx.clearRect(0,0,600,400);
+
+    drawEdge("O","Z");
+    drawEdge("O","D");
+    drawEdge("Z","M");
+    drawEdge("D","M");
+    drawEdge("M","K");
+
+    let pRain = infer();
+
+    for (let key in nodes) {
+        let n = nodes[key];
+        let p = (key==="D") ? pRain : 0.5;
+
+        ctx.beginPath();
+        ctx.arc(n.x,n.y,30,0,Math.PI*2);
+        ctx.fillStyle = `rgba(255,255,0,${p})`;
+        ctx.fill();
+
+        ctx.strokeStyle="#fff";
+        ctx.stroke();
+
+        ctx.fillStyle="#fff";
+        ctx.textAlign="center";
+        ctx.fillText(n.label, n.x, n.y-5);
+
+        if (n.state!==null) {
+            ctx.fillText(n.state ? "ANO":"NE", n.x, n.y+15);
+        }
+    }
+
+    out.textContent = "P(Déšť = ano) = " + pRain.toFixed(3);
+}
+
+function drawEdge(a,b){
+    let n1 = nodes[a], n2 = nodes[b];
+    ctx.beginPath();
+    ctx.moveTo(n1.x,n1.y);
+    ctx.lineTo(n2.x,n2.y);
+    ctx.strokeStyle="#888";
+    ctx.stroke();
+}
+
+// --- interakce ---
+canvas.addEventListener("click", e => {
+    let rect = canvas.getBoundingClientRect();
+    let x = e.clientX - rect.left;
+    let y = e.clientY - rect.top;
+
+    for (let k in nodes) {
+        let n = nodes[k];
+        let dx = x-n.x, dy=y-n.y;
+        if (dx*dx+dy*dy < 30*30) {
+            if (n.state===null) n.state=true;
+            else if (n.state===true) n.state=false;
+            else n.state=null;
+        }
+    }
+    draw();
+});
+
+draw();
+</script>
+
+</body>
+</html>

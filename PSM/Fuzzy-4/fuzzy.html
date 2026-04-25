@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+<meta charset="UTF-8">
+<title>Fuzzy teplota</title>
+<style>
+    body { font-family: sans-serif; background: #111; color: #eee; }
+    input { margin: 10px 0; }
+    canvas { background: #fff; display: block; padding: 10px; }
+</style>
+</head>
+<body>
+
+<h3>Fuzzy teplota (voda)</h3>
+<input type="range" id="temp" min="0" max="100" value="30">
+<span id="value">30°C</span>
+<p id="output"></p>
+
+<canvas id="c" width="600" height="300"></canvas>
+
+<script>
+const canvas = document.getElementById("c");
+const ctx = canvas.getContext("2d");
+const input = document.getElementById("temp");
+const output = document.getElementById("output");
+const valueLabel = document.getElementById("value");
+
+const W = canvas.width;
+const H = canvas.height;
+
+function cold(x) {
+    if (x <= 20) return 1;
+    if (x >= 40) return 0;
+    return (40 - x) / 20;
+}
+
+function warm(x) {
+    if (x <= 20 || x >= 80) return 0;
+    if (x <= 50) return (x - 20) / 30;
+    return (80 - x) / 30;
+}
+
+function hot(x) {
+    if (x <= 60) return 0;
+    if (x >= 80) return 1;
+    return (x - 60) / 20;
+}
+
+function draw() {
+    ctx.clearRect(0,0,W,H);
+
+    drawCurve(cold, "blue");
+    drawCurve(warm, "orange");
+    drawCurve(hot, "red");
+
+    drawPoint(parseFloat(input.value));
+}
+
+function drawCurve(fn, color) {
+    ctx.beginPath();
+    for (let i = 0; i <= 100; i++) {
+        let x = i / 100 * W;
+        let y = H - fn(i) * H;
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+    }
+    ctx.strokeStyle = color;
+    ctx.lineWidth = 2;
+    ctx.stroke();
+}
+
+function drawPoint(temp) {
+    let x = temp / 100 * W;
+
+    [cold, warm, hot].forEach((fn, i) => {
+        let y = H - fn(temp) * H;
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fillStyle = ["blue","orange","red"][i];
+        ctx.fill();
+    });
+}
+
+function update() {
+    let t = parseFloat(input.value);
+    valueLabel.textContent = t + "°C";
+
+    let c = cold(t);
+    let w = warm(t);
+    let h = hot(t);
+
+    output.textContent =
+        `studená: ${c.toFixed(2)} | vlažná: ${w.toFixed(2)} | horká: ${h.toFixed(2)}`;
+
+    draw();
+}
+
+input.addEventListener("input", update);
+update();
+</script>
+
+</body>
+</html>
