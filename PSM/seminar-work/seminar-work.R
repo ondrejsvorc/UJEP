@@ -55,3 +55,37 @@ boxplot(LOYX ~ switch_bin, data=dat,
 cat("\nVýznamné prediktory (p < 0.05):\n")
 print(summary(model)$coefficients[summary(model)$coefficients[,4] < 0.05, ])
 
+
+
+# ==============================================================================
+# INTERPRETACE VÝSLEDKŮ PRO MANAŽERSKÝ GRAF
+# ==============================================================================
+# Výpočet dopadu v %: (1 - Odds Ratio) * 100
+# Kladná hodnota (+) = snížení rizika odchodu (faktor, který drží klienta)
+# Záporná hodnota (-) = zvýšení rizika odchodu
+# ------------------------------------------------------------------------------
+
+# 1. LOYX (Loajalita a doporučení)
+# OR: 0.4886 | Dopad: +51 % | p < 0.001 (VÝZNAMNÉ)
+# Klíčový faktor stability. Zvýšení loajality o 1 bod sníží šanci na odchod o 51 %.
+
+# 2. IMAG (Image a důvěryhodnost banky)
+# OR: 0.7605 | Dopad: +24 % | p = 0.024 (VÝZNAMNÉ)
+# Významný faktor. Lepší reputace snižuje riziko odchodu o 24 %.
+
+# 3. SAT (Celková spokojenost)
+# OR: 0.8669 | Dopad: +13 % | p = 0.372 (NEVÝZNAMNÉ)
+# Matematický náznak vlivu existuje, ale statisticky není v datech průkazný.
+
+# 4. EXPE (Očekávání a zkušenosti)
+# OR: 0.9168 | Dopad: +8 %  | p = 0.605 (NEVÝZNAMNÉ)
+# Nízký a statisticky neprůkazný vliv na rozhodování o odchodu.
+
+# 5. VAL (Vnímaná hodnota / Cena)
+# OR: 0.9440 | Dopad: +6 %  | p = 0.793 (NEVÝZNAMNÉ)
+# Cena a hodnota nejsou pro odchod klientů v tomto modelu rozhodující.
+
+# 6. QUAL (Kvalita produktů a poradenství)
+# OR: 1.0456 | Dopad: -5 %  | p = 0.799 (NEVÝZNAMNÉ)
+# OR > 1 naznačuje mírný negativní vliv, ale výsledek je statisticky náhodný.
+# ------------------------------------------------------------------------------

@@ -119,26 +119,123 @@ X_reduced
 # Kolik procent informace tyto proměnné obsahují?
 # - První tři komponenty vysvětlují přibližně 66 % variability dat.
 
+X_scaled <- scale(X)
+fa <- factanal(X_scaled, factors = 3, rotation = "varimax", scores = "Bartlett")
+print(fa$loadings, cutoff = 0.4)
+
+# ===================== FAKTOROVÁ ANALÝZA =====================
+
+# ---------------------------------------------------------------------------
+# FAKTOR 1 – „Fenolické látky (chuť, struktura, kvalita)“
+#
+# Proměnná                         Váha     Význam
+# ---------------------------------------------------------------------------
+# Flavanoids                       0.928    hlavní fenoly (chuť, hořkost)
+# OD280/OD315                      0.864    kvalita a koncentrace fenolů
+# Total.phenols                    0.824    celkové množství fenolů
+# Hue                              0.654    odstín barvy (souvisí s fenoly)
+# Proanthocyanin                   0.622    třísloviny (svíravost)
+# Nonflavanoid.phenols            -0.533    jiný typ fenolů (opačný efekt)
+#
+# Laická interpretace:
+# -> Tento faktor říká, jak moc je víno „chemicky bohaté“ na látky,
+#    které ovlivňují chuť, hořkost a kvalitu.
+# -> Vysoká hodnota = plnější chuť, více tříslovin, „kvalitnější struktura“
+# ---------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------
+# FAKTOR 2 – „Síla a tělnatost vína“
+#
+# Proměnná                         Váha     Význam
+# ---------------------------------------------------------------------------
+# Alcohol                          0.779    obsah alkoholu
+# Color.intensity                  0.748    intenzita barvy
+# Proline                          0.688    koncentrace látek (zrání, kvalita)
+#
+# Laická interpretace:
+# -> Tento faktor říká, jak „silné“ a „hutné“ víno je.
+# -> Vysoká hodnota = více alkoholu, tmavší barva, více extraktu
+# -> typicky „těžší“ víno (plnější tělo)
+# ---------------------------------------------------------------------------
+
+
+# ---------------------------------------------------------------------------
+# FAKTOR 3 – „Minerální složení“
+#
+# Proměnná                         Váha     Význam
+# ---------------------------------------------------------------------------
+# Alcalinity.of.ash                0.856    zásaditost (chemická rovnováha)
+# Ash                              0.629    obsah minerálů
+#
+# Laická interpretace:
+# -> Tento faktor popisuje „minerální charakter“ vína.
+# -> Vysoká hodnota = více minerálů, jiná chemická stabilita
+# -> souvisí s půdou a chemickým složením
+# ---------------------------------------------------------------------------
+
+
+# ===================== VYSVĚTLENÁ VARIABILITA =====================
+# Faktor 1: 30.8 %
+# Faktor 2: 17.5 %
+# Faktor 3: 10.0 %
+# CELKEM:   58.4 %
+#
+# -> Faktory dohromady vystihují cca 58 % variability.
+# =================================================================
 
 
 # 3. Je možné na základě chemické analýzy vzorku vína poznat, ke které odrůdě víno patří? Určete vhodnou funkci / funkce, které Vám neznámý vzorek pomohou přiřadit ke správné skupině. Jak je taková rozhodovací funkce dobrá? A kolik takovýchto funkcí potřebujete?
 
 library(MASS)
 
-lda_model <- lda(wine$Cultivar ~ ., data = as.data.frame(X_reduced))
-lda_pred <- predict(lda_model)
+set.seed(456)
 
-cat("Matice záměn:\n")
-print(table(Predicted = lda_pred$class, True = wine$Cultivar))
+X <- setdiff(colnames(wine), "Cultivar")
+Y <- wine$Cultivar
 
-cat("\nÚspěšnost klasifikace:\n")
-cat(sprintf("%.2f %%\n", 100 * mean(lda_pred$class == wine$Cultivar)))
+row_count <- nrow(wine)
 
+train_indices <- sample(1:row_count, 0.8 * row_count)
+train_data <- wine[train_indices, ]
+
+test_indices <- setdiff(1:row_count, train_indices)
+test_data <- wine[test_indices, ]
+
+# Zvolil jsem tzv. uniformní apriorní pravděpodobnosti, protože chci aby:
+# - všechny odrůdy měli na startu stejnou šanci, resp. nechci modelu napovídat, která odruda je reálně častější
+# - říkám, že všechny odrudy jsou v datech zastoupeny rovnoměrně
+# - z dat nevíme, jaká je reálná distribuce vín na trhu, tedy chceme distribuční funkci, která bude nestranná
+# Dělám to zkrátka proto, abych zajistil, že výsledná klasifikace bude založena čistě na chemických rozdílech mezi víny.
+# Tím zabráním tomu, aby model 'nadržoval' některé odrůdě jen proto, že je v tréninkových datech náhodou zastoupena vícekrát.
+prior_probability <- c(1/3, 1/3, 1/3)
+lda_model <- lda(formula = Cultivar ~ ., data = train_data, prior = c(1/3, 1/3, 1/3))
+
+predictions <- predict(object = lda_model, newdata = test_data)
+
+confusion_matrix <- table(Predicted = predictions$class, Actual = test_data$Cultivar)
+print(confusion_matrix)
+
+accuracy <- mean(predictions$class == test_data$Cultivar)
+cat("Přesnost predikce na testovacích datech:", round(accuracy * 100, 2), "%")
+
+# Diskriminační funkce(LD1) pokrývá téměř 74 % rozlišovací informace mezi odrůdami.
+# Druhá funkce (LD2) doplňuje zbývajících 26 %.
+# Dohromady tyto dvě funkce vysvětlují 100 % variability mezi skupinami, což znamená, že dvourozměrný graf LD1 vs. LD2
+# je dokonalou reprezentací toho, jak se od sebe odrůdy chemicky liší, a neztrácíme tímto zobrazením žádnou informaci podstatnou pro klasifikaci.
 cat("\nPodíl diskriminační informace (LD1, LD2):\n")
 print(lda_model$svd^2 / sum(lda_model$svd^2))
 
-plot(lda_pred$x[, 1], lda_pred$x[, 2], col = wine$Cultivar, pch = 19, xlab = "LD1", ylab = "LD2")
-legend("topright", legend = levels(wine$Cultivar), col = 1:length(levels(wine$Cultivar)), pch = 19)
+plot(predictions$x[, 1], predictions$x[, 2], 
+     col = test_data$Cultivar,
+     pch = 19, 
+     xlab = "LD1", ylab = "LD2", 
+     main = "LDA: Klasifikace testovacích vzorků")
+
+legend("topright",
+       legend = levels(test_data$Cultivar), 
+       col = 1:length(levels(test_data$Cultivar)), 
+       pch = 19)
 
 # ODPOVĚDI NA OTÁZKY:
 
@@ -177,10 +274,31 @@ table(cluster_3, wine$Cultivar)
 clusters <- cutree(hc_ward, k = 3)
 aggregate(X, by = list(Cluster = clusters), mean)
 
+
+set.seed(123)
+km_model <- kmeans(x = X_scaled, centers = 3, nstart = 25)
+clusters_kmeans <- km_model$cluster
+
+comparison_table <- table(Ward = cluster_3, Kmeans = clusters_kmeans)
+print("Srovnání metod Ward a K-means:")
+print(comparison_table)
+
+cluster_profiles <- aggregate(X, by = list(Cluster_ID = clusters_kmeans), FUN = mean)
+print("Průměrné hodnoty chemických vlastností v shlucích (K-means):")
+print(cluster_profiles)
+
+pca_res <- prcomp(X_scaled)
+plot(pca_res$x[,1], pca_res$x[,2], col = clusters_kmeans, pch = 19,
+     xlab = "PC1", ylab = "PC2", main = "Vizualizace K-means shluků")
+legend("topright", legend = paste("Shluk", 1:3), col = 1:3, pch = 19)
+
+
+
 # ODPOVĚDI NA OTÁZKY:
 
 # Jaké metody byly vyzkoušeny?
 # - Hierarchické shlukování metodou Ward s různým počtem shluků (k = 2, 3, 4).
+# - Nehiearchické shlukování metodou K-means.
 
 # Kolik skupin bylo zvoleno jako optimální?
 # - 3 shluky.
@@ -188,3 +306,7 @@ aggregate(X, by = list(Cluster = clusters), mean)
 # Jak lze jednotlivé skupiny charakterizovat?
 # - Skupiny se liší zejména obsahem fenolů (Total.phenols), alkoholu (Alcohol),
 # intenzitou barvy (Color.intensity) a minerálním složením vína (Ash, Alcalinity.of.ash, Magnesium).
+
+# Shluk 1 (Těžší, kyselá vína): Nejvyšší kyselost (Malic.acid 3.31) a intenzita barvy (7.23). Nejnižší obsah flavonoidů (0.82) a nejnižší kvalita fenolů.
+# Shluk 2 (Silná, prémiová vína): Nejvyšší alkohol (13.68 %), hořčík (107.97) a extrémně vysoký prolin (1100.23). Nejbohatší na antioxidanty (OD280/OD315 3.16).
+# Shluk 3 (Lehká, jemná vína): Nejnižší alkohol (12.25 %) a nejnižší barva (2.97). Celkově nejnižší obsah minerálů a prolinu.
