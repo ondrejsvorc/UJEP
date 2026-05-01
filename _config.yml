@@ -1,0 +1,37 @@
+title: UJEP materiály
+description: Digitální rozcestník studijních materiálů z UJEP.
+remote_theme: pages-themes/primer@v0.6.0
+repository: ondrejsvorc/UJEP
+
+url: "https://ujep.ondrejsvorc.cz"
+baseurl: "" 
+
+plugins:
+  - jekyll-remote-theme
+  - jekyll-github-metadata
+  - jekyll-include-cache
+  - jekyll-seo-tag
+
+defaults:
+  - scope:
+      path: ""
+    values:
+      layout: default
+
+markdown: kramdown
+kramdown:
+  input: GFM
+  hard_wrap: false
+  autolink: true
+  syntax_highlighter: rouge
+
+exclude:
+  - .git
+  - .cursor
+  - vendor
+  - pipeline.yml
+  - generate_index.py
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
